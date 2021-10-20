@@ -1,13 +1,26 @@
 {
-    "name": "syntaxfix",
-    "displayName": "SyntaxFix",
+    "name": "better-snippets",
+    "displayName": "Better Snippets",
     "publisher": "zardoy",
     "version": "0.1.0",
     "categories": [
         "Other"
     ],
     "contributes": {
-        "commands": [],
+        "commands": [
+            {
+                "command": "completionInsert",
+                "title": "CompletionInsert"
+            }
+        ],
+        "menus": {
+            "commandPalette": [
+                {
+                    "command": "completionInsert",
+                    "when": "false"
+                }
+            ]
+        },
         "configuration": {
             "properties": {
                 "customSnippets": {
@@ -34,15 +47,16 @@
                                                         "type": "string",
                                                         "enum": [
                                                             "lineStart",
+                                                            "topLineStart",
                                                             "fileStart",
                                                             "stringLiteral",
                                                             "inComments"
                                                         ],
-                                                        "description": "Unimplemented: inComments"
+                                                        "description": "Unimplemented: inComments. topLineStart means line start without indendation, useful for top-level declaration snippets, like `export const`"
                                                     },
                                                     {
                                                         "type": "object",
-                                                        "description": "TODO: move to triggerSymbol top-prop",
+                                                        "description": "TODO: move to triggerSymbol top-prop. UNIMPLEMENTED",
                                                         "properties": {
                                                             "afterSymbol": {
                                                                 "type": "string",
@@ -109,7 +123,7 @@
         }
     },
     "activationEvents": [
-        "onLanguage:typescript"
+        "onStartupFinished"
     ],
     "capabilities": {
         "untrustedWorkspaces": {
