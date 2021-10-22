@@ -3,7 +3,6 @@ import { extensionCtx, getExtensionSetting } from 'vscode-framework'
 
 export const activate = () => {
     const disposables: vscode.Disposable[] = []
-
     const unregisterSnippets = () => {
         for (const disposable of disposables) disposable.dispose()
     }
@@ -25,11 +24,10 @@ export const activate = () => {
                 provideCompletionItems(document, position) {
                     // investigate: positionaAt, offsetAT
                     const lineText = document.lineAt(position.line)
-                    for (const { body, locations, pathRegex } of snippets) {
-                        // TODO ensure; relative path
-                        if (pathRegex && document.uri.path.match(pathRegex)) continue
-                        // if (locations)
-                    }
+                    // TODO ensure; relative path
+                    for (const { body, locations, pathRegex } of snippets) if (pathRegex && pathRegex.test(document.uri.path)) continue
+                    // if (locations)
+
                     console.log('Trigger!')
                     return []
                 },
