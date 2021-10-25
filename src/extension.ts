@@ -1,23 +1,49 @@
-import { getExtensionSetting } from 'vscode-framework'
 import vscode from 'vscode'
+import { extensionCtx, getExtensionSetting } from 'vscode-framework'
 
-// settings: also suggest to install @types/node if package.json has typescript
 export const activate = () => {
-    // onDidChange...
-    vscode.languages.registerCompletionItemProvider(
-        {
-            language: 'markdown',
-        },
-        {
-            provideCompletionItems(document, position, _, trigger) {
-                console.log('trigger')
-                const completions: vscode.CompletionItem[] = []
+    const disposables: vscode.Disposable[] = []
+    const unregisterSnippets = () => {
+        for (const disposable of disposables) disposable.dispose()
+    }
 
-                const snippets = getExtensionSetting('customSnippets')
+    const registerSnippets = () => {
+        const customSnippets = getExtensionSetting('customSnippets')
+        const languageSnippets: Record<string, Array<{ body: string; locations?: string[]; pathRegex?: string }>> = {}
+        for (const [label, config] of Object.entries(customSnippets)) {
+            const { body, when = {} } = config
+            const { languages = ['*'], ...rest } = when
+            for (const language of languages) {
+                if (!languageSnippets[language]) languageSnippets[language] = []
+                languageSnippets[language]!.push({ body, ...rest })
+            }
+        }
 
-                return []
-            },
-        },
-        '<',
-    )
+        for (const [language, snippets] of Object.entries(languageSnippets)) {
+            const disposable = vscode.languages.registerCompletionItemProvider(language, {
+                provideCompletionItems(document, position) {
+                    // investigate: positionaAt, offsetAT
+                    const lineText = document.lineAt(position.line)
+                    // TODO ensure; relative path
+                    for (const { body, locations, pathRegex } of snippets) if (pathRegex && pathRegex.test(document.uri.path)) continue
+                    // if (locations)
+
+                    console.log('Trigger!')
+                    return []
+                },
+            })
+            extensionCtx.subscriptions.push(disposable)
+            disposables.push(disposable)
+        }
+    }
+
+    registerSnippets()
+    vscode.workspace.onDidChangeConfiguration(({ affectsConfiguration }) => {
+        const snippetsChanged = affectsConfiguration('better-snippets.customSnippets')
+        if (snippetsChanged) {
+            console.log('Snippets updated')
+            unregisterSnippets()
+            registerSnippets()
+        }
+    })
 }
