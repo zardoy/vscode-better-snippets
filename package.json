@@ -38,7 +38,7 @@
                                 "when": {
                                     "type": "object",
                                     "properties": {
-                                        "location": {
+                                        "locations": {
                                             "type": "array",
                                             "description": "By default displays everywhere, specify to suggest only in these location",
                                             "items": {
@@ -147,5 +147,8 @@
         "eslint-plugin-zardoy-config": "^0.1.0",
         "typescript": "^4.4.4",
         "vscode-framework": "^0.0.7"
+    },
+    "dependencies": {
+        "got": "^11.8.2"
     }
 }

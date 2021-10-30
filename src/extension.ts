@@ -23,9 +23,19 @@ export const activate = () => {
             const disposable = vscode.languages.registerCompletionItemProvider(language, {
                 provideCompletionItems(document, position) {
                     // investigate: positionaAt, offsetAT
-                    const lineText = document.lineAt(position.line)
+                    const currentLine = document.lineAt(position.line)
                     // TODO ensure; relative path
-                    for (const { body, locations, pathRegex } of snippets) if (pathRegex && pathRegex.test(document.uri.path)) continue
+                    for (const { body, locations, pathRegex } of snippets) {
+                        // eslint-disable-next-line zardoy-config/unicorn/prefer-regexp-test
+                        if (pathRegex && (!document.uri?.path || !document.uri.path.match(pathRegex))) continue
+                        if (locations) {
+                            for (const location of locations) {
+                                if (location === 'topLineStart') {
+                                    // const showIt = currentLine.text === '' || suggestions.some(({ label }) => (label as string).startsWith(currentLine))
+                                }
+                            }
+                        }
+                    }
                     // if (locations)
 
                     console.log('Trigger!')
