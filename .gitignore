@@ -3,6 +3,7 @@
 node_modules
 .vscode-test-web
 
+src/generated.ts
 build
 dist
 out
