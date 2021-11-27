@@ -3,7 +3,6 @@
 node_modules
 .vscode-test-web
 
-src/generated.ts
 build
 dist
 out
@@ -23,3 +22,7 @@ experiment-*
 .env.*.local
 
 .vscode-test
+
+out
+src/generated.ts
+src/configurationTypeCache.jsonc

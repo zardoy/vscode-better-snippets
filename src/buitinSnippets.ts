@@ -2,43 +2,71 @@ import vscode from 'vscode'
 import { getExtensionSetting } from 'vscode-framework'
 
 export const registerBuitinSnippets = () => {
+    const builtinSnippets = getExtensionSetting('enableBuiltinSnippets')
     // TODO unregister with setting
-    if (!getExtensionSetting('builtinSnippets')) return
-    // postfix
+    if (!builtinSnippets) return
+
+    if (builtinSnippets !== true) return
+
     vscode.languages.registerCompletionItemProvider(
+        ['typescript', 'javascript', 'typescriptreact', 'javascriptreact'],
         {
-            language: 'typescript',
-        },
-        {
-            provideCompletionItems(document, position, token, context) {
-                // LINE END Snippets
-                const line = document.lineAt(position)
-                if (line.range.end.character !== position.character) return
+            provideCompletionItems(document, endPos, token, context) {
+                console.debug('asked', endPos)
+                // LINE END SNIPPET!
+                const line = document.lineAt(endPos)
+                if (line.range.end.character !== endPos.character) return
                 const lineText = line.text
                 const completions: vscode.CompletionItem[] = []
-                if (lineText.includes('||') || lineText.includes('&&') || (lineText.includes('==') && lineText.endsWith('.if'))) {
-                    const startPos = new vscode.Position(position.line, line.firstNonWhitespaceCharacterIndex)
-                    const snippetLabel = 'if'
-                    const completion = new vscode.CompletionItem({ label: snippetLabel, description: 'Better Snippets Postfix' })
+                // #region .if
+                // simple inline .if postfix. doesn't work with multiline, will be migrated to postfix extension
+                if ('|| && == !='.split(' ').some(predicate => lineText.includes(predicate))) {
+                    console.debug('should  be here')
+                    const startPos = new vscode.Position(endPos.line, line.firstNonWhitespaceCharacterIndex)
+                    const completion = new vscode.CompletionItem({ label: 'if', description: 'Better Snippets Postfix' }, vscode.CompletionItemKind.Snippet)
                     // completion.range = new vscode.Range(position.translate(0, -1), line.range.end)
                     completion.insertText = ') '
+                    const lastDotPos = new vscode.Position(endPos.line, lineText.lastIndexOf('.'))
                     completion.additionalTextEdits = [
-                        { range: new vscode.Range(startPos, startPos), newText: 'if (' },
                         {
-                            range: new vscode.Range(position.translate(0, -(snippetLabel.length + 1)), position.translate(0, -snippetLabel.length)),
+                            range: new vscode.Range(lastDotPos, lastDotPos.translate(0, 1)),
                             newText: '',
                         },
+                        { range: new vscode.Range(startPos, startPos), newText: 'if (' },
                     ]
+                    // TODO setting
+                    // its just simply fast!
+                    const eqeqRegex = /[^=]==[^=]/g
+                    let match
+                    while ((match = eqeqRegex.exec(lineText))) {
+                        const startPos = new vscode.Position(endPos.line, match.index + 1)
+                        completion.additionalTextEdits.push({
+                            newText: '===',
+                            range: new vscode.Range(startPos, startPos.translate(0, 2)),
+                        })
+                    }
+
+                    const noteqRegex = /!=[^=]/g
+                    while ((match = noteqRegex.exec(lineText))) {
+                        const startPos = new vscode.Position(endPos.line, match.index)
+                        completion.additionalTextEdits.push({
+                            newText: '!==',
+                            range: new vscode.Range(startPos, startPos.translate(0, 2)),
+                        })
+                    }
+
                     completions.push(completion)
                 }
+                // #endregion
 
                 return completions
             },
         },
+        '.',
     )
 
     // export
-    vscode.languages.registerCompletionItemProvider('typescript', {
+    vscode.languages.registerCompletionItemProvider(['typescript', 'javascript', 'typescriptreact', 'javascriptreact'], {
         provideCompletionItems(document, position) {
             const suggestions: vscode.CompletionItem[] = []
             // TODO-low move it to description
