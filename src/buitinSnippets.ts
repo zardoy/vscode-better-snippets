@@ -8,8 +8,9 @@ export const registerBuitinSnippets = () => {
 
     if (builtinSnippets !== true) return
 
+    const jsLangs = ['typescript', 'javascript', 'typescriptreact', 'javascriptreact']
     vscode.languages.registerCompletionItemProvider(
-        ['typescript', 'javascript', 'typescriptreact', 'javascriptreact'],
+        jsLangs,
         {
             provideCompletionItems(document, endPos, token, context) {
                 console.debug('asked', endPos)
@@ -66,7 +67,7 @@ export const registerBuitinSnippets = () => {
     )
 
     // export
-    vscode.languages.registerCompletionItemProvider(['typescript', 'javascript', 'typescriptreact', 'javascriptreact'], {
+    vscode.languages.registerCompletionItemProvider(jsLangs, {
         provideCompletionItems(document, position) {
             const suggestions: vscode.CompletionItem[] = []
             // TODO-low move it to description
@@ -74,6 +75,9 @@ export const registerBuitinSnippets = () => {
             const constCompletion = new vscode.CompletionItem('er', vscode.CompletionItemKind.Event)
             constCompletion.insertText = new vscode.SnippetString('export const $1 = ')
             suggestions.push(constCompletion)
+            const typeCompletion = new vscode.CompletionItem('et', vscode.CompletionItemKind.Event)
+            typeCompletion.insertText = new vscode.SnippetString('export type $1 = ')
+            suggestions.push(typeCompletion)
 
             // em = Export Method
             const methodCompletion = new vscode.CompletionItem('em', vscode.CompletionItemKind.Event)

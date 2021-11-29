@@ -1,3 +1,6 @@
 {
-    "extends": ["plugin:zardoy-config/recommended"]
+    "extends": ["plugin:zardoy-config/recommended"],
+    "rules": {
+        "no-template-curly-in-string": "off"
+    }
 }

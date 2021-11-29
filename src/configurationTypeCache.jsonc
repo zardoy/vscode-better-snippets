@@ -1,0 +1,85 @@
+// GENERATED. DON'T EDIT MANUALLY
+// md5hash: b1133a33eb441d6c98ddca7b50e500f4
+{
+    "type": "object",
+    "properties": {
+        "enableBuiltinSnippets": {
+            "description": "Boolean or object to enable variants of snippets exclusively",
+            "default": true,
+            "anyOf": [
+                {
+                    "type": "object",
+                    "properties": {
+                        "postfixes": {
+                            "default": false,
+                            "type": "boolean"
+                        },
+                        "other": {
+                            "default": false,
+                            "type": "boolean"
+                        }
+                    }
+                },
+                {
+                    "type": "boolean"
+                }
+            ]
+        },
+        "customSnippets": {
+            "type": "object",
+            "additionalProperties": {
+                "type": "object",
+                "properties": {
+                    "body": {
+                        "type": "string"
+                    },
+                    "when": {
+                        "type": "object",
+                        "properties": {
+                            "languages": {
+                                "description": "Don't specify to enabled in all languages",
+                                "type": "array",
+                                "items": {
+                                    "type": "string"
+                                }
+                            },
+                            "locations": {
+                                "description": "By default displays anywhere, specify to suggest only in following locations",
+                                "type": "array",
+                                "items": {
+                                    "anyOf": [
+                                        {
+                                            "type": "object",
+                                            "properties": {
+                                                "afterSymbol": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "enum": [
+                                                "fileStart",
+                                                "inComments",
+                                                "lineStart",
+                                                "stringLiteral",
+                                                "topLineStart"
+                                            ],
+                                            "type": "string"
+                                        }
+                                    ]
+                                }
+                            },
+                            "pathRegex": {
+                                "description": "Regexp against relative path. Example: tsconfig.json$. TODO: fileTypes top: package.json\ntsconfig.json etc",
+                                "type": "string"
+                            }
+                        }
+                    }
+                },
+                "required": [
+                    "body"
+                ]
+            }
+        }
+    }
+}
