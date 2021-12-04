@@ -30,7 +30,7 @@ export const registerPostfixSnippets = () => {
                     ]
                     // TODO remove it!
                     // though its just simply fast!
-                    const eqeqRegex = /[^=]==[^=]/g
+                    const eqeqRegex = /[^=!]==[^=]/g
                     let match: RegExpExecArray | null
                     while ((match = eqeqRegex.exec(lineText))) {
                         const startPos = new vscode.Position(endPos.line, match.index + 1)
