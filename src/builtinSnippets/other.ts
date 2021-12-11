@@ -17,7 +17,7 @@ export const registerOtherSnippets = () => {
 
             // em = Export Method
             const methodCompletion = new vscode.CompletionItem('em', vscode.CompletionItemKind.Event)
-            methodCompletion.insertText = new vscode.SnippetString('export const ${1:method} = ($2) => ')
+            methodCompletion.insertText = new vscode.SnippetString('export const ${1:method} = ($2) => {}')
             // methodCompletion.command = {
             //     command: 'better-snippets.completionInsert',
             //     title: '',
