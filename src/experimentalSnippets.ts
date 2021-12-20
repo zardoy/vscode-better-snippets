@@ -1,12 +1,11 @@
 import vscode from 'vscode'
-import { jsLangs } from '../util'
+import { jsLangs } from './util'
 
 export const registerPostfixSnippets = () => {
-    vscode.languages.registerCompletionItemProvider(
+    return vscode.languages.registerCompletionItemProvider(
         jsLangs,
         {
             provideCompletionItems(document, endPos, token, context) {
-                console.debug('asked', endPos)
                 // LINE END SNIPPET!
                 const line = document.lineAt(endPos)
                 if (line.range.end.character !== endPos.character) return
@@ -20,6 +19,7 @@ export const registerPostfixSnippets = () => {
                     const completion = new vscode.CompletionItem({ label: 'if', description: 'Better Snippets Postfix' }, vscode.CompletionItemKind.Snippet)
                     // completion.range = new vscode.Range(position.translate(0, -1), line.range.end)
                     completion.insertText = ') '
+                    completion.sortText = '!100'
                     const lastDotPos = new vscode.Position(endPos.line, lineText.lastIndexOf('.'))
                     completion.additionalTextEdits = [
                         {

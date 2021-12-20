@@ -1,73 +1,133 @@
-import vscode from 'vscode'
-import { extensionCtx, getExtensionSetting } from 'vscode-framework'
-import { registerBuitinSnippets } from './buitinSnippets'
+/* eslint-disable unicorn/prefer-regexp-test */
+import { SnippetParser } from 'vscode-snippet-parser'
+import * as vscode from 'vscode'
+import { mergeDeepRight } from 'rambda'
+import { DeepRequired } from 'ts-essentials'
+import { extensionCtx, getExtensionSetting, getExtensionSettingId } from 'vscode-framework'
+import { omitObj, pickObj } from '@zardoy/utils'
+import { Configuration } from './configurationType'
+import { normalizeFilePathRegex, normalizeLanguages, normalizeRegex } from './util'
+import { builtinSnippets } from './builtinSnippets'
+import { registerPostfixSnippets } from './experimentalSnippets'
+
+const unmergedSnippetDefaults: DeepRequired<Configuration['customSnippetDefaults']> = {
+    sortText: undefined!,
+    type: 'Snippet',
+    group: 'Better Snippet',
+    when: {
+        languages: ['js'],
+        locations: ['code'],
+        pathRegex: undefined!,
+    },
+}
 
 export const activate = () => {
-    const disposables: vscode.Disposable[] = []
-    const unregisterSnippets = () => {
-        for (const disposable of disposables) disposable.dispose()
+    let disposables: vscode.Disposable[] = []
+
+    type CustomSnippetUnresolved = Configuration['customSnippets'][number]
+    type CustomSnippet = CustomSnippetUnresolved & typeof unmergedSnippetDefaults
+
+    // #region snippetDefaults
+    let snippetDefaults: DeepRequired<Configuration['customSnippetDefaults']>
+    function updateSnippetDefaults() {
+        snippetDefaults = mergeDeepRight(unmergedSnippetDefaults, getExtensionSetting('customSnippetDefaults'))
     }
 
-    // const registerSnippets = () => {
-    //     const customSnippets = getExtensionSetting('customSnippets')
-    //     const languageSnippets: Record<string, Array<{ body: string; locations?: string[]; pathRegex?: string }>> = {}
-    //     for (const [label, config] of Object.entries(customSnippets)) {
-    //         const { body, when = {} } = config
-    //         const { languages = ['*'], ...rest } = when
-    //         for (const language of languages) {
-    //             if (!languageSnippets[language]) languageSnippets[language] = []
-    //             languageSnippets[language]!.push({ body, ...rest })
-    //         }
-    //     }
+    updateSnippetDefaults()
+    vscode.workspace.onDidChangeConfiguration(({ affectsConfiguration }) => {
+        if (affectsConfiguration(getExtensionSettingId('customSnippetDefaults'))) updateSnippetDefaults()
+    })
+    // #endregion
 
-    //     for (const [language, snippets] of Object.entries(languageSnippets)) {
-    //         const disposable = vscode.languages.registerCompletionItemProvider(language, {
-    //             provideCompletionItems(document, position) {
-    //                 // investigate: positionaAt, offsetAT
-    //                 const currentLine = document.lineAt(position.line)
-    //                 // TODO ensure; relative path
-    //                 const completions: vscode.CompletionItem[] = []
+    const mergeSnippetWithDefaults = (snippet: CustomSnippetUnresolved): CustomSnippet =>
+        mergeDeepRight(
+            {
+                ...omitObj(snippetDefaults, 'sortText', 'when'),
+                ...(snippet.sortText ? {} : pickObj(snippetDefaults, 'sortText')),
+                when: omitObj(snippetDefaults.when, 'pathRegex'),
+            } as CustomSnippet,
+            snippet,
+        )
 
-    //                 const addCompletion = (prefix: string, body: string) => {
-    //                     // add special handling of .
-    //                     const completion = new vscode.CompletionItem({ label: prefix, description: 'Better Snippet' }, vscode.CompletionItemKind.Event)
-    //                     completions.push(completion)
-    //                 }
+    const registerSnippets = () => {
+        const customSnippets = [...getExtensionSetting('customSnippets'), ...(getExtensionSetting('enableBuiltinSnippets') ? builtinSnippets : [])]
 
-    //                 for (const { body, locations, pathRegex } of snippets) {
-    //                     // eslint-disable-next-line zardoy-config/unicorn/prefer-regexp-test
-    //                     if (pathRegex && (!document.uri?.path || !document.uri.path.match(pathRegex))) continue
-    //                     if (locations) {
-    //                         for (const location of locations) {
-    //                             if (location === 'fileStart' && position.line !== 0) {
-    //                                 if (position.character === 0) addCompletion()
-    //                             }
-    //                             if (location === 'topLineStart') {
-    //                                 // TODO filter mode: starts or include
-    //                                 if (currentLine)
-    //                                     const showIt = currentLine.text === '' || suggestions.some(({ label }) => (label as string).startsWith(currentLine))
-    //                             }
-    //                         }
-    //                     }
-    //                 }
+        const languageSnippets: { [language: string]: CustomSnippet[] } = {}
+        for (const customSnippetRaw of customSnippets) {
+            const customSnippet = mergeSnippetWithDefaults(customSnippetRaw)
+            for (const language of customSnippet.when.languages) {
+                if (!languageSnippets[language]) languageSnippets[language] = []
+                languageSnippets[language]!.push(customSnippet)
+            }
+        }
 
-    //                 return completions
-    //             },
-    //         })
-    //         extensionCtx.subscriptions.push(disposable)
-    //         disposables.push(disposable)
-    //     }
-    // }
+        for (const [language, snippets] of Object.entries(languageSnippets)) {
+            const disposable = vscode.languages.registerCompletionItemProvider(normalizeLanguages(language), {
+                // eslint-disable-next-line @typescript-eslint/no-loop-func
+                provideCompletionItems(document, position, _token, context) {
+                    if (context.triggerKind !== vscode.CompletionTriggerKind.Invoke) return
+                    console.log('Trigger suggestions')
+                    // const source = ts.createSourceFile('test.ts', document.getText(), ts.ScriptTarget.ES5, true)
+                    // const pos = source.getPositionOfLineAndCharacter(position.line, position.character)
+                    // const node = findNodeAtPosition(source, pos)
+                    // const nodeKind = node.kind
+                    // const commentKind = [ts.SyntaxKind.JSDocComment, ts.SyntaxKind.MultiLineCommentTrivia, ts.SyntaxKind.SingleLineCommentTrivia]
+                    // console.log(ts.isStringLiteralLike(node), ts.isJsxText(node), commentKind.includes(nodeKind), ts.SyntaxKind[nodeKind])
 
-    // registerSnippets()
-    // vscode.workspace.onDidChangeConfiguration(({ affectsConfiguration }) => {
-    //     const snippetsChanged = affectsConfiguration('better-snippets.customSnippets')
-    //     if (snippetsChanged) {
-    //         console.log('Snippets updated')
-    //         unregisterSnippets()
-    //         registerSnippets()
-    //     }
-    // })
+                    const line = document.lineAt(position.line)
+                    const lineText = line.text
+                    // TODO ensure; relative path
+                    const completions: vscode.CompletionItem[] = []
 
-    registerBuitinSnippets()
+                    for (const { body, when, name, group, type, ...params } of snippets) {
+                        let currentLocation
+                        const addCompletion = () => {
+                            // todo add special handling of .
+                            console.log(`Snippet ${name} included. Reason: ${currentLocation}`)
+                            const completion = new vscode.CompletionItem({ label: name, description: group }, vscode.CompletionItemKind[type])
+                            completion.sortText = params.sortText
+                            const snippetText = Array.isArray(body) ? body.join('\n') : body
+                            const snippet = new vscode.SnippetString(snippetText)
+                            completion.insertText = snippet
+                            completion.documentation = new vscode.MarkdownString().appendCodeblock(new SnippetParser().text(snippetText), document.languageId)
+                            if (!completion.documentation) completion.documentation = undefined
+                            completions.push(completion)
+                        }
+
+                        const { locations, pathRegex, fileType, lineHasRegex } = when
+                        const docPath = document.uri.path
+                        if (snippetDefaults.when.pathRegex && !docPath.match(normalizeRegex(snippetDefaults.when.pathRegex))) continue
+                        if (pathRegex && !docPath.match(normalizeFilePathRegex(pathRegex, fileType))) continue
+                        if (lineHasRegex && !lineText.match(normalizeRegex(lineHasRegex))) continue
+                        for (const location of locations) {
+                            currentLocation = location
+                            if (location === 'fileStart' && position.line !== 0 && name.startsWith(lineText)) addCompletion()
+                            if (location === 'topLineStart' && name.startsWith(lineText)) addCompletion()
+                            if (location === 'lineStart' && name.startsWith(lineText.trim())) addCompletion()
+                            if (location === 'code') addCompletion()
+                        }
+                    }
+
+                    return completions
+                },
+            })
+            disposables.push(disposable, registerPostfixSnippets())
+            extensionCtx.subscriptions.push(...disposables)
+        }
+    }
+
+    registerSnippets()
+    vscode.workspace.onDidChangeConfiguration(({ affectsConfiguration }) => {
+        if (
+            affectsConfiguration(getExtensionSettingId('customSnippets')) ||
+            affectsConfiguration(getExtensionSettingId('customSnippetDefaults')) ||
+            affectsConfiguration(getExtensionSettingId('enableBuiltinSnippets')) ||
+            affectsConfiguration(getExtensionSettingId('enableExperimentalSnippets'))
+        ) {
+            console.log('Snippets updated')
+            vscode.Disposable.from(...disposables).dispose()
+            disposables = []
+            registerSnippets()
+        }
+    })
 }

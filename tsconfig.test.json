@@ -1,0 +1,8 @@
+{
+    "extends": "@zardoy/tsconfig/node",
+    "compilerOptions": {
+        "outDir": "testsOut",
+        "noEmit": false
+    },
+    "include": ["test"]
+}

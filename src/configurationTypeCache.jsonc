@@ -1,85 +1,144 @@
 // GENERATED. DON'T EDIT MANUALLY
-// md5hash: b1133a33eb441d6c98ddca7b50e500f4
+// md5hash: 9dd68629878473d16fb0bf52a7c082ef
 {
     "type": "object",
     "properties": {
         "enableBuiltinSnippets": {
-            "description": "Boolean or object to enable variants of snippets exclusively",
+            "description": "Include builtin JS snippets",
             "default": true,
-            "anyOf": [
-                {
-                    "type": "object",
-                    "properties": {
-                        "postfixes": {
-                            "default": false,
-                            "type": "boolean"
-                        },
-                        "other": {
-                            "default": false,
-                            "type": "boolean"
-                        }
-                    }
-                },
-                {
-                    "type": "boolean"
-                }
-            ]
+            "type": "boolean"
+        },
+        "enableExperimentalSnippets": {
+            "description": "Whether to enable builtin postfix snippets. They may be moved to another extension in future releases",
+            "default": false,
+            "type": "boolean"
         },
         "customSnippets": {
-            "type": "object",
-            "additionalProperties": {
+            "type": "array",
+            "items": {
                 "type": "object",
                 "properties": {
+                    "name": {
+                        "type": "string"
+                    },
                     "body": {
+                        "anyOf": [
+                            {
+                                "type": "array",
+                                "items": {
+                                    "type": "string"
+                                }
+                            },
+                            {
+                                "type": "string"
+                            }
+                        ]
+                    },
+                    "group": {
+                        "type": "string"
+                    },
+                    "sortText": {
+                        "description": "For JS langs only. How to resolve suggested imports if any",
+                        "type": "string"
+                    },
+                    "type": {
                         "type": "string"
                     },
                     "when": {
                         "type": "object",
                         "properties": {
+                            "lineHasRegex": {
+                                "description": "Shouldn't be used with `Start` location as snippet would be hidden in these cases",
+                                "type": "string"
+                            },
                             "languages": {
-                                "description": "Don't specify to enabled in all languages",
+                                "description": "Language identifier. Special ones: styles (css, scss...), js (js, ts, jsx, tsx)",
                                 "type": "array",
                                 "items": {
                                     "type": "string"
                                 }
                             },
                             "locations": {
-                                "description": "By default displays anywhere, specify to suggest only in following locations",
+                                "description": "Specify to restrict showing suggest in specific location",
                                 "type": "array",
                                 "items": {
-                                    "anyOf": [
-                                        {
-                                            "type": "object",
-                                            "properties": {
-                                                "afterSymbol": {
-                                                    "type": "string"
-                                                }
-                                            }
-                                        },
-                                        {
-                                            "enum": [
-                                                "fileStart",
-                                                "inComments",
-                                                "lineStart",
-                                                "stringLiteral",
-                                                "topLineStart"
-                                            ],
-                                            "type": "string"
-                                        }
-                                    ]
+                                    "enum": [
+                                        "code",
+                                        "comment",
+                                        "fileStart",
+                                        "lineStart",
+                                        "topLineStart"
+                                    ],
+                                    "type": "string"
                                 }
                             },
                             "pathRegex": {
-                                "description": "Regexp against relative path. Example: tsconfig.json$. TODO: fileTypes top: package.json\ntsconfig.json etc",
+                                "type": "string"
+                            },
+                            "fileType": {
+                                "description": "Shortcuts for complex path regexs. If specified, `pathRegex` is ignored",
+                                "enum": [
+                                    "package.json",
+                                    "tsconfig.json"
+                                ],
                                 "type": "string"
                             }
                         }
                     }
                 },
                 "required": [
-                    "body"
+                    "body",
+                    "name"
                 ]
             }
+        },
+        "customSnippetDefaults": {
+            "type": "object",
+            "properties": {
+                "sortText": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "group": {
+                    "type": "string"
+                },
+                "when": {
+                    "type": "object",
+                    "properties": {
+                        "languages": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        },
+                        "locations": {
+                            "type": "array",
+                            "items": {
+                                "enum": [
+                                    "code",
+                                    "comment",
+                                    "fileStart",
+                                    "lineStart",
+                                    "topLineStart"
+                                ],
+                                "type": "string"
+                            }
+                        },
+                        "pathRegex": {
+                            "description": "Restrict suggesting all snippets (instead of overriding regexs will be merged)",
+                            "type": "string"
+                        }
+                    }
+                }
+            }
         }
-    }
+    },
+    "required": [
+        "customSnippetDefaults",
+        "customSnippets",
+        "enableBuiltinSnippets",
+        "enableExperimentalSnippets"
+    ]
 }
