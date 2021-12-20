@@ -46,7 +46,7 @@
     "scripts": {
         "start": "vscode-framework start",
         "build": "vscode-framework build",
-        "test": "tsc -p tsconfig.test.json && node testsOut/runTests.js"
+        "test": "echo not-implemented"
     },
     "devDependencies": {
         "@types/chai": "^4.3.0",
