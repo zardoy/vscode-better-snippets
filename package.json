@@ -6,7 +6,13 @@
     "version": "0.0.0-dev",
     "web": true,
     "categories": [
+        "Snippets",
         "Other"
+    ],
+    "keywords": [
+        "snippets",
+        "snippets alternative",
+        "insane snippets"
     ],
     "contributes": {
         "commands": [

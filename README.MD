@@ -4,7 +4,7 @@
 
 Though, it is TypeScript-oriented extension, it can also be used with other languages as well.
 
-The main setting is `betterSnippets.customSnippets`: [example usage](./test/snippets.json).
+The main setting is `betterSnippets.customSnippets`: [example usage](./test/snippets.jsonc).
 
 Snippets in VSCode are always contextless, you can only configure to display them in defined by `scope` language IDs, however this extension you can control snippet:
 
