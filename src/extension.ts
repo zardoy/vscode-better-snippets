@@ -1,9 +1,9 @@
 /* eslint-disable unicorn/prefer-regexp-test */
-import { SnippetParser } from 'vscode-snippet-parser'
 import * as vscode from 'vscode'
+import { SnippetParser } from 'vscode-snippet-parser'
 import { mergeDeepRight } from 'rambda'
 import { DeepRequired } from 'ts-essentials'
-import { extensionCtx, getExtensionSetting, getExtensionSettingId } from 'vscode-framework'
+import { extensionCtx, getExtensionSetting, getExtensionSettingId, registerActiveDevelopmentCommand } from 'vscode-framework'
 import { omitObj, pickObj } from '@zardoy/utils'
 import { Configuration } from './configurationType'
 import { normalizeFilePathRegex, normalizeLanguages, normalizeRegex } from './util'
@@ -62,11 +62,17 @@ export const activate = () => {
         }
 
         for (const [language, snippets] of Object.entries(languageSnippets)) {
+            let triggerFromInner = false
             const disposable = vscode.languages.registerCompletionItemProvider(normalizeLanguages(language), {
                 // eslint-disable-next-line @typescript-eslint/no-loop-func
-                provideCompletionItems(document, position, _token, context) {
+                async provideCompletionItems(document, position, _token, context) {
                     if (context.triggerKind !== vscode.CompletionTriggerKind.Invoke) return
-                    console.log('Trigger suggestions')
+                    if (triggerFromInner) {
+                        triggerFromInner = false
+                        return []
+                    }
+
+                    console.log('Trigger suggestions', vscode.CompletionTriggerKind[context.triggerKind])
                     // const source = ts.createSourceFile('test.ts', document.getText(), ts.ScriptTarget.ES5, true)
                     // const pos = source.getPositionOfLineAndCharacter(position.line, position.character)
                     // const node = findNodeAtPosition(source, pos)
@@ -101,7 +107,7 @@ export const activate = () => {
                         if (lineHasRegex && !lineText.match(normalizeRegex(lineHasRegex))) continue
                         for (const location of locations) {
                             currentLocation = location
-                            if (location === 'fileStart' && position.line !== 0 && name.startsWith(lineText)) addCompletion()
+                            if (location === 'fileStart' && position.line === 0 && name.startsWith(lineText)) addCompletion()
                             if (location === 'topLineStart' && name.startsWith(lineText)) addCompletion()
                             if (location === 'lineStart' && name.startsWith(lineText.trim())) addCompletion()
                             if (location === 'code') addCompletion()
@@ -115,6 +121,21 @@ export const activate = () => {
             extensionCtx.subscriptions.push(...disposables)
         }
     }
+
+    registerActiveDevelopmentCommand(async () => {
+        const activeEditor = vscode.window.activeTextEditor
+        if (!activeEditor) return
+
+        console.time('get completions')
+        const existingCompletions: vscode.CompletionList = (await vscode.commands.executeCommand(
+            'vscode.executeCompletionItemProvider',
+            activeEditor.document.uri,
+            activeEditor.selection.end,
+        )) as any
+        console.timeEnd('get completions')
+
+        console.log(existingCompletions.items.filter(({ label }) => (typeof label === 'object' ? label.label === 'useState' : label === 'useState')))
+    })
 
     registerSnippets()
     vscode.workspace.onDidChangeConfiguration(({ affectsConfiguration }) => {
