@@ -20,7 +20,7 @@ export type Configuration = {
      * Whether to enable builtin postfix snippets. They may be moved to another extension in future releases
      * @default false */
     enableExperimentalSnippets: boolean
-    customSnippets: {
+    customSnippets: Array<{
         name: string
         // string[] is only for compatibility with builtin snippet, but that usage is deprecated
         body: string | string[]
@@ -62,7 +62,7 @@ export type Configuration = {
              */
             // npmDependencies?: string[]
         }
-    }[]
+    }>
     customSnippetDefaults: {
         sortText?: string
         type?: string

@@ -1,8 +1,8 @@
 import vscode from 'vscode'
 import { jsLangs } from './util'
 
-export const registerPostfixSnippets = () => {
-    return vscode.languages.registerCompletionItemProvider(
+export const registerPostfixSnippets = () =>
+    vscode.languages.registerCompletionItemProvider(
         jsLangs,
         {
             provideCompletionItems(document, endPos, token, context) {
@@ -78,4 +78,3 @@ export const registerPostfixSnippets = () => {
         },
         '.',
     )
-}

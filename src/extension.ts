@@ -65,7 +65,7 @@ export const activate = () => {
             let triggerFromInner = false
             const disposable = vscode.languages.registerCompletionItemProvider(normalizeLanguages(language), {
                 // eslint-disable-next-line @typescript-eslint/no-loop-func
-                async provideCompletionItems(document, position, _token, context) {
+                provideCompletionItems(document, position, _token, context) {
                     if (context.triggerKind !== vscode.CompletionTriggerKind.Invoke) return
                     if (triggerFromInner) {
                         triggerFromInner = false
@@ -117,25 +117,12 @@ export const activate = () => {
                     return completions
                 },
             })
-            disposables.push(disposable, registerPostfixSnippets())
+            disposables.push(disposable)
             extensionCtx.subscriptions.push(...disposables)
         }
+
+        disposables.push(registerPostfixSnippets())
     }
-
-    registerActiveDevelopmentCommand(async () => {
-        const activeEditor = vscode.window.activeTextEditor
-        if (!activeEditor) return
-
-        console.time('get completions')
-        const existingCompletions: vscode.CompletionList = (await vscode.commands.executeCommand(
-            'vscode.executeCompletionItemProvider',
-            activeEditor.document.uri,
-            activeEditor.selection.end,
-        )) as any
-        console.timeEnd('get completions')
-
-        console.log(existingCompletions.items.filter(({ label }) => (typeof label === 'object' ? label.label === 'useState' : label === 'useState')))
-    })
 
     registerSnippets()
     vscode.workspace.onDidChangeConfiguration(({ affectsConfiguration }) => {
