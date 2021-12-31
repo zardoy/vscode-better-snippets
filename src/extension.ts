@@ -3,13 +3,13 @@ import * as vscode from 'vscode'
 import { SnippetParser } from 'vscode-snippet-parser'
 import { mergeDeepRight } from 'rambda'
 import { DeepRequired } from 'ts-essentials'
-import { extensionCtx, getExtensionSetting, getExtensionSettingId, registerActiveDevelopmentCommand } from 'vscode-framework'
+import { extensionCtx, getExtensionCommandId, getExtensionSetting, getExtensionSettingId, registerActiveDevelopmentCommand } from 'vscode-framework'
 import { omitObj, pickObj } from '@zardoy/utils'
 import { Configuration } from './configurationType'
 import { normalizeFilePathRegex, normalizeLanguages, normalizeRegex } from './util'
 import { builtinSnippets } from './builtinSnippets'
 import { registerPostfixSnippets } from './experimentalSnippets'
-
+import { CompletionInsertArg, registerCompletionInsert } from './completionInsert'
 const unmergedSnippetDefaults: DeepRequired<Configuration['customSnippetDefaults']> = {
     sortText: undefined!,
     type: 'Snippet',
@@ -21,11 +21,11 @@ const unmergedSnippetDefaults: DeepRequired<Configuration['customSnippetDefaults
     },
 }
 
+type CustomSnippetUnresolved = Configuration['customSnippets'][number]
+export type CustomSnippet = CustomSnippetUnresolved & typeof unmergedSnippetDefaults
+
 export const activate = () => {
     let disposables: vscode.Disposable[] = []
-
-    type CustomSnippetUnresolved = Configuration['customSnippets'][number]
-    type CustomSnippet = CustomSnippetUnresolved & typeof unmergedSnippetDefaults
 
     // #region snippetDefaults
     let snippetDefaults: DeepRequired<Configuration['customSnippetDefaults']>
@@ -85,7 +85,7 @@ export const activate = () => {
                     // TODO ensure; relative path
                     const completions: vscode.CompletionItem[] = []
 
-                    for (const { body, when, name, group, type, ...params } of snippets) {
+                    for (const { body, when, name, group, type, resolveImports, ...params } of snippets) {
                         let currentLocation
                         const addCompletion = () => {
                             // todo add special handling of .
@@ -96,6 +96,19 @@ export const activate = () => {
                             const snippet = new vscode.SnippetString(snippetText)
                             completion.insertText = snippet
                             completion.documentation = new vscode.MarkdownString().appendCodeblock(new SnippetParser().text(snippetText), document.languageId)
+                            if (resolveImports) {
+                                const arg: CompletionInsertArg = {
+                                    action: 'resolve-imports',
+                                    importsConfig: resolveImports,
+                                    insertPos: position,
+                                }
+                                completion.command = {
+                                    command: getExtensionCommandId('completionInsert'),
+                                    title: '',
+                                    arguments: [arg],
+                                }
+                            }
+
                             if (!completion.documentation) completion.documentation = undefined
                             completions.push(completion)
                         }
@@ -138,4 +151,5 @@ export const activate = () => {
             registerSnippets()
         }
     })
+    registerCompletionInsert()
 }

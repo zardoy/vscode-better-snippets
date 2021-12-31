@@ -33,13 +33,13 @@ export type Configuration = {
         //     insertSemicolon?: boolean
         // }
         /** For JS langs only. How to resolve suggested imports if any */
-        // resolveImports?: {
-        //     // specifier can be subst only for now
-        //     [importSpecifier: string]: {
-        //         package?: string | true // = specifier, true = best match
-        //         export?: string // default or specifier if package is specified
-        //     }
-        // }
+        resolveImports?: {
+            // specifier can be subst only for now
+            [importSpecifier: string]: {
+                package?: string // = specifier, true = best match
+                // export?: string // default or specifier if package is specified
+            }
+        }
         sortText?: string
         type?: string
         when?: {

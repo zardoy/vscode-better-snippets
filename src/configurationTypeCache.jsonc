@@ -1,5 +1,5 @@
 // GENERATED. DON'T EDIT MANUALLY
-// md5hash: 95ff59fa741974f2652ecd15e8ac23e3
+// md5hash: cac5d0f3577ccc54ddfba0afe905142d
 {
     "type": "object",
     "properties": {
@@ -37,8 +37,19 @@
                     "group": {
                         "type": "string"
                     },
-                    "sortText": {
+                    "resolveImports": {
                         "description": "For JS langs only. How to resolve suggested imports if any",
+                        "type": "object",
+                        "additionalProperties": {
+                            "type": "object",
+                            "properties": {
+                                "package": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "sortText": {
                         "type": "string"
                     },
                     "type": {
