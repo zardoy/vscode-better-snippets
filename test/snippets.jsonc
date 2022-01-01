@@ -4,13 +4,19 @@
             "name": "useState",
             "body": "const [${1:state}, set${1/(.*)/${1:/capitalize}/}] = useState(${2:initialState})",
             // show above TS import suggestion
-            "sortText": "!100",
-            // make suggestion icon nice
+            "sortText": "!1", // we can also lower suggestion e.g. "sortText": "z"
+            // Optionally make suggestion icon nice
             "type": "Event",
             "when": {
                 "locations": ["lineStart"],
                 // shortcut for javascriptreact, typescriptreact
                 "languages": ["react"]
+            },
+            // Make snippet import useState from react package for us! Though with some latency :(
+            "resolveImports": {
+                "useState": {
+                    "package": "react"
+                }
             }
         }
     ]
