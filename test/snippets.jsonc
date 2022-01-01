@@ -1,5 +1,6 @@
 {
     "betterSnippets.customSnippets": [
+        // New line snippet
         {
             "name": "useState",
             "body": "const [${1:state}, set${1/(.*)/${1:/capitalize}/}] = useState(${2:initialState})",
@@ -17,6 +18,24 @@
                 "useState": {
                     "package": "react"
                 }
+            }
+        },
+        // File template
+        {
+            "name": "react",
+            "body": [
+                "import React from 'react'",
+                "",
+                "const ${TM_FILENAME_BASE}: React.FC = () => {",
+                "\treturn $1",
+                "}",
+                "",
+                "export default ${TM_FILENAME_BASE}"
+            ],
+            "sortText": "!1",
+            "when": {
+                "languages": ["react"],
+                "locations": ["fileStart"]
             }
         }
     ]
