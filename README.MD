@@ -37,3 +37,8 @@ Postfixes:
 Special:
 
 - `useParams` for `react-router-dom`
+
+## Similar Extensions
+
+- [TS/JS postfix completion](https://marketplace.visualstudio.com/items?itemName=ipatalas.vscode-postfix-ts)
+- Feel free to open PR to add another one!
