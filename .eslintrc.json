@@ -1,6 +1,6 @@
 {
     "extends": "zardoy",
     "rules": {
-        "unicorn/import-style": "off"
+        "no-template-curly-in-string": "off"
     }
 }

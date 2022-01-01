@@ -9,9 +9,10 @@ export interface CompletionInsertArg {
     action: 'resolve-imports'
     importsConfig: NonNullable<CustomSnippet['resolveImports']>
     insertPos: vscode.Position
+    snippetLines: number
 }
 export const registerCompletionInsert = () => {
-    registerExtensionCommand('completionInsert', (_, { action, importsConfig, insertPos }: CompletionInsertArg) => {
+    registerExtensionCommand('completionInsert', (_, { action, importsConfig, insertPos, snippetLines }: CompletionInsertArg) => {
         if (action === 'resolve-imports') {
             const editor = vscode.window.activeTextEditor!
             const { document } = editor
@@ -22,8 +23,7 @@ export const registerCompletionInsert = () => {
                     const diagnostics = vscode.languages.getDiagnostics(activeEditorUri)
                     for (const problem of diagnostics) {
                         const { range } = problem
-                        // TODO not the best assumption
-                        if (!new vscode.Range(insertPos, insertPos.translate(1)).intersection(range) || !oneOf(problem.code, 2552, 2304)) continue
+                        if (!new vscode.Range(insertPos, insertPos.translate(snippetLines)).intersection(range) || !oneOf(problem.code, 2552, 2304)) continue
                         const missingIdentifier = /'(.+?)'/.exec(problem.message)?.[1]
                         if (!missingIdentifier) return
                         const specifier = importsConfig[missingIdentifier]
@@ -58,7 +58,7 @@ export const registerCompletionInsert = () => {
                     }
                 }
             })
-            setTimeout(() => disposable.dispose(), 1200)
+            setTimeout(() => disposable.dispose(), 1300)
         }
     })
 }

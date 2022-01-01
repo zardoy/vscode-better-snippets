@@ -10,6 +10,7 @@ import { normalizeFilePathRegex, normalizeLanguages, normalizeRegex } from './ut
 import { builtinSnippets } from './builtinSnippets'
 import { registerPostfixSnippets } from './experimentalSnippets'
 import { CompletionInsertArg, registerCompletionInsert } from './completionInsert'
+import { registerSpecialCommand } from './specialCommand'
 const unmergedSnippetDefaults: DeepRequired<Configuration['customSnippetDefaults']> = {
     sortText: undefined!,
     type: 'Snippet',
@@ -22,7 +23,7 @@ const unmergedSnippetDefaults: DeepRequired<Configuration['customSnippetDefaults
 }
 
 type CustomSnippetUnresolved = Configuration['customSnippets'][number]
-export type CustomSnippet = CustomSnippetUnresolved & typeof unmergedSnippetDefaults
+export type CustomSnippet = CustomSnippetUnresolved & typeof unmergedSnippetDefaults & { specialCommand: string }
 
 export const activate = () => {
     let disposables: vscode.Disposable[] = []
@@ -85,7 +86,7 @@ export const activate = () => {
                     // TODO ensure; relative path
                     const completions: vscode.CompletionItem[] = []
 
-                    for (const { body, when, name, group, type, resolveImports, ...params } of snippets) {
+                    for (const { body, when, name, group, type, resolveImports, specialCommand, ...params } of snippets) {
                         let currentLocation
                         const addCompletion = () => {
                             // todo add special handling of .
@@ -95,12 +96,14 @@ export const activate = () => {
                             const snippetText = Array.isArray(body) ? body.join('\n') : body
                             const snippet = new vscode.SnippetString(snippetText)
                             completion.insertText = snippet
-                            completion.documentation = new vscode.MarkdownString().appendCodeblock(new SnippetParser().text(snippetText), document.languageId)
+                            const snippetPreview = new vscode.MarkdownString().appendCodeblock(new SnippetParser().text(snippetText), document.languageId)
+                            if (snippetText) completion.documentation = snippetPreview
                             if (resolveImports) {
                                 const arg: CompletionInsertArg = {
                                     action: 'resolve-imports',
                                     importsConfig: resolveImports,
                                     insertPos: position,
+                                    snippetLines: snippetText.split('\n').length,
                                 }
                                 completion.command = {
                                     command: getExtensionCommandId('completionInsert'),
@@ -108,6 +111,13 @@ export const activate = () => {
                                     arguments: [arg],
                                 }
                             }
+
+                            if (specialCommand)
+                                completion.command = {
+                                    command: getExtensionCommandId('applySpecialSnippet'),
+                                    arguments: [specialCommand],
+                                    title: '',
+                                }
 
                             if (!completion.documentation) completion.documentation = undefined
                             completions.push(completion)
@@ -152,4 +162,5 @@ export const activate = () => {
         }
     })
     registerCompletionInsert()
+    registerSpecialCommand()
 }

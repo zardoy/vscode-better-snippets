@@ -33,3 +33,7 @@ Can be disabled.
 Postfixes:
 
 - `if`: `something === 'here'.if` -> `if (something === 'here')`
+
+Special:
+
+- `useParams` for `react-router-dom`
