@@ -1,5 +1,5 @@
-import { basename } from 'path'
 import * as vscode from 'vscode'
+import { basename } from 'path-browserify'
 import { oneOf } from '@zardoy/utils'
 import { getExtensionCommandId, registerActiveDevelopmentCommand, registerExtensionCommand } from 'vscode-framework'
 import { CompletionInsertArg } from './completionInsert'
