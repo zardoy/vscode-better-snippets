@@ -12,7 +12,9 @@
     "keywords": [
         "snippets",
         "snippets alternative",
-        "insane snippets"
+        "insane snippets",
+        "live templates",
+        "templates"
     ],
     "contributes": {
         "commands": [
