@@ -12,7 +12,7 @@ const languageFilesMaps = {
 }
 
 // settings: also suggest to install @types/node if package.json has typescript
-export const activate = () => {
+export const registerMarkdownSnippets = () => {
     // vscode.languages.registerRenameProvider()
 
     // ```LANUGAGE suggestions

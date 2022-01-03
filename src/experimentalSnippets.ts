@@ -1,7 +1,8 @@
 import vscode from 'vscode'
 import { jsLangs } from './util'
 
-export const registerPostfixSnippets = () =>
+export const registerPostfixSnippets = () => {
+    const POSTFIX_DESCRIPTION = 'Better Snippets Postfix'
     vscode.languages.registerCompletionItemProvider(
         jsLangs,
         {
@@ -14,9 +15,8 @@ export const registerPostfixSnippets = () =>
                 // #region .if
                 // simple inline .if postfix. doesn't work with multiline, will be migrated to postfix extension
                 if ('|| && == != > >= < <='.split(' ').some(predicate => lineText.includes(predicate))) {
-                    console.debug('should be here')
                     const startPos = new vscode.Position(endPos.line, line.firstNonWhitespaceCharacterIndex)
-                    const completion = new vscode.CompletionItem({ label: 'if', description: 'Better Snippets Postfix' }, vscode.CompletionItemKind.Snippet)
+                    const completion = new vscode.CompletionItem({ label: 'if', description: POSTFIX_DESCRIPTION }, vscode.CompletionItemKind.Snippet)
                     // completion.range = new vscode.Range(position.translate(0, -1), line.range.end)
                     completion.insertText = ') '
                     completion.sortText = '!100'
@@ -48,17 +48,13 @@ export const registerPostfixSnippets = () =>
                     //         range: new vscode.Range(startPos, startPos.translate(0, 2)),
                     //     })
                     // }
-
                     completions.push(completion)
                 }
-                // #endregion
 
+                // #endregion
                 if (/Index\.[^.]*$/.test(lineText)) {
                     const startPos = new vscode.Position(endPos.line, line.firstNonWhitespaceCharacterIndex)
-                    const completion = new vscode.CompletionItem(
-                        { label: 'notFound', description: 'Better Snippets Postfix' },
-                        vscode.CompletionItemKind.Snippet,
-                    )
+                    const completion = new vscode.CompletionItem({ label: 'notFound', description: POSTFIX_DESCRIPTION }, vscode.CompletionItemKind.Snippet)
                     // TODO insert snippet
                     completion.insertText = ' === -1) return'
                     const lastDotPos = new vscode.Position(endPos.line, lineText.lastIndexOf('.'))
@@ -69,7 +65,6 @@ export const registerPostfixSnippets = () =>
                         },
                         { range: new vscode.Range(startPos, startPos), newText: 'if (' },
                     ]
-
                     completions.push(completion)
                 }
 
@@ -78,3 +73,4 @@ export const registerPostfixSnippets = () =>
         },
         '.',
     )
+}

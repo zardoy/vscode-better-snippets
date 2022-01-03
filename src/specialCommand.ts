@@ -1,7 +1,7 @@
 import * as vscode from 'vscode'
 import { basename } from 'path-browserify'
 import { oneOf } from '@zardoy/utils'
-import { getExtensionCommandId, registerActiveDevelopmentCommand, registerExtensionCommand } from 'vscode-framework'
+import { getExtensionCommandId, registerExtensionCommand } from 'vscode-framework'
 import { CompletionInsertArg } from './completionInsert'
 
 export const registerSpecialCommand = () => {
@@ -55,8 +55,5 @@ export const registerSpecialCommand = () => {
             default:
                 break
         }
-    })
-    registerActiveDevelopmentCommand(async () => {
-        await vscode.commands.executeCommand(getExtensionCommandId('applySpecialSnippet'), 'useParam')
     })
 }

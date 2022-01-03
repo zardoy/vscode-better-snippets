@@ -1,4 +1,3 @@
-/* eslint-disable unicorn/prefer-regexp-test */
 import * as vscode from 'vscode'
 import { SnippetParser } from 'vscode-snippet-parser'
 import { mergeDeepRight } from 'rambda'
@@ -31,7 +30,7 @@ export const activate = () => {
     // #region snippetDefaults
     let snippetDefaults: DeepRequired<Configuration['customSnippetDefaults']>
     function updateSnippetDefaults() {
-        snippetDefaults = mergeDeepRight(unmergedSnippetDefaults, getExtensionSetting('customSnippetDefaults'))
+        snippetDefaults = getSnippetsDefaults()
     }
 
     updateSnippetDefaults()
@@ -73,7 +72,11 @@ export const activate = () => {
                         return []
                     }
 
-                    console.log('Trigger suggestions', vscode.CompletionTriggerKind[context.triggerKind])
+                    console.log(language, 'Trigger suggestions', vscode.CompletionTriggerKind[context.triggerKind], 'for', snippets.length, 'snippets')
+                    console.debug(
+                        'Loaded snippets:',
+                        snippets.map(snippet => snippet.name),
+                    )
                     // const source = ts.createSourceFile('test.ts', document.getText(), ts.ScriptTarget.ES5, true)
                     // const pos = source.getPositionOfLineAndCharacter(position.line, position.character)
                     // const node = findNodeAtPosition(source, pos)
@@ -87,7 +90,7 @@ export const activate = () => {
                     const completions: vscode.CompletionItem[] = []
 
                     for (const { body, when, name, group, type, resolveImports, specialCommand, ...params } of snippets) {
-                        let currentLocation
+                        let currentLocation: string
                         const addCompletion = () => {
                             // todo add special handling of .
                             console.log(`Snippet ${name} included. Reason: ${currentLocation}`)
@@ -123,11 +126,23 @@ export const activate = () => {
                             completions.push(completion)
                         }
 
-                        const { locations, pathRegex, fileType, lineHasRegex } = when
+                        const { locations, fileType, ...regexes } = when
                         const docPath = document.uri.path
-                        if (snippetDefaults.when.pathRegex && !docPath.match(normalizeRegex(snippetDefaults.when.pathRegex))) continue
-                        if (pathRegex && !docPath.match(normalizeFilePathRegex(pathRegex, fileType))) continue
-                        if (lineHasRegex && !lineText.match(normalizeRegex(lineHasRegex))) continue
+                        const regexFails = (regex: string | RegExp | undefined, testingString: string, regexName: string) => {
+                            if (!regex) return false
+                            // eslint-disable-next-line unicorn/prefer-regexp-test
+                            const doesntMatch = !testingString.match(regex instanceof RegExp ? regex : normalizeRegex(regex))
+                            if (doesntMatch) console.log(`Snippet ${name} skipped due to regex: ${regexName} (${regex} against ${testingString})`)
+                            return doesntMatch
+                        }
+
+                        if (
+                            regexFails(snippetDefaults.when.pathRegex, docPath, 'snippetDefaults.when.pathRegex') ||
+                            regexFails(normalizeFilePathRegex(regexes.pathRegex, fileType), docPath, 'snippet.pathRegex') ||
+                            regexFails(regexes.lineHasRegex, lineText, 'snippet.lineHasRegex') ||
+                            regexFails(regexes.lineRegex, lineText.slice(0, position.character), 'snippet.lineRegex')
+                        )
+                            continue
                         for (const location of locations) {
                             currentLocation = location
                             if (location === 'fileStart' && position.line === 0 && name.startsWith(lineText)) addCompletion()
@@ -155,7 +170,7 @@ export const activate = () => {
             affectsConfiguration(getExtensionSettingId('enableBuiltinSnippets')) ||
             affectsConfiguration(getExtensionSettingId('enableExperimentalSnippets'))
         ) {
-            console.log('Snippets updated')
+            console.log('Snippets configuration updated')
             vscode.Disposable.from(...disposables).dispose()
             disposables = []
             registerSnippets()
@@ -164,3 +179,17 @@ export const activate = () => {
     registerCompletionInsert()
     registerSpecialCommand()
 }
+
+const unmergedSnippetDefaults: DeepRequired<Configuration['customSnippetDefaults']> = {
+    sortText: undefined!,
+    type: 'Snippet',
+    group: 'Better Snippet',
+    when: {
+        languages: ['js'],
+        locations: ['code'],
+        pathRegex: undefined!,
+    },
+}
+
+export const getSnippetsDefaults = (): DeepRequired<Configuration['customSnippetDefaults']> =>
+    mergeDeepRight(unmergedSnippetDefaults, getExtensionSetting('customSnippetDefaults'))

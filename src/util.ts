@@ -2,11 +2,12 @@
 import { Configuration } from './configurationType'
 
 export const jsLangs = ['typescript', 'javascript', 'typescriptreact', 'javascriptreact']
+export const reactLangs = ['javascriptreact', 'typescriptreact']
 
 export const normalizeLanguages = (language: string) => {
     if (language === 'js') return jsLangs
     if (language === 'styles') return ['css', 'scss', 'sass', 'source.css.styled']
-    if (language === 'react') return ['javascriptreact', 'typescriptreact']
+    if (language === 'react') return reactLangs
     return language
 }
 
