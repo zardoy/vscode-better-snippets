@@ -2,7 +2,7 @@ import * as vscode from 'vscode'
 import { SnippetParser } from 'vscode-snippet-parser'
 import { mergeDeepRight } from 'rambda'
 import { DeepRequired } from 'ts-essentials'
-import { extensionCtx, getExtensionCommandId, getExtensionSetting, getExtensionSettingId, registerActiveDevelopmentCommand } from 'vscode-framework'
+import { extensionCtx, getExtensionCommandId, getExtensionSetting, getExtensionSettingId } from 'vscode-framework'
 import { omitObj, pickObj } from '@zardoy/utils'
 import { Configuration } from './configurationType'
 import { normalizeFilePathRegex, normalizeLanguages, normalizeRegex } from './util'
@@ -10,16 +10,7 @@ import { builtinSnippets } from './builtinSnippets'
 import { registerPostfixSnippets } from './experimentalSnippets'
 import { CompletionInsertArg, registerCompletionInsert } from './completionInsert'
 import { registerSpecialCommand } from './specialCommand'
-const unmergedSnippetDefaults: DeepRequired<Configuration['customSnippetDefaults']> = {
-    sortText: undefined!,
-    type: 'Snippet',
-    group: 'Better Snippet',
-    when: {
-        languages: ['js'],
-        locations: ['code'],
-        pathRegex: undefined!,
-    },
-}
+import { registerCreateSnippetFromSelection } from './createSnippetFromSelection'
 
 type CustomSnippetUnresolved = Configuration['customSnippets'][number]
 export type CustomSnippet = CustomSnippetUnresolved & typeof unmergedSnippetDefaults & { specialCommand: string }
@@ -132,7 +123,7 @@ export const activate = () => {
                             if (!regex) return false
                             // eslint-disable-next-line unicorn/prefer-regexp-test
                             const doesntMatch = !testingString.match(regex instanceof RegExp ? regex : normalizeRegex(regex))
-                            if (doesntMatch) console.log(`Snippet ${name} skipped due to regex: ${regexName} (${regex} against ${testingString})`)
+                            if (doesntMatch) console.log(`Snippet ${name} skipped due to regex: ${regexName} (${regex as string} against ${testingString})`)
                             return doesntMatch
                         }
 
@@ -178,6 +169,7 @@ export const activate = () => {
     })
     registerCompletionInsert()
     registerSpecialCommand()
+    registerCreateSnippetFromSelection()
 }
 
 const unmergedSnippetDefaults: DeepRequired<Configuration['customSnippetDefaults']> = {

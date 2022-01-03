@@ -3,7 +3,7 @@ import { jsLangs } from './util'
 
 export const registerPostfixSnippets = () => {
     const POSTFIX_DESCRIPTION = 'Better Snippets Postfix'
-    vscode.languages.registerCompletionItemProvider(
+    return vscode.languages.registerCompletionItemProvider(
         jsLangs,
         {
             provideCompletionItems(document, endPos, token, context) {

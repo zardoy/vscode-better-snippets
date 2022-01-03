@@ -45,6 +45,8 @@ export type Configuration = {
         when?: {
             /** Shouldn't be used with `Start` location as snippet would be hidden in these cases */
             lineHasRegex?: string
+            /** Same as `lineHasRegex`, but the line will be tested from first character till current cursor position */
+            lineRegex?: string
             /**
              * Language identifier. Special ones: styles (css, scss...), js (js, ts, jsx, tsx)
              */
@@ -63,6 +65,14 @@ export type Configuration = {
             // npmDependencies?: string[]
         }
     }>
+    // /** @default true Ask to which language add snippet, when adding native snippet, otherwise use current */
+    // 'nativeSnippetCreator.askLanguageId': boolean
+    // /** @default false */
+    // 'nativeSnippetCreator.globalSnippetName': false | string
+    // /** @default false (for native snippets) Open snippet after its creation */
+    // 'nativeSnippetCreator.showSnippetAfterCreation': boolean
+    /** @default false Open snippet after its creation */
+    'snippetCreator.showSnippetAfterCreation': boolean
     customSnippetDefaults: {
         sortText?: string
         type?: string
@@ -71,7 +81,7 @@ export type Configuration = {
             languages?: string[]
             locations?: SnippetLocation[]
             // TODO
-            /** Restrict suggesting all snippets (instead of overriding regexs will be merged) */
+            /** Restrict suggesting all snippets (instead of overriding, regexs will be merged) */
             pathRegex?: string
         }
     }

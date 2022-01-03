@@ -22,6 +22,7 @@ specifiers:
   mocha: ^9.1.3
   path-browserify: ^1.0.1
   rambda: ^6.9.0
+  string-dedent: ^2.0.0
   ts-essentials: ^9.1.2
   type-fest: ^2.8.0
   typescript: ^4.5.4
@@ -34,6 +35,7 @@ dependencies:
   got: 11.8.3
   path-browserify: 1.0.1
   rambda: 6.9.0
+  string-dedent: 2.0.0
   ts-essentials: 9.1.2_typescript@4.5.4
   type-fest: 2.8.0
   vscode-framework: 0.0.18_5a40d9e486cde44d9af68b1188fbd92b
@@ -3949,6 +3951,11 @@ packages:
   /statuses/1.5.0:
     resolution: {integrity: sha1-Fhx9rBd2Wf2YEfQ3cfqZOBR4Yow=}
     engines: {node: '>= 0.6'}
+    dev: false
+
+  /string-dedent/2.0.0:
+    resolution: {integrity: sha512-E9zkFFcawkYKYlwebKwNMCPuIkOpG3soKqGlCehXliTKGuADGVlI8TJobNXUZIodd4c6uRmk+DOpKSK2cJmSlw==}
+    engines: {node: '>=0.12.0'}
     dev: false
 
   /string-width/4.2.3:
