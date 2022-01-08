@@ -50,10 +50,10 @@ export const registerCompletionInsert = () => {
                                 ...(showInstallSuggestions ? [] : ['Install as dependency', 'install as devDependency']),
                             )
                             if (installChoice === undefined) return
-                            const npmTheFastestInstalled = vscode.extensions.all.find(({ id }) => id === 'zardoy.npm-the-fastest')
-                            if (!npmTheFastestInstalled) {
+                            const npmRapidReadyInstalled = vscode.extensions.all.find(({ id }) => id === 'zardoy.npm-rapid-ready')
+                            if (!npmRapidReadyInstalled) {
                                 const openChoice = await vscode.window.showErrorMessage(
-                                    'NPM THE FASTEST must be installed to perform installation',
+                                    'NPM Rapid Ready must be installed to perform installation',
                                     'Show me extension',
                                 )
                                 if (!openChoice) return
@@ -62,7 +62,7 @@ export const registerCompletionInsert = () => {
                             }
 
                             // TODO! support path
-                            await vscode.commands.executeCommand('npmTheFastest.addPackages', {
+                            await vscode.commands.executeCommand('npmRapidReady.addPackages', {
                                 [installChoice.endsWith('dependency') ? 'packages' : 'devPackages']: [missingIdentifier],
                             })
                             // self run this command to finally import missing identifiers
