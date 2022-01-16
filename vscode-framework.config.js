@@ -8,6 +8,7 @@ const config = {
                 EXTENSION_BOOTSTRAP_CONFIG: null,
             },
         },
+        mainFields: ['module', 'main'],
     },
     development: {
         // disableExtensions: false,

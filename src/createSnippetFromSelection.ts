@@ -1,6 +1,8 @@
 import * as vscode from 'vscode'
+import delay from 'delay'
 import stringDedent from 'string-dedent'
 import { getExtensionId, getExtensionSetting, getExtensionSettingId, registerExtensionCommand, showQuickPick } from 'vscode-framework'
+import { parseTree, findNodeAtLocation } from 'jsonc-parser'
 import { Configuration } from './configurationType'
 import { jsLangs, reactLangs } from './util'
 import { getSnippetsDefaults } from './extension'
@@ -41,17 +43,19 @@ export const registerCreateSnippetFromSelection = () => {
                 : snippetLines.map(line => line.replace(/\t/, '\\t'))
         const snippetName = await vscode.window.showInputBox({
             ignoreFocusOut: true,
-            // TODO suggest templ if file selection
+            // TODO suggest templ if file selection (though its bad idea)
             title: 'Enter snippet name',
         })
+        if (snippetName === undefined) return
         const snippetWhen: Configuration['customSnippets'][number]['when'] = {
             ...(getSnippetsDefaults().when.languages.includes(langId) ? null : { languages: [langId] }),
         }
         const configuration = vscode.workspace.getConfiguration(process.env.IDS_PREFIX)
+        const existingCustomSnippets = configuration.get<any[]>('customSnippets') ?? []
         await configuration.update(
             'customSnippets',
             [
-                ...(configuration.get<any[]>('customSnippets') ?? []),
+                ...existingCustomSnippets,
                 {
                     name: snippetName,
                     body: snippetLines.length === 1 ? snippetLines[0]! : snippetLines,
@@ -60,8 +64,19 @@ export const registerCreateSnippetFromSelection = () => {
             ],
             vscode.ConfigurationTarget.Global,
         )
-        // TODO!
-        if (getExtensionSetting('snippetCreator.showSnippetAfterCreation')) await vscode.commands.executeCommand('workbench.action.openSettingsJson')
+        if (getExtensionSetting('snippetCreator.showSnippetAfterCreation')) {
+            await vscode.commands.executeCommand('workbench.action.openSettingsJson')
+            const jsonSettingsEditor = vscode.window.activeTextEditor!
+            const jsonSettingsDocument = jsonSettingsEditor.document
+            // we've already awaited above, but not vscode
+            await delay(150)
+            const { offset, length } = findNodeAtLocation(parseTree(jsonSettingsDocument.getText())!, [
+                getExtensionSettingId('customSnippets'),
+                existingCustomSnippets.length,
+            ])!
+            jsonSettingsEditor.selection = new vscode.Selection(jsonSettingsDocument.positionAt(offset), jsonSettingsDocument.positionAt(offset + length))
+            jsonSettingsEditor.revealRange(jsonSettingsEditor.selection)
+        }
     })
 }
 
