@@ -1,5 +1,5 @@
 // GENERATED. DON'T EDIT MANUALLY
-// md5hash: 9ff4dd10346c732392aa3450ff2a378e
+// md5hash: e4fa5b8150f19f53d5a560cd0b7e9ecb
 {
     "type": "object",
     "properties": {
@@ -7,6 +7,15 @@
             "description": "Include builtin JS snippets",
             "default": true,
             "type": "boolean"
+        },
+        "useParamMode": {
+            "description": "Choose the output for useSnippet type:\n```ts\n// generic\nconst params = useParams<'groupId'>()\n// cast\nconst params = useParams() as { groupId: string }\n```\n[see issue for more](https://github.com/remix-run/react-router/issues/8498)",
+            "default": "cast",
+            "enum": [
+                "cast",
+                "generic"
+            ],
+            "type": "string"
         },
         "enableExperimentalSnippets": {
             "description": "Whether to enable builtin postfix snippets. They may be moved to another extension in future releases",
@@ -16,96 +25,293 @@
         "customSnippets": {
             "type": "array",
             "items": {
-                "type": "object",
-                "properties": {
-                    "name": {
-                        "type": "string"
-                    },
-                    "body": {
-                        "anyOf": [
-                            {
-                                "type": "array",
-                                "items": {
-                                    "type": "string"
-                                }
-                            },
-                            {
-                                "type": "string"
-                            }
-                        ]
-                    },
-                    "group": {
-                        "type": "string"
-                    },
-                    "resolveImports": {
-                        "description": "For JS langs only. How to resolve suggested imports if any",
-                        "type": "object",
-                        "additionalProperties": {
-                            "type": "object",
-                            "properties": {
-                                "package": {
-                                    "type": "string"
-                                }
-                            }
-                        }
-                    },
-                    "sortText": {
-                        "type": "string"
-                    },
-                    "type": {
-                        "type": "string"
-                    },
-                    "when": {
+                "allOf": [
+                    {
                         "type": "object",
                         "properties": {
-                            "lineHasRegex": {
-                                "description": "Shouldn't be used with `Start` location as snippet would be hidden in these cases",
-                                "type": "string"
+                            "body": {
+                                "anyOf": [
+                                    {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    {
+                                        "type": "string"
+                                    }
+                                ]
                             },
-                            "lineRegex": {
-                                "description": "Same as `lineHasRegex`, but the line will be tested from first character till current cursor position",
-                                "type": "string"
+                            "executeCommand": {
+                                "description": "Execute custom command on snippet accept, doesn't work with resolveImports",
+                                "anyOf": [
+                                    {
+                                        "type": "object",
+                                        "properties": {
+                                            "command": {
+                                                "type": "string"
+                                            },
+                                            "arguments": {
+                                                "type": "array",
+                                                "items": {}
+                                            }
+                                        },
+                                        "required": [
+                                            "arguments",
+                                            "command"
+                                        ]
+                                    },
+                                    {
+                                        "type": "string"
+                                    }
+                                ]
                             },
-                            "languages": {
-                                "description": "Language identifier. Special ones: styles (css, scss...), js (js, ts, jsx, tsx)",
-                                "type": "array",
-                                "items": {
-                                    "type": "string"
+                            "resolveImports": {
+                                "description": "For JS langs only. How to resolve suggested imports if any",
+                                "type": "object",
+                                "additionalProperties": {
+                                    "type": "object",
+                                    "properties": {
+                                        "package": {
+                                            "type": "string"
+                                        }
+                                    }
                                 }
                             },
-                            "locations": {
-                                "description": "Specify to restrict showing suggest in specific location",
-                                "type": "array",
-                                "items": {
-                                    "enum": [
-                                        "code",
-                                        "comment",
-                                        "fileStart",
-                                        "lineStart",
-                                        "topLineStart"
-                                    ],
-                                    "type": "string"
+                            "when": {
+                                "type": "object",
+                                "properties": {
+                                    "lineHasRegex": {
+                                        "description": "Shouldn't be used with `Start` location as snippet would be hidden in that case",
+                                        "type": "string"
+                                    },
+                                    "lineRegex": {
+                                        "description": "Same as `lineHasRegex`, but the line will be tested from first character till current cursor position",
+                                        "type": "string"
+                                    },
+                                    "languages": {
+                                        "description": "Language identifier. Special ones: styles (css, scss...), js (js, ts, jsx, tsx)",
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "locations": {
+                                        "description": "Specify to restrict showing suggest in specific location",
+                                        "type": "array",
+                                        "items": {
+                                            "enum": [
+                                                "code",
+                                                "comment",
+                                                "fileStart",
+                                                "lineStart",
+                                                "topLineStart"
+                                            ],
+                                            "type": "string"
+                                        }
+                                    },
+                                    "pathRegex": {
+                                        "type": "string"
+                                    },
+                                    "fileType": {
+                                        "description": "Shortcuts for complex path regexs. If specified, `pathRegex` is ignored",
+                                        "enum": [
+                                            "package.json",
+                                            "tsconfig.json"
+                                        ],
+                                        "type": "string"
+                                    }
                                 }
-                            },
-                            "pathRegex": {
-                                "type": "string"
-                            },
-                            "fileType": {
-                                "description": "Shortcuts for complex path regexs. If specified, `pathRegex` is ignored",
-                                "enum": [
-                                    "package.json",
-                                    "tsconfig.json"
-                                ],
-                                "type": "string"
                             }
-                        }
+                        },
+                        "required": [
+                            "body"
+                        ]
+                    },
+                    {
+                        "type": "object",
+                        "properties": {
+                            "name": {
+                                "type": "string"
+                            },
+                            "group": {
+                                "description": "Description, displayed in completion widget",
+                                "type": "string"
+                            },
+                            "sortText": {
+                                "type": "string"
+                            },
+                            "type": {
+                                "anyOf": [
+                                    {
+                                        "enum": [
+                                            "Class",
+                                            "Color",
+                                            "Constant",
+                                            "Constructor",
+                                            "Enum",
+                                            "EnumMember",
+                                            "Event",
+                                            "Field",
+                                            "File",
+                                            "Folder",
+                                            "Function",
+                                            "Interface",
+                                            "Issue",
+                                            "Keyword",
+                                            "Method",
+                                            "Module",
+                                            "Operator",
+                                            "Property",
+                                            "Reference",
+                                            "Snippet",
+                                            "Struct",
+                                            "Text",
+                                            "TypeParameter",
+                                            "Unit",
+                                            "User",
+                                            "Value",
+                                            "Variable"
+                                        ],
+                                        "type": "string"
+                                    },
+                                    {
+                                        "type": "number"
+                                    }
+                                ]
+                            }
+                        },
+                        "required": [
+                            "name"
+                        ]
                     }
-                },
-                "required": [
-                    "body",
-                    "name"
                 ]
             }
+        },
+        "typingSnippets": {
+            "type": "array",
+            "items": {
+                "allOf": [
+                    {
+                        "type": "object",
+                        "properties": {
+                            "body": {
+                                "anyOf": [
+                                    {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    {
+                                        "type": "string"
+                                    }
+                                ]
+                            },
+                            "executeCommand": {
+                                "description": "Execute custom command on snippet accept, doesn't work with resolveImports",
+                                "anyOf": [
+                                    {
+                                        "type": "object",
+                                        "properties": {
+                                            "command": {
+                                                "type": "string"
+                                            },
+                                            "arguments": {
+                                                "type": "array",
+                                                "items": {}
+                                            }
+                                        },
+                                        "required": [
+                                            "arguments",
+                                            "command"
+                                        ]
+                                    },
+                                    {
+                                        "type": "string"
+                                    }
+                                ]
+                            },
+                            "resolveImports": {
+                                "description": "For JS langs only. How to resolve suggested imports if any",
+                                "type": "object",
+                                "additionalProperties": {
+                                    "type": "object",
+                                    "properties": {
+                                        "package": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            },
+                            "when": {
+                                "type": "object",
+                                "properties": {
+                                    "lineHasRegex": {
+                                        "description": "Shouldn't be used with `Start` location as snippet would be hidden in that case",
+                                        "type": "string"
+                                    },
+                                    "lineRegex": {
+                                        "description": "Same as `lineHasRegex`, but the line will be tested from first character till current cursor position",
+                                        "type": "string"
+                                    },
+                                    "languages": {
+                                        "description": "Language identifier. Special ones: styles (css, scss...), js (js, ts, jsx, tsx)",
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "locations": {
+                                        "description": "Specify to restrict showing suggest in specific location",
+                                        "type": "array",
+                                        "items": {
+                                            "enum": [
+                                                "code",
+                                                "comment",
+                                                "fileStart",
+                                                "lineStart",
+                                                "topLineStart"
+                                            ],
+                                            "type": "string"
+                                        }
+                                    },
+                                    "pathRegex": {
+                                        "type": "string"
+                                    },
+                                    "fileType": {
+                                        "description": "Shortcuts for complex path regexs. If specified, `pathRegex` is ignored",
+                                        "enum": [
+                                            "package.json",
+                                            "tsconfig.json"
+                                        ],
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        },
+                        "required": [
+                            "body"
+                        ]
+                    },
+                    {
+                        "type": "object",
+                        "properties": {
+                            "sequence": {
+                                "description": "Snippet will be accepted only after typing THE EXACT sequence of characters on the keyboard. Using arrows or mouse for navigating will reset the sequence (see settings)",
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "sequence"
+                        ]
+                    }
+                ]
+            }
+        },
+        "typingSnippetsUndoStops": {
+            "default": true,
+            "type": "boolean"
         },
         "snippetCreator.showSnippetAfterCreation": {
             "default": "false Open snippet after its creation",
@@ -118,7 +324,43 @@
                     "type": "string"
                 },
                 "type": {
-                    "type": "string"
+                    "anyOf": [
+                        {
+                            "enum": [
+                                "Class",
+                                "Color",
+                                "Constant",
+                                "Constructor",
+                                "Enum",
+                                "EnumMember",
+                                "Event",
+                                "Field",
+                                "File",
+                                "Folder",
+                                "Function",
+                                "Interface",
+                                "Issue",
+                                "Keyword",
+                                "Method",
+                                "Module",
+                                "Operator",
+                                "Property",
+                                "Reference",
+                                "Snippet",
+                                "Struct",
+                                "Text",
+                                "TypeParameter",
+                                "Unit",
+                                "User",
+                                "Value",
+                                "Variable"
+                            ],
+                            "type": "string"
+                        },
+                        {
+                            "type": "number"
+                        }
+                    ]
                 },
                 "group": {
                     "type": "string"
@@ -159,6 +401,9 @@
         "customSnippets",
         "enableBuiltinSnippets",
         "enableExperimentalSnippets",
-        "snippetCreator.showSnippetAfterCreation"
+        "snippetCreator.showSnippetAfterCreation",
+        "typingSnippets",
+        "typingSnippetsUndoStops",
+        "useParamMode"
     ]
 }

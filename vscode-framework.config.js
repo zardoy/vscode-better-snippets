@@ -9,6 +9,9 @@ const config = {
             },
         },
     },
+    development: {
+        // disableExtensions: false,
+    },
     // target: 'web',
     // webOpen: 'web',
     target: { desktop: true, web: true },

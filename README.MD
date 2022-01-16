@@ -26,7 +26,30 @@ Also, web should be supported.
 
 ## Builtin Snippets
 
-This extension comes with some [top-line builtin snippets](src/builtinSnippets.ts), they can be disabled.
+This extension comes handy [top-line builtin snippets](src/builtinSnippets.ts) for JS and Markdown languages. They can be disabled.
+
+## Typing Snippets
+
+You can also define so called typing snippets. Some sequence of letter will be replaced with snippet, for example:
+
+`cb ` -> `($1) => $2`
+
+Configuration:
+
+```json
+"betterSnippets.typingSnippets": [
+    {
+        "sequence": "cb ",
+        "body":"($1) => $2"
+    }
+],
+```
+
+Note that:
+
+- some features from snippets such as `resolveImports` or `when` clause are supported
+- any cursor movement (using arrows or mouse) will reset the typing sequence
+- they don't work with multiple selections (when there are multiple cursor in editor)
 
 ## Experimental Snippets
 

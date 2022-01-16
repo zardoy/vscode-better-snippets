@@ -1,7 +1,7 @@
 import * as vscode from 'vscode'
 import { basename } from 'path-browserify'
 import { oneOf } from '@zardoy/utils'
-import { getExtensionCommandId, registerExtensionCommand } from 'vscode-framework'
+import { getExtensionCommandId, getExtensionSetting, registerExtensionCommand } from 'vscode-framework'
 import { CompletionInsertArg } from './completionInsert'
 
 export const registerSpecialCommand = () => {
@@ -35,7 +35,10 @@ export const registerSpecialCommand = () => {
                 const paramMatch = /:(.+?)[/"']/.exec(usageLine)?.[1]
                 if (!paramMatch) return
                 const snippet = new vscode.SnippetString('const ')
-                snippet.appendPlaceholder(`{ ${paramMatch} }`, 2).appendText(` = useParams<'${paramMatch}'>()`)
+                snippet.appendPlaceholder(`{ ${paramMatch} }`, 2)
+                snippet.appendText(` = useParams`)
+                snippet.appendText(getExtensionSetting('useParamMode') === 'cast' ? `() as { ${paramMatch}: string }` : `<'${paramMatch}'>()`)
+
                 const insertPos = activeEditor.selection.end
                 await activeEditor.insertSnippet(snippet)
                 const arg: CompletionInsertArg = {
@@ -53,7 +56,7 @@ export const registerSpecialCommand = () => {
             }
 
             default:
-                break
+                throw new Error(`There is no special command for ${specialCommand}`)
         }
     })
 }

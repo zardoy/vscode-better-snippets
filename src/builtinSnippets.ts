@@ -1,3 +1,5 @@
+import dedent from 'string-dedent'
+import { getExtensionCommandId } from 'vscode-framework'
 import { Configuration } from './configurationType'
 
 const topLineSnippets: Array<[string, string]> = [
@@ -6,27 +8,72 @@ const topLineSnippets: Array<[string, string]> = [
     ['et', 'export type $1 = '],
     ['em', 'export const ${1:method} = ($2) => {$3}'],
     ['ef', 'export { $2 } from "$1"'],
+    ['ed', 'export default '],
 ]
 
-export const builtinSnippets: Configuration['customSnippets'] = [
-    ...topLineSnippets.map(([name, body]): Configuration['customSnippets'][number] => ({
-        name,
-        body,
-        group: 'Builtin Better Snippet',
-        type: 'Event',
-        when: {
-            locations: ['topLineStart'],
-            languages: ['js'],
+const markdownTop = {
+    locations: ['topLineStart'],
+    languages: ['markdown'],
+}
+
+type CustomSnippet = Configuration['customSnippets'][number]
+
+// todo set required: languages
+export const builtinSnippets: Configuration['customSnippets'] = (
+    [
+        // js
+        ...topLineSnippets.map(
+            ([name, body]): CustomSnippet => ({
+                name,
+                body,
+                type: 'Event',
+                when: {
+                    locations: ['topLineStart'],
+                    languages: ['js'],
+                },
+            }),
+        ),
+        {
+            name: 'useParam',
+            body: '',
+            // experimentaly
+            sortText: '10',
+            type: 'Event',
+            executeCommand: {
+                command: getExtensionCommandId('applySpecialSnippet'),
+                arguments: ['useParam'],
+            },
+            when: {
+                locations: ['lineStart'],
+                languages: ['react'],
+            },
         },
-    })),
-    {
-        name: 'useParam',
-        body: '',
-        //@ts-expect-error Hidden feature
-        specialCommand: 'useParam',
-        when: {
-            locations: ['lineStart'],
-            languages: ['react'],
+        // md
+        {
+            name: 'ts',
+            body: '```ts\n$1\n```',
+            when: markdownTop,
         },
-    },
-]
+        {
+            name: 'tsx',
+            body: '```tsx\n$1\n```',
+            when: markdownTop,
+        },
+        {
+            name: 'codeblock',
+            body: '```$1\n$2\n```',
+            when: markdownTop,
+        },
+        {
+            name: 'dropdown',
+            body: dedent`
+              <details>
+              <summary>$1</summary>
+
+              $2
+              </details>
+            `,
+            when: markdownTop,
+        },
+    ] as Configuration['customSnippets']
+).map((snippet): CustomSnippet => ({ group: 'Builtin Better Snippet', ...snippet }))
