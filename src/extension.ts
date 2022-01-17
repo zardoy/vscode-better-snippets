@@ -234,14 +234,13 @@ export const activate = () => {
                         if (appliableTypingSnippets.length > 2) console.warn(`Multiple appliable typing snippets found: ${appliableTypingSnippets.join(', ')}`)
                         const snippet = appliableTypingSnippets[0]
                         if (!snippet) return
-                        console.log('applying texting snippet', snippet.sequence)
+                        console.log('applying typing snippet', snippet.sequence)
                         const startPosition = endPosition.translate(0, -snippet.sequence.length)
                         const { body, executeCommand, resolveImports } = snippet
                         await new Promise<void>(resolve => {
                             internalDocumentChange = true
-                            const { dispose } = vscode.workspace.onDidChangeTextDocument(({ document, contentChanges }) => {
+                            const { dispose } = vscode.workspace.onDidChangeTextDocument(({ document }) => {
                                 if (document.uri !== editor?.document.uri) return
-                                console.log('changes', contentChanges[0]!)
                                 internalDocumentChange = false
                                 dispose()
                                 resolve()
