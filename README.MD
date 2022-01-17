@@ -8,7 +8,7 @@ The main setting is `betterSnippets.customSnippets`: **[example usage](./test/sn
 
 Snippets in VSCode are always contextless, they will be suggested in comments, string, everywhere. You can only restrict them showing only in specific language IDs, however this extension let you can control:
 
-- Snippet Icon (with `type`, you still can't use custom icon though)
+- Snippet Icon (with `iconType`, `fileIcon` or `folderIcon`)
 - Snippet Sorting (with `sortText`, you can boost suggestion to top or bottom)
 - Snippet Location (e.g. display snippet only in the start of the line or the file)
 - Display Snippets only in specific files by filtering the path by regex (for example set `when.fileRegex` to `App.tsx?`)

@@ -7,7 +7,7 @@
             // show above TS import suggestion
             "sortText": "!1", // we can also lower suggestion e.g. "sortText": "z"
             // Optionally make suggestion icon nice
-            "type": "Event",
+            "iconType": "Event",
             "when": {
                 "locations": ["lineStart"],
                 // shortcut for javascriptreact, typescriptreact
