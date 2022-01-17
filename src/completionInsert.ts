@@ -2,7 +2,9 @@
 /* eslint-disable no-await-in-loop */
 import * as vscode from 'vscode'
 import { oneOf } from '@zardoy/utils'
-import { getExtensionCommandId, registerExtensionCommand } from 'vscode-framework'
+import { getExtensionCommandId, getExtensionSetting, registerExtensionCommand } from 'vscode-framework'
+import delay from 'delay'
+import { range } from 'rambda'
 import { CustomSnippet } from './extension'
 
 export interface CompletionInsertArg {
@@ -10,17 +12,19 @@ export interface CompletionInsertArg {
     importsConfig: NonNullable<CustomSnippet['resolveImports']>
     insertPos: vscode.Position
     snippetLines: number
+    useExistingDiagnosticsPooling?: number
 }
 export const registerCompletionInsert = () => {
-    registerExtensionCommand('completionInsert', (_, execArg: CompletionInsertArg) => {
-        const { action, importsConfig, insertPos, snippetLines } = execArg
+    registerExtensionCommand('completionInsert', async (_, execArg: CompletionInsertArg) => {
+        const { action, importsConfig, insertPos, snippetLines, useExistingDiagnosticsPooling } = execArg
         if (action === 'resolve-imports') {
             const editor = vscode.window.activeTextEditor!
             const { document } = editor
             const activeEditorUri = document.uri
             let observed = false
-            const notImportedIdentifiers = Object.keys(importsConfig)
-            const disposable = vscode.languages.onDidChangeDiagnostics(async ({ uris }) => {
+            const missingIdentifiers = new Set<string>()
+            const resolveIdentifiers = new Set<string>()
+            const observeDiagnosticsChanges = async ({ uris }) => {
                 observed = true
                 if (!uris.includes(activeEditorUri)) return
                 console.log('document diagnostic changed')
@@ -44,8 +48,13 @@ export const registerCompletionInsert = () => {
                         if (typeof specifier.package === 'string' && specifier.package !== match[2]!) return false
                         return true
                     })
-                    if (!codeAction) return
-                    notImportedIdentifiers.splice(notImportedIdentifiers.indexOf(missingIdentifier), 1)
+                    if (!codeAction) {
+                        if (!resolveIdentifiers.has(missingIdentifier)) missingIdentifiers.add(missingIdentifier)
+                        return
+                    }
+
+                    missingIdentifiers.delete(missingIdentifier)
+                    resolveIdentifiers.add(missingIdentifier)
 
                     // suppose changes always happen in the same document (uri)
                     if (codeAction.edit)
@@ -58,8 +67,21 @@ export const registerCompletionInsert = () => {
                                 undoStopBefore: false,
                             },
                         )
+                    else console.warn(`[resolve ${missingIdentifier}] No edit in`, codeAction)
                 }
-            })
+            }
+
+            if (useExistingDiagnosticsPooling !== undefined) {
+                void observeDiagnosticsChanges({ uris: [document.uri] })
+                if (useExistingDiagnosticsPooling !== 0)
+                    // pooling TS codeactions
+                    for (const i of range(0, Math.floor(getExtensionSetting('diagnosticTimeout') / useExistingDiagnosticsPooling))) {
+                        await delay(useExistingDiagnosticsPooling)
+                        void observeDiagnosticsChanges({ uris: [document.uri] })
+                    }
+            }
+
+            const disposable = vscode.languages.onDidChangeDiagnostics(observeDiagnosticsChanges)
             setTimeout(async () => {
                 disposable.dispose()
                 if (!observed) {
@@ -67,28 +89,28 @@ export const registerCompletionInsert = () => {
                     return
                 }
 
-                // Below: suggest to install missing packages
-                if (process.env.PLATFORM === 'web') return
-                const missingIdentifiers = notImportedIdentifiers.map(indentifier => {
+                // Below: warn about failed to import missing identifiers from resolveImports
+                /** parsed */
+                const missing = [...missingIdentifiers.values()].map(indentifier => {
                     const packagePath = importsConfig[indentifier]!.package
-                    const installable = packagePath && ['./', '../'].every(predicate => !packagePath.startsWith(predicate))
+                    const installable = process.env.PLATFORM !== 'web' && packagePath && ['./', '../'].every(predicate => !packagePath.startsWith(predicate))
                     return {
                         indentifier,
                         packagePath,
                         installable,
                     }
                 })
-                if (missingIdentifiers.length === 0) return
+                if (missing.length === 0) return
 
                 const installChoice = await vscode.window.showWarningMessage(
-                    `Cannot import missing ${missingIdentifiers
+                    `Cannot import missing ${missing
                         .map(({ indentifier, packagePath, installable }) => {
                             let str = indentifier
                             if (packagePath) str += `: ${installable ? '📦' : ''}${packagePath}`
                             return str
                         })
                         .join(', ')}`,
-                    ...(missingIdentifiers.some(({ installable }) => installable) ? [] : ['Install to deps', 'Install to devDeps']),
+                    ...(missing.some(({ installable }) => installable) ? ['Install to deps', 'Install to devDeps'] : []),
                 )
                 if (installChoice === undefined) return
                 const npmRapidReadyInstalled = vscode.extensions.all.find(({ id }) => id === 'zardoy.npm-rapid-ready')
@@ -101,13 +123,14 @@ export const registerCompletionInsert = () => {
 
                 // TODO! support path
                 await vscode.commands.executeCommand('npmRapidReady.addPackages', {
-                    [installChoice === 'Install to deps' ? 'packages' : 'devPackages']: [
-                        missingIdentifiers.filter(({ installable }) => installable).map(({ packagePath }) => packagePath),
-                    ],
+                    [installChoice === 'Install to deps' ? 'packages' : 'devPackages']: missing
+                        .filter(({ installable }) => installable)
+                        .map(({ packagePath }) => packagePath),
                 })
                 // self run this command to finally import missing identifiers
-                await vscode.commands.executeCommand(getExtensionCommandId('completionInsert'), execArg)
-            }, 1500)
+                await vscode.commands.executeCommand(getExtensionCommandId('completionInsert'), { ...execArg, useExistingDiagnosticsPooling: 300 })
+                // TODO maybe extend timeout on pooling? Why TS service in vscode is so slow hf
+            }, getExtensionSetting('diagnosticTimeout'))
         }
     })
 }
