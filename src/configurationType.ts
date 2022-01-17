@@ -79,7 +79,7 @@ export type Configuration = {
         GeneralSnippet & {
             name: string
             /** Displayed in completion widget */
-            description: string
+            description?: string
             /** @deprecated */
             group?: string
             // formatting?: {
@@ -121,7 +121,7 @@ export type Configuration = {
         /** @deprecated */
         type?: string
         /** Displayed in completion widget */
-        description: string
+        description?: string
         /** @deprecated */
         group?: string
         when?: {
