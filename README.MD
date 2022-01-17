@@ -61,7 +61,7 @@ Postfixes:
 
 Special:
 
-- `useParams` for `react-router-dom`
+- `useParams` for `react-router`
 
 ## Similar Extensions
 
