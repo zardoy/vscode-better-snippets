@@ -6,6 +6,7 @@ import { getExtensionCommandId, getExtensionSetting, registerExtensionCommand } 
 import delay from 'delay'
 import { range } from 'rambda'
 import { CustomSnippet } from './extension'
+import { jsLangs } from './util'
 
 export interface CompletionInsertArg {
     action: 'resolve-imports'
@@ -93,7 +94,11 @@ export const registerCompletionInsert = () => {
                 /** parsed */
                 const missing = [...missingIdentifiers.values()].map(indentifier => {
                     const packagePath = importsConfig[indentifier]!.package
-                    const installable = process.env.PLATFORM !== 'web' && packagePath && ['./', '../'].every(predicate => !packagePath.startsWith(predicate))
+                    const installable =
+                        process.env.PLATFORM !== 'web' &&
+                        jsLangs.includes(document.languageId) &&
+                        packagePath &&
+                        ['./', '../'].every(predicate => !packagePath.startsWith(predicate))
                     return {
                         indentifier,
                         packagePath,
