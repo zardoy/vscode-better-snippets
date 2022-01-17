@@ -78,7 +78,9 @@ export type Configuration = {
     customSnippets: Array<
         GeneralSnippet & {
             name: string
-            /** Description, displayed in completion widget */
+            /** Displayed in completion widget */
+            description: string
+            /** @deprecated */
             group?: string
             // formatting?: {
             //     /**
@@ -87,8 +89,14 @@ export type Configuration = {
             //     doubleQuotes?: boolean
             //     insertSemicolon?: boolean
             // }
-            sortText?: string
-            type?: SnippetType
+            /** If specified, `iconType` is ignored. It makes sense to use with custom file icon theme */
+            fileIcon?: string
+            /** If specified, `iconType` and `fileIcon` is ignored. It makes sense to use with custom file icon theme */
+            folderIcon?: string
+            sortText?: string | null
+            iconType?: SnippetType
+            /** @deprecated */
+            type?: string
         }
     >
     typingSnippets: Array<
@@ -109,7 +117,12 @@ export type Configuration = {
     'snippetCreator.showSnippetAfterCreation': boolean
     customSnippetDefaults: {
         sortText?: string
-        type?: SnippetType
+        iconType?: SnippetType
+        /** @deprecated */
+        type?: string
+        /** Displayed in completion widget */
+        description: string
+        /** @deprecated */
         group?: string
         when?: {
             languages?: string[]

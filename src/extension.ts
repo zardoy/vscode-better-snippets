@@ -134,36 +134,51 @@ export const activate = () => {
                     }
 
                     const includedSnippets = getCurrentSnippets('completion', snippets, document, position, language)
-                    return includedSnippets.map(({ body, group, name, sortText, type, executeCommand, resolveImports }) => {
-                        const completion = new vscode.CompletionItem({ label: name, description: group }, vscode.CompletionItemKind[type as string | number])
-                        completion.sortText = sortText
-                        const snippetString = new vscode.SnippetString(body)
-                        completion.insertText = snippetString
-                        const snippetPreview = new vscode.MarkdownString().appendCodeblock(new SnippetParser().text(body), document.languageId)
-                        completion.documentation = snippetPreview
-                        if (resolveImports) {
-                            const arg: CompletionInsertArg = {
-                                action: 'resolve-imports',
-                                importsConfig: resolveImports,
-                                insertPos: position,
-                                snippetLines: body.split('\n').length,
-                            }
-                            completion.command = {
-                                command: getExtensionCommandId('completionInsert'),
-                                title: '',
-                                arguments: [arg],
-                            }
-                        }
-
-                        if (executeCommand)
-                            completion.command = {
-                                ...(typeof executeCommand === 'string' ? { command: executeCommand } : executeCommand),
-                                title: '',
+                    return includedSnippets.map(
+                        ({ body, name, sortText, executeCommand, resolveImports, fileIcon, folderIcon, description, iconType, group, type }) => {
+                            if (group) description = group
+                            if (type) iconType = type as any
+                            //
+                            const completion = new vscode.CompletionItem({ label: name, description }, vscode.CompletionItemKind[iconType as string | number])
+                            completion.sortText = sortText
+                            const snippetString = new vscode.SnippetString(body)
+                            completion.insertText = snippetString
+                            const snippetPreview = new vscode.MarkdownString().appendCodeblock(new SnippetParser().text(body), document.languageId)
+                            if (fileIcon) {
+                                completion.kind = vscode.CompletionItemKind.File
+                                completion.detail = fileIcon
                             }
 
-                        if (!completion.documentation) completion.documentation = undefined
-                        return completion
-                    })
+                            if (folderIcon) {
+                                completion.kind = vscode.CompletionItemKind.Folder
+                                completion.detail = folderIcon
+                            }
+
+                            completion.documentation = snippetPreview
+                            if (resolveImports) {
+                                const arg: CompletionInsertArg = {
+                                    action: 'resolve-imports',
+                                    importsConfig: resolveImports,
+                                    insertPos: position,
+                                    snippetLines: body.split('\n').length,
+                                }
+                                completion.command = {
+                                    command: getExtensionCommandId('completionInsert'),
+                                    title: '',
+                                    arguments: [arg],
+                                }
+                            }
+
+                            if (executeCommand)
+                                completion.command = {
+                                    ...(typeof executeCommand === 'string' ? { command: executeCommand } : executeCommand),
+                                    title: '',
+                                }
+
+                            if (!body || !completion.documentation) completion.documentation = undefined
+                            return completion
+                        },
+                    )
                 },
             })
             disposables.push(disposable)
@@ -294,8 +309,10 @@ export const activate = () => {
 
 const unmergedSnippetDefaults: DeepRequired<Configuration['customSnippetDefaults']> = {
     sortText: undefined!,
-    type: 'Snippet',
-    group: 'Better Snippet',
+    iconType: 'Snippet',
+    type: undefined!,
+    description: 'Better Snippet',
+    group: undefined!,
     when: {
         languages: ['js'],
         locations: ['code'],

@@ -1,5 +1,5 @@
 // GENERATED. DON'T EDIT MANUALLY
-// md5hash: e4fa5b8150f19f53d5a560cd0b7e9ecb
+// md5hash: ee62898c6156ed09e6660d9081e8ef78
 {
     "type": "object",
     "properties": {
@@ -134,14 +134,25 @@
                             "name": {
                                 "type": "string"
                             },
+                            "description": {
+                                "description": "Displayed in completion widget",
+                                "type": "string"
+                            },
                             "group": {
-                                "description": "Description, displayed in completion widget",
+                                "type": "string"
+                            },
+                            "fileIcon": {
+                                "description": "If specified, `iconType` is ignored. It makes sense to use with custom file icon theme",
+                                "type": "string"
+                            },
+                            "folderIcon": {
+                                "description": "If specified, `iconType` and `fileIcon` is ignored. It makes sense to use with custom file icon theme",
                                 "type": "string"
                             },
                             "sortText": {
                                 "type": "string"
                             },
-                            "type": {
+                            "iconType": {
                                 "anyOf": [
                                     {
                                         "enum": [
@@ -179,9 +190,13 @@
                                         "type": "number"
                                     }
                                 ]
+                            },
+                            "type": {
+                                "type": "string"
                             }
                         },
                         "required": [
+                            "description",
                             "name"
                         ]
                     }
@@ -323,7 +338,7 @@
                 "sortText": {
                     "type": "string"
                 },
-                "type": {
+                "iconType": {
                     "anyOf": [
                         {
                             "enum": [
@@ -362,6 +377,13 @@
                         }
                     ]
                 },
+                "type": {
+                    "type": "string"
+                },
+                "description": {
+                    "description": "Displayed in completion widget",
+                    "type": "string"
+                },
                 "group": {
                     "type": "string"
                 },
@@ -393,7 +415,10 @@
                         }
                     }
                 }
-            }
+            },
+            "required": [
+                "description"
+            ]
         }
     },
     "required": [
