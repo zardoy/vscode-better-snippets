@@ -132,4 +132,9 @@ export type Configuration = {
             pathRegex?: string
         }
     }
+    /**
+     * After which ms stop observing on diagnostics to resovle resolveImports
+     * @default 1500
+     */
+    diagnosticTimeout: number
 }
