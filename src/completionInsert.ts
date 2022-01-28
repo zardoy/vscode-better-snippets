@@ -6,7 +6,7 @@ import { getExtensionCommandId, getExtensionSetting, registerExtensionCommand } 
 import delay from 'delay'
 import { range } from 'rambda'
 import { CustomSnippet } from './extension'
-import { jsLangs } from './util'
+import { langsSupersets } from './util'
 
 export interface CompletionInsertArg {
     action: 'resolve-imports'
@@ -96,7 +96,7 @@ export const registerCompletionInsert = () => {
                     const packagePath = importsConfig[indentifier]!.package
                     const installable =
                         process.env.PLATFORM !== 'web' &&
-                        jsLangs.includes(document.languageId) &&
+                        langsSupersets.js.includes(document.languageId) &&
                         packagePath &&
                         ['./', '../'].every(predicate => !packagePath.startsWith(predicate))
                     return {

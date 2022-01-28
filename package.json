@@ -57,7 +57,7 @@
         "start": "vscode-framework start",
         "start-web": "vscode-framework start --web",
         "build": "vscode-framework build && tsm prepare.ts",
-        "test": "echo not-implemented"
+        "test": "jest"
     },
     "pnpm": {
         "overrides": {
@@ -83,14 +83,18 @@
         "vscode-manifest": "^0.0.8"
     },
     "dependencies": {
+        "@types/jest": "^27.4.0",
         "@types/path-browserify": "^1.0.0",
         "@zardoy/utils": "^0.0.4",
+        "delay": "^5.0.0",
+        "esbuild-runner": "^2.2.1",
         "escape-string-regexp": "^5.0.0",
         "got": "^11.8.3",
-        "delay": "^5.0.0",
+        "jest": "^27.4.7",
         "jsonc-parser": "^3.0.0",
         "modify-json-file": "^1.2.2",
         "path-browserify": "^1.0.1",
+        "prettier": "^2.5.1",
         "rambda": "^6.9.0",
         "string-dedent": "^2.0.0",
         "ts-essentials": "^9.1.2",

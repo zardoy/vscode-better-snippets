@@ -1,10 +1,10 @@
-import vscode from 'vscode'
-import { jsLangs } from './util'
+import * as vscode from 'vscode'
+import { langsSupersets } from './util'
 
 export const registerPostfixSnippets = () => {
     const POSTFIX_DESCRIPTION = 'Better Snippets Postfix'
     return vscode.languages.registerCompletionItemProvider(
-        jsLangs,
+        langsSupersets.js,
         {
             provideCompletionItems(document, endPos, token, context) {
                 // LINE END SNIPPET!

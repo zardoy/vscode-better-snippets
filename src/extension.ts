@@ -227,7 +227,9 @@ export const activate = () => {
                         const endPosition = originalPos.translate(0, 1)
                         const appliableTypingSnippets = getCurrentSnippets(
                             'typing',
-                            typingSnippets.filter(({ sequence }) => lastTypedSeq.endsWith(sequence)),
+                            typingSnippets.filter(
+                                ({ sequence, when }) => normalizeLanguages(when.languages).includes(document.languageId) && lastTypedSeq.endsWith(sequence),
+                            ),
                             document,
                             endPosition,
                         )

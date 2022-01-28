@@ -1,10 +1,10 @@
 import * as vscode from 'vscode'
 import delay from 'delay'
 import stringDedent from 'string-dedent'
-import { getExtensionId, getExtensionSetting, getExtensionSettingId, registerExtensionCommand, showQuickPick } from 'vscode-framework'
+import { getExtensionSetting, getExtensionSettingId, registerExtensionCommand, showQuickPick, VSCodeQuickPickItem } from 'vscode-framework'
 import { parseTree, findNodeAtLocation } from 'jsonc-parser'
 import { Configuration } from './configurationType'
-import { jsLangs, reactLangs } from './util'
+import { langsEquals, langsSupersets, normalizeLanguages } from './util'
 import { getSnippetsDefaults } from './extension'
 
 export const registerCreateSnippetFromSelection = () => {
@@ -16,23 +16,26 @@ export const registerCreateSnippetFromSelection = () => {
         const { document } = activeEditor
         const suggestedLangs = [document.languageId]
         const allLangs = await vscode.languages.getLanguages()
-        const supportedSupersetLanguages = {
-            react: reactLangs,
-            js: jsLangs,
-        }
-        const otherSupersetLangs = {}
 
-        const foundSupportedSupersets = Object.entries(supportedSupersetLanguages).filter(([, langs]) => langs.includes(document.languageId))
+        const foundSupportedSupersets = Object.entries(langsSupersets).filter(([, langs]) => langs.includes(document.languageId))
         // TODO allow to pick many when global snippet file is set
+        const snippetDefaults = getSnippetsDefaults()
+        const defaultLanguages = normalizeLanguages(snippetDefaults.when.languages)
         const langId =
             foundSupportedSupersets.length === 0
                 ? document.languageId
                 : await showQuickPick<string>([
-                      ...foundSupportedSupersets.map(([superset, supsersetLangs]) => ({
-                          label: superset,
-                          value: superset,
-                          description: `Group of ${supsersetLangs.join(', ')}`,
-                      })),
+                      ...foundSupportedSupersets.map(([superset, supsersetLangs]): VSCodeQuickPickItem => {
+                          const isDefault = langsEquals(defaultLanguages, supsersetLangs)
+                          let description = `(${supsersetLangs.join(', ')})`
+                          if (isDefault) description = `Default ${description}`
+                          return {
+                              label: superset,
+                              value: superset,
+                              picked: isDefault,
+                              description,
+                          }
+                      }),
                       { label: document.languageId, value: document.languageId },
                   ])
         if (langId === undefined) return
@@ -48,7 +51,7 @@ export const registerCreateSnippetFromSelection = () => {
         })
         if (snippetName === undefined) return
         const snippetWhen: Configuration['customSnippets'][number]['when'] = {
-            ...(getSnippetsDefaults().when.languages.includes(langId) ? null : { languages: [langId] }),
+            ...(langsEquals(defaultLanguages, normalizeLanguages(langId)) ? null : { languages: [langId] }),
         }
         const configuration = vscode.workspace.getConfiguration(process.env.IDS_PREFIX)
         const existingCustomSnippets = configuration.get<any[]>('customSnippets') ?? []

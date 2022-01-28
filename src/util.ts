@@ -1,15 +1,17 @@
 // import ts from 'typescript'
+import { ensureArray } from '@zardoy/utils'
+import { equals } from 'rambda'
 import { Configuration } from './configurationType'
 
-export const jsLangs = ['typescript', 'javascript', 'typescriptreact', 'javascriptreact']
-export const reactLangs = ['javascriptreact', 'typescriptreact']
+export const langsSupersets = {
+    js: ['typescript', 'javascript', 'typescriptreact', 'javascriptreact'],
+    react: ['javascriptreact', 'typescriptreact'],
+    ts: ['typescript', 'typescriptreact'],
 
-export const normalizeLanguages = (language: string) => {
-    if (language === 'js') return jsLangs
-    if (language === 'styles') return ['css', 'scss', 'sass', 'source.css.styled']
-    if (language === 'react') return reactLangs
-    return language
+    styles: ['css', 'scss', 'sass', 'source.css.styled'],
 }
+
+export const normalizeLanguages = (language: string | string[]) => ensureArray(language).flatMap(language => langsSupersets[language] ?? language)
 
 // tests: https://github.com/zardoy/github-manager/tree/main/test/normalizeRegex.test.ts
 export const normalizeRegex = (input: string) => {
@@ -30,6 +32,8 @@ export const normalizeFilePathRegex = (input: string, fileType: NonNullable<Conf
             return /(t|j)sconfig(\..+)?.json$/
     }
 }
+
+export const langsEquals = (a: string[], b: string[]) => equals(a.sort(), b.sort())
 
 // const findNodeAtPosition = (source: ts.SourceFile, character: number) => {
 //     const matchingNodes: INode[] = []
