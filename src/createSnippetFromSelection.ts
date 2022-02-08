@@ -24,20 +24,25 @@ export const registerCreateSnippetFromSelection = () => {
         const langId =
             foundSupportedSupersets.length === 0
                 ? document.languageId
-                : await showQuickPick<string>([
-                      ...foundSupportedSupersets.map(([superset, supsersetLangs]): VSCodeQuickPickItem => {
-                          const isDefault = langsEquals(defaultLanguages, supsersetLangs)
-                          let description = `(${supsersetLangs.join(', ')})`
-                          if (isDefault) description = `Default ${description}`
-                          return {
-                              label: superset,
-                              value: superset,
-                              picked: isDefault,
-                              description,
-                          }
-                      }),
-                      { label: document.languageId, value: document.languageId },
-                  ])
+                : await showQuickPick<string>(
+                      [
+                          ...foundSupportedSupersets.map(([superset, supsersetLangs]): VSCodeQuickPickItem => {
+                              const isDefault = langsEquals(defaultLanguages, supsersetLangs)
+                              let description = `(${supsersetLangs.join(', ')})`
+                              if (isDefault) description = `Default ${description}`
+                              return {
+                                  label: superset,
+                                  value: superset,
+                                  picked: isDefault,
+                                  description,
+                              }
+                          }),
+                          { label: document.languageId, value: document.languageId },
+                      ],
+                      {
+                          title: 'Select language(s) in which snippet will be suggested',
+                      },
+                  )
         if (langId === undefined) return
         let snippetLines = stringDedent(document.getText(activeEditor.selection)).split('\n')
         if (!activeEditor.options.insertSpaces)
@@ -47,7 +52,7 @@ export const registerCreateSnippetFromSelection = () => {
         const snippetName = await vscode.window.showInputBox({
             ignoreFocusOut: true,
             // TODO suggest templ if file selection (though its bad idea)
-            title: 'Enter snippet name',
+            title: 'Enter name for the snippet',
         })
         if (snippetName === undefined) return
         const snippetWhen: Configuration['customSnippets'][number]['when'] = {
