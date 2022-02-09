@@ -4,6 +4,9 @@
     "publisher": "zardoy",
     "icon": "resources/icon.png",
     "version": "0.0.0-dev",
+    "author": "Vitaly Turovsky <vital2580@icloud.com>",
+    "license": "MIT",
+    "private": true,
     "web": true,
     "categories": [
         "Snippets",
@@ -49,15 +52,13 @@
         },
         "virtualWorkspaces": true
     },
-    "repository": "https://github.com/zardoy/vscode-fix-all-json.git",
-    "author": "Vitaly Turovsky <vital2580@icloud.com>",
-    "license": "MIT",
-    "private": true,
     "scripts": {
         "start": "vscode-framework start",
         "start-web": "vscode-framework start --web",
         "build": "vscode-framework build && tsm prepare.ts",
-        "test": "jest"
+        "integration-test": "tsc -p tsconfig.test.json && node testsOut/runTests.js",
+        "integration-test-watch": "tsc-watch -p tsconfig.test.json --onSuccess \"node testsOut/runTests.js\"",
+        "test": "jest && pnpm integration-test"
     },
     "pnpm": {
         "overrides": {
@@ -86,6 +87,7 @@
         "@types/jest": "^27.4.0",
         "@types/path-browserify": "^1.0.0",
         "@zardoy/utils": "^0.0.4",
+        "chai": "^4.3.6",
         "delay": "^5.0.0",
         "esbuild-runner": "^2.2.1",
         "escape-string-regexp": "^5.0.0",
@@ -98,6 +100,7 @@
         "rambda": "^6.9.0",
         "string-dedent": "^2.0.0",
         "ts-essentials": "^9.1.2",
+        "tsc-watch": "^4.6.0",
         "type-fest": "^2.9.0",
         "vscode-framework": "^0.0.18",
         "vscode-snippet-parser": "^0.0.5"

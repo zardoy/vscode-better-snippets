@@ -4,5 +4,5 @@
         "outDir": "testsOut",
         "noEmit": false
     },
-    "include": ["test"]
+    "include": ["test/integration"]
 }
