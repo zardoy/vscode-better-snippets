@@ -4,7 +4,9 @@ import * as vscode from 'vscode'
 import { EOL } from 'os'
 import { expect } from 'chai'
 import delay from 'delay'
-import { Configuration } from '../../../src/configurationType'
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment, @typescript-eslint/prefer-ts-expect-error
+//@ts-ignore
+import type { Configuration } from '../../../src/configurationType'
 
 const normalizeEol = (input: string) => input.split('\n').join(EOL)
 
