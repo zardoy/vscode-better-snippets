@@ -30,6 +30,8 @@ This extension comes handy [top-line builtin snippets](src/builtinSnippets.ts) f
 
 ## Typing Snippets
 
+> aka hotstrings from [AutoHotkey](https://www.autohotkey.com/)
+
 You can also define so called typing snippets. Some sequence of letter will be replaced with snippet, for example:
 
 `cb ` -> `($1) => $2`
