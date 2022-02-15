@@ -4,7 +4,7 @@ import { equals } from 'rambda'
 import { Configuration } from './configurationType'
 
 export const langsSupersets = {
-    js: ['typescript', 'javascript', 'typescriptreact', 'javascriptreact'],
+    js: ['typescript', 'javascript', 'typescriptreact', 'javascriptreact', 'vue'],
     react: ['javascriptreact', 'typescriptreact'],
     ts: ['typescript', 'typescriptreact'],
 
