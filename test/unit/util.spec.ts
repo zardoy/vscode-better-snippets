@@ -1,25 +1,23 @@
-import {
-  normalizeLanguages,
-  langsEquals,
-  langsSupersets,
-} from "../../src/util";
+import { defaultLanguageSupersets } from '../../src/configurationType'
+import { normalizeLanguages as normalizeLanguagesOriginal, langsEquals } from '../../src/util'
 
-test("normalizeLanguages", () => {
-  expect(normalizeLanguages("javascriptreact")).toMatchInlineSnapshot(`
+const normalizeLanguages = (langs: string | string[]) => normalizeLanguagesOriginal(langs, defaultLanguageSupersets)
+
+test('normalizeLanguages', () => {
+    expect(normalizeLanguages('javascriptreact')).toMatchInlineSnapshot(`
     Array [
       "javascriptreact",
     ]
-  `);
-  expect(normalizeLanguages("js")).toMatchInlineSnapshot(`
+  `)
+    expect(normalizeLanguages('js')).toMatchInlineSnapshot(`
     Array [
       "typescript",
       "javascript",
       "typescriptreact",
       "javascriptreact",
     ]
-  `);
-  expect(normalizeLanguages(["typescriptreact", "typescript", "ts", "styles"]))
-    .toMatchInlineSnapshot(`
+  `)
+    expect(normalizeLanguages(['typescriptreact', 'typescript', 'ts', 'styles'])).toMatchInlineSnapshot(`
     Array [
       "typescriptreact",
       "typescript",
@@ -30,12 +28,10 @@ test("normalizeLanguages", () => {
       "sass",
       "source.css.styled",
     ]
-  `);
-  expect(normalizeLanguages([])).toMatchInlineSnapshot(`Array []`);
-});
+  `)
+    expect(normalizeLanguages([])).toMatchInlineSnapshot(`Array []`)
+})
 
-test("langEquals", () => {
-  expect(
-    langsEquals(langsSupersets.js, normalizeLanguages("js"))
-  ).toMatchInlineSnapshot(`true`);
-});
+test('langEquals', () => {
+    expect(langsEquals(defaultLanguageSupersets.js, normalizeLanguages('js'))).toMatchInlineSnapshot(`true`)
+})

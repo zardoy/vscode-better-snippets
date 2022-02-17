@@ -1,10 +1,12 @@
 import * as vscode from 'vscode'
-import { langsSupersets } from './util'
+import { getExtensionSetting } from 'vscode-framework'
 
-export const registerPostfixSnippets = () => {
+export const registerExperimentalSnippets = () => {
     const POSTFIX_DESCRIPTION = 'Better Snippets Postfix'
+    const langsSupersets = getExtensionSetting('languageSupersets')
     return vscode.languages.registerCompletionItemProvider(
-        langsSupersets.js,
+        // is user mad?
+        langsSupersets.js ?? [],
         {
             provideCompletionItems(document, endPos, token, context) {
                 // LINE END SNIPPET!

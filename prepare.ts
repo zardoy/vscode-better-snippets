@@ -1,5 +1,6 @@
 import { ContributesConfigurationType, ManifestType } from 'vscode-manifest'
 import { modifyPackageJsonFile } from 'modify-json-file'
+import { defaultLanguageSupersets } from './src/configurationType'
 
 await modifyPackageJsonFile({ dir: 'out' }, pkgUntyped => {
     const pkg = pkgUntyped as ManifestType
@@ -11,6 +12,10 @@ await modifyPackageJsonFile({ dir: 'out' }, pkgUntyped => {
     properties['betterSnippets.customSnippets']['items']['allOf'][1]['properties']['group']['deprecationMessage'] = properties[
         'betterSnippets.customSnippetDefaults'
     ]['properties']['group']['deprecationMessage'] = 'Use `description` instead. It will be removed in next minor release'
+
+    // TODO move it from here
+    properties['betterSnippets.languageSupersets'].default = defaultLanguageSupersets
+
     for (const [, property] of Object.entries(properties)) {
         if (property.description) {
             property.markdownDescription = property.description

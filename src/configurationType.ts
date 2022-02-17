@@ -133,8 +133,23 @@ export type Configuration = {
         }
     }
     /**
-     * After which ms stop observing on diagnostics to resovle resolveImports
+     * (advanced) After which milliseconds stop observing on diagnostics to resovle snippet's `resolveImports`
      * @default 1500
      */
     diagnosticTimeout: number
+    // TODO Try to move to core as it is common to use
+    /**
+     * Define/change family of languages. You can use family's name instead of language id in when.
+     */
+    // TODO default is set in prepare.ts
+    // * Note that family name can overlap with language id, contributed by other extension. If this is case rename the family or set it to null (in case if family is builtin)
+    languageSupersets: { [family: string]: string[] }
+}
+
+export const defaultLanguageSupersets = {
+    js: ['typescript', 'javascript', 'typescriptreact', 'javascriptreact'],
+    react: ['javascriptreact', 'typescriptreact'],
+    ts: ['typescript', 'typescriptreact'],
+
+    styles: ['css', 'scss', 'sass', 'source.css.styled'],
 }

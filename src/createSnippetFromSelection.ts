@@ -4,7 +4,7 @@ import stringDedent from 'string-dedent'
 import { getExtensionSetting, getExtensionSettingId, registerExtensionCommand, showQuickPick, VSCodeQuickPickItem } from 'vscode-framework'
 import { parseTree, findNodeAtLocation } from 'jsonc-parser'
 import { Configuration } from './configurationType'
-import { langsEquals, langsSupersets, normalizeLanguages } from './util'
+import { langsEquals, normalizeLanguages } from './util'
 import { getSnippetsDefaults } from './extension'
 
 export const registerCreateSnippetFromSelection = () => {
@@ -14,13 +14,12 @@ export const registerCreateSnippetFromSelection = () => {
         const activeEditor = vscode.window.activeTextEditor
         if (!activeEditor) return
         const { document } = activeEditor
-        const suggestedLangs = [document.languageId]
-        const allLangs = await vscode.languages.getLanguages()
 
+        const langsSupersets = getExtensionSetting('languageSupersets')
         const foundSupportedSupersets = Object.entries(langsSupersets).filter(([, langs]) => langs.includes(document.languageId))
         // TODO allow to pick many when global snippet file is set
         const snippetDefaults = getSnippetsDefaults()
-        const defaultLanguages = normalizeLanguages(snippetDefaults.when.languages)
+        const defaultLanguages = normalizeLanguages(snippetDefaults.when.languages, langsSupersets)
         const langId =
             foundSupportedSupersets.length === 0
                 ? document.languageId
@@ -56,7 +55,7 @@ export const registerCreateSnippetFromSelection = () => {
         })
         if (snippetName === undefined) return
         const snippetWhen: Configuration['customSnippets'][number]['when'] = {
-            ...(langsEquals(defaultLanguages, normalizeLanguages(langId)) ? null : { languages: [langId] }),
+            ...(langsEquals(defaultLanguages, normalizeLanguages(langId, langsSupersets)) ? null : { languages: [langId] }),
         }
         const configuration = vscode.workspace.getConfiguration(process.env.IDS_PREFIX)
         const existingCustomSnippets = configuration.get<any[]>('customSnippets') ?? []

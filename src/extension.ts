@@ -8,7 +8,7 @@ import escapeStringRegexp from 'escape-string-regexp'
 import { Configuration } from './configurationType'
 import { normalizeFilePathRegex, normalizeLanguages, normalizeRegex } from './util'
 import { builtinSnippets } from './builtinSnippets'
-import { registerPostfixSnippets } from './experimentalSnippets'
+import { registerExperimentalSnippets } from './experimentalSnippets'
 import { CompletionInsertArg, registerCompletionInsert } from './completionInsert'
 import { registerSpecialCommand } from './specialCommand'
 import { registerCreateSnippetFromSelection } from './createSnippetFromSelection'
@@ -112,6 +112,7 @@ export const activate = () => {
     }
 
     const registerSnippets = () => {
+        const langsSupersets = getExtensionSetting('languageSupersets')
         const customSnippets = [...getExtensionSetting('customSnippets'), ...(getExtensionSetting('enableBuiltinSnippets') ? builtinSnippets : [])]
 
         const languageSnippets: { [language: string]: CustomSnippet[] } = {}
@@ -125,7 +126,7 @@ export const activate = () => {
 
         for (const [language, snippets] of Object.entries(languageSnippets)) {
             let triggerFromInner = false
-            const disposable = vscode.languages.registerCompletionItemProvider(normalizeLanguages(language), {
+            const disposable = vscode.languages.registerCompletionItemProvider(normalizeLanguages(language, langsSupersets), {
                 provideCompletionItems(document, position, _token, context) {
                     // if (context.triggerKind !== vscode.CompletionTriggerKind.Invoke) return
                     if (triggerFromInner) {
@@ -228,7 +229,8 @@ export const activate = () => {
                         const appliableTypingSnippets = getCurrentSnippets(
                             'typing',
                             typingSnippets.filter(
-                                ({ sequence, when }) => normalizeLanguages(when.languages).includes(document.languageId) && lastTypedSeq.endsWith(sequence),
+                                ({ sequence, when }) =>
+                                    normalizeLanguages(when.languages, langsSupersets).includes(document.languageId) && lastTypedSeq.endsWith(sequence),
                             ),
                             document,
                             endPosition,
@@ -285,7 +287,7 @@ export const activate = () => {
             )
         }
 
-        disposables.push(registerPostfixSnippets())
+        disposables.push(registerExperimentalSnippets())
     }
 
     registerSnippets()
@@ -295,7 +297,8 @@ export const activate = () => {
             affectsConfiguration(getExtensionSettingId('customSnippetDefaults')) ||
             affectsConfiguration(getExtensionSettingId('typingSnippets')) ||
             affectsConfiguration(getExtensionSettingId('enableBuiltinSnippets')) ||
-            affectsConfiguration(getExtensionSettingId('enableExperimentalSnippets'))
+            affectsConfiguration(getExtensionSettingId('enableExperimentalSnippets')) ||
+            affectsConfiguration(getExtensionSettingId('languageSupersets'))
         ) {
             console.log('Snippets configuration updated')
             vscode.Disposable.from(...disposables).dispose()

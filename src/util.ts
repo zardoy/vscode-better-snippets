@@ -3,15 +3,8 @@ import { ensureArray } from '@zardoy/utils'
 import { equals } from 'rambda'
 import { Configuration } from './configurationType'
 
-export const langsSupersets = {
-    js: ['typescript', 'javascript', 'typescriptreact', 'javascriptreact', 'vue'],
-    react: ['javascriptreact', 'typescriptreact'],
-    ts: ['typescript', 'typescriptreact'],
-
-    styles: ['css', 'scss', 'sass', 'source.css.styled'],
-}
-
-export const normalizeLanguages = (language: string | string[]) => ensureArray(language).flatMap(language => langsSupersets[language] ?? language)
+export const normalizeLanguages = (language: string | string[], loadedLanguageSupersets: Configuration['languageSupersets']) =>
+    ensureArray(language).flatMap(language => loadedLanguageSupersets[language] ?? language)
 
 // tests: https://github.com/zardoy/github-manager/tree/main/test/normalizeRegex.test.ts
 export const normalizeRegex = (input: string) => {
