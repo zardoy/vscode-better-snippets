@@ -14,7 +14,7 @@ Snippets in VSCode are always contextless, they will be suggested in comments, s
 - Display Snippets only in specific files by filtering the path by regex (for example set `when.fileRegex` to `App.tsx?`)
 - Display Snippet only if line matching the regex (for example set `when.lineRegex` to `\s*const`)
 
-This can give more context to your snippets.
+This can give extreme control for your snippets.
 
 You can use this extension instead of builtin snippets.
 
@@ -68,4 +68,5 @@ Special:
 ## Similar Extensions
 
 - [TS/JS postfix completion](https://marketplace.visualstudio.com/items?itemName=ipatalas.vscode-postfix-ts)
+- [Module Templates](https://marketplace.visualstudio.com/items?itemName=asbjornh.vscode-module-templates) for creating complex templates with one command
 - Feel free to open PR to add another one!
