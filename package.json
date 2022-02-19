@@ -58,14 +58,18 @@
         "build": "vscode-framework build && tsm prepare.ts",
         "integration-test": "tsc -p tsconfig.test.json && node testsOut/runTests.js",
         "integration-test-watch": "tsc-watch -p tsconfig.test.json --onSuccess \"node testsOut/runTests.js\"",
-        "test": "jest && pnpm integration-test"
+        "test": "jest && pnpm integration-test",
+        "lint": "eslint src/**",
+        "postinstall": "patch-package"
     },
     "pnpm": {
         "overrides": {
-            "esbuild": "^0.14.10"
+            "esbuild": "^0.14.10",
+            "typescript-json-schema": "^0.53.0"
         }
     },
     "devDependencies": {
+        "@milahu/patch-package-with-pnpm-support": "github:milahu/patch-package#pnpm-support-2",
         "@types/chai": "^4.3.0",
         "@types/glob": "^7.2.0",
         "@types/mocha": "^9.1.0",

@@ -1,7 +1,6 @@
 import { join } from 'path'
 import glob from 'glob'
 import Mocha from 'mocha'
-import * as jest from 'jest'
 
 export const run = async () => {
     // can't require 'vscode' as no way to disable sandboxing https://github.com/facebook/jest/issues/8010
