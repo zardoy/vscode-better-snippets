@@ -1,4 +1,5 @@
 import * as vscode from 'vscode'
+import { ConditionalPick } from 'type-fest'
 import { SnippetParser } from 'vscode-snippet-parser'
 import { mergeDeepRight } from 'rambda'
 import { DeepRequired } from 'ts-essentials'
@@ -113,11 +114,20 @@ export const activate = () => {
 
     const registerSnippets = () => {
         const langsSupersets = getExtensionSetting('languageSupersets')
-        const customSnippets = [...getExtensionSetting('customSnippets'), ...(getExtensionSetting('enableBuiltinSnippets') ? builtinSnippets : [])]
+        const getMergedConfig = <T extends keyof ConditionalPick<Configuration, any[]>>(configKey: T): Configuration[T] => {
+            const {
+                globalValue = [],
+                workspaceValue = [],
+                workspaceFolderValue = [],
+            } = vscode.workspace.getConfiguration(process.env.IDS_PREFIX, null).inspect<any[]>(configKey)!
+            return [...globalValue, ...workspaceValue, ...workspaceFolderValue]
+        }
+
+        const snippetsToLoad = [...getMergedConfig('customSnippets'), ...(getExtensionSetting('enableBuiltinSnippets') ? builtinSnippets : [])]
 
         const languageSnippets: { [language: string]: CustomSnippet[] } = {}
-        for (const customSnippetRaw of customSnippets) {
-            const customSnippet = mergeSnippetWithDefaults(customSnippetRaw)
+        for (const snippetToLoad of snippetsToLoad) {
+            const customSnippet = mergeSnippetWithDefaults(snippetToLoad)
             for (const language of customSnippet.when.languages) {
                 if (!languageSnippets[language]) languageSnippets[language] = []
                 languageSnippets[language]!.push(mergeSnippetWithDefaults(customSnippet))
@@ -186,9 +196,9 @@ export const activate = () => {
             extensionCtx.subscriptions.push(...disposables)
         }
 
-        const typingSnippetsRaw = getExtensionSetting('typingSnippets')
-        if (typingSnippetsRaw.length > 0) {
-            const typingSnippets = typingSnippetsRaw.map(snippet => mergeSnippetWithDefaults(snippet))
+        const typingSnippetsToLoad = getMergedConfig('typingSnippets')
+        if (typingSnippetsToLoad.length > 0) {
+            const typingSnippets = typingSnippetsToLoad.map(snippet => mergeSnippetWithDefaults(snippet))
             let lastTypedSeq = ''
             let lastTypePosition = null as null | vscode.Position
             const resetSelection = () => {
@@ -238,7 +248,7 @@ export const activate = () => {
                         if (appliableTypingSnippets.length > 2) console.warn(`Multiple appliable typing snippets found: ${appliableTypingSnippets.join(', ')}`)
                         const snippet = appliableTypingSnippets[0]
                         if (!snippet) return
-                        console.log('applying typing snippet', snippet.sequence)
+                        console.log('Applying typing snippet', snippet.sequence)
                         const startPosition = endPosition.translate(0, -snippet.sequence.length)
                         const { body, executeCommand, resolveImports } = snippet
                         await new Promise<void>(resolve => {

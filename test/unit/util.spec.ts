@@ -9,6 +9,11 @@ test('normalizeLanguages', () => {
       "javascriptreact",
     ]
   `)
+    expect(normalizeLanguages('*')).toMatchInlineSnapshot(`
+    Array [
+      "*",
+    ]
+  `)
     expect(normalizeLanguages('js')).toMatchInlineSnapshot(`
     Array [
       "typescript",
