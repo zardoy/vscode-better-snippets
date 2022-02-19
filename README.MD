@@ -22,7 +22,7 @@ You can use this extension instead of builtin snippets.
 
 Just because snippets are now aware of context, you can configure them to **always** show on top and/or show them only when exact snippet prefix is typed.
 
-Also, web should be supported.
+Also, web is supported.
 
 ## Builtin Snippets
 

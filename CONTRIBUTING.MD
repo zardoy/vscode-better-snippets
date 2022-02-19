@@ -1,7 +1,7 @@
 <!-- https://github.com/vitest-dev/vitest/blob/main/CONTRIBUTING.md -->
 ## Better Snippets Contributing Guide
 
-Hi! Thank you so much for contributing to VSCode Better Snippets extension! We are really excited to bring high-end quality extensions and we really appreciate any interest in it!
+Hi! Thank you so much for contributing to VSCode Better Snippets extension! We are really excited to bring high quality extensions and we really appreciate any interest in it!
 Let us give you some high-level overview for you.
 
 ## Repo Setup
