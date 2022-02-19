@@ -47,5 +47,6 @@ To launch unit tests once run `pnpm jest`. To watch them in watch mode run `pnpm
 
 They are in `test/integration`. This type of tests require integration of VSCode. If you find yourself mocking of `'vscode'` is hard or want to simulate some sequence of user actions, you should add test here.
 You don't need to test absolutely every feature of extension, as writing tests here require time. However, instead of doing the same thing on window reload several times, try to write test here and then run `pnpm integration-test:watch`. After running this script, each time when you edit some file in `test/integration`, window with integration tests will be reopened, you will the results in console.
+Note that while running this script, you must also keep `pnpm start` running in the background. However, changing a file in `src/`, won't relaunch integration tests. If this is your case, you should edit the script.
 
 Note that running `pnpm test` will launch unit + integration tests.
