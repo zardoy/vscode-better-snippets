@@ -1,7 +1,5 @@
 name: Extension VSIX
 on:
-  push:
-    branches: [test]
   pull_request:
 
 jobs:
