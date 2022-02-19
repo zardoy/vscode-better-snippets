@@ -1,0 +1,6 @@
+{
+    "sharedActionsOverride": {
+        "runTest": false,
+        "runBuild": false
+    }
+}
