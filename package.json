@@ -59,7 +59,7 @@
         "integration-test": "tsc -p tsconfig.test.json && node testsOut/runTests.js",
         "integration-test-watch": "tsc-watch -p tsconfig.test.json --onSuccess \"node testsOut/runTests.js\"",
         "test": "jest && pnpm integration-test",
-        "lint": "eslint src/**",
+        "lint": "eslint src/**/*.ts",
         "postinstall": "patch-package"
     },
     "pnpm": {
