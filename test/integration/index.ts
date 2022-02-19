@@ -4,7 +4,7 @@ import Mocha from 'mocha'
 import * as jest from 'jest'
 
 export const run = async () => {
-    // can't require vscode as no way to disable sandboxing https://github.com/facebook/jest/issues/8010
+    // can't require 'vscode' as no way to disable sandboxing https://github.com/facebook/jest/issues/8010
     // await jest.runCLI(
     //     {
     //         ci: true,
