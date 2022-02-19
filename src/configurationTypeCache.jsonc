@@ -1,5 +1,5 @@
 // GENERATED. DON'T EDIT MANUALLY
-// md5hash: 98e15640955b0b267461d725fa2d97b3
+// md5hash: bba4fa4dfaccd654e444ff4d6d56f02c
 {
     "type": "object",
     "properties": {
@@ -417,9 +417,19 @@
             }
         },
         "diagnosticTimeout": {
-            "description": "After which ms stop observing on diagnostics to resovle resolveImports",
+            "description": "(advanced) After which milliseconds stop observing on diagnostics to resovle snippet's `resolveImports`",
             "default": 1500,
             "type": "number"
+        },
+        "languageSupersets": {
+            "description": "Define/change family of languages. You can use family's name instead of language id in when.",
+            "type": "object",
+            "additionalProperties": {
+                "type": "array",
+                "items": {
+                    "type": "string"
+                }
+            }
         }
     },
     "required": [
@@ -428,6 +438,7 @@
         "diagnosticTimeout",
         "enableBuiltinSnippets",
         "enableExperimentalSnippets",
+        "languageSupersets",
         "snippetCreator.showSnippetAfterCreation",
         "typingSnippets",
         "typingSnippetsUndoStops",
