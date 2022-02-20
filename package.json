@@ -72,12 +72,13 @@
         "@milahu/patch-package-with-pnpm-support": "github:milahu/patch-package#pnpm-support-2",
         "@types/chai": "^4.3.0",
         "@types/glob": "^7.2.0",
+        "@types/jest": "^27.4.0",
         "@types/mocha": "^9.1.0",
         "@types/node": "^16.11.25",
+        "@types/path-browserify": "^1.0.0",
         "@types/vscode": "^1.64.0",
         "@vscode/test-electron": "^2.1.2",
         "@zardoy/tsconfig": "^1.4.0",
-        "char": "^1.0.2",
         "cross-env": "^7.0.3",
         "eslint": "^8.9.0",
         "eslint-config-zardoy": "^0.2.8",
@@ -88,8 +89,6 @@
         "vscode-manifest": "^0.0.8"
     },
     "dependencies": {
-        "@types/jest": "^27.4.0",
-        "@types/path-browserify": "^1.0.0",
         "@zardoy/utils": "^0.0.4",
         "chai": "^4.3.6",
         "delay": "^5.0.0",

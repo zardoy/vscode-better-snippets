@@ -1,10 +1,10 @@
 // GENERATED. DON'T EDIT MANUALLY
-// md5hash: bba4fa4dfaccd654e444ff4d6d56f02c
+// md5hash: 55e3557ab79566d1de77d75601b8a623
 {
     "type": "object",
     "properties": {
         "enableBuiltinSnippets": {
-            "description": "Include builtin JS snippets",
+            "description": "Include builtin JS/MD snippets",
             "default": true,
             "type": "boolean"
         },
@@ -23,6 +23,7 @@
             "type": "boolean"
         },
         "customSnippets": {
+            "suggestSortText": "betterSnippets.1",
             "type": "array",
             "items": {
                 "allOf": [
@@ -30,6 +31,12 @@
                         "type": "object",
                         "properties": {
                             "body": {
+                                "suggestSortText": "2",
+                                "defaultSnippets": [
+                                    {
+                                        "body": "$1"
+                                    }
+                                ],
                                 "anyOf": [
                                     {
                                         "type": "array",
@@ -42,43 +49,8 @@
                                     }
                                 ]
                             },
-                            "executeCommand": {
-                                "description": "Execute custom command on snippet accept, doesn't work with resolveImports",
-                                "anyOf": [
-                                    {
-                                        "type": "object",
-                                        "properties": {
-                                            "command": {
-                                                "type": "string"
-                                            },
-                                            "arguments": {
-                                                "type": "array",
-                                                "items": {}
-                                            }
-                                        },
-                                        "required": [
-                                            "arguments",
-                                            "command"
-                                        ]
-                                    },
-                                    {
-                                        "type": "string"
-                                    }
-                                ]
-                            },
-                            "resolveImports": {
-                                "description": "For JS langs only. How to resolve suggested imports if any",
-                                "type": "object",
-                                "additionalProperties": {
-                                    "type": "object",
-                                    "properties": {
-                                        "package": {
-                                            "type": "string"
-                                        }
-                                    }
-                                }
-                            },
                             "when": {
+                                "suggestSortText": "3",
                                 "type": "object",
                                 "properties": {
                                     "lineHasRegex": {
@@ -122,6 +94,42 @@
                                         "type": "string"
                                     }
                                 }
+                            },
+                            "resolveImports": {
+                                "description": "For JS langs only. How to resolve suggested imports if any",
+                                "type": "object",
+                                "additionalProperties": {
+                                    "type": "object",
+                                    "properties": {
+                                        "package": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            },
+                            "executeCommand": {
+                                "description": "Execute custom command on snippet accept, doesn't work with resolveImports",
+                                "anyOf": [
+                                    {
+                                        "type": "object",
+                                        "properties": {
+                                            "command": {
+                                                "type": "string"
+                                            },
+                                            "arguments": {
+                                                "type": "array",
+                                                "items": {}
+                                            }
+                                        },
+                                        "required": [
+                                            "arguments",
+                                            "command"
+                                        ]
+                                    },
+                                    {
+                                        "type": "string"
+                                    }
+                                ]
                             }
                         },
                         "required": [
@@ -132,10 +140,11 @@
                         "type": "object",
                         "properties": {
                             "name": {
+                                "suggestSortText": "!",
                                 "type": "string"
                             },
                             "description": {
-                                "description": "Displayed in completion widget",
+                                "description": "Should be short. Always displayed in completion widget on the same raw as label.",
                                 "type": "string"
                             },
                             "group": {
@@ -203,6 +212,7 @@
             }
         },
         "typingSnippets": {
+            "suggestSortText": "betterSnippets.2",
             "type": "array",
             "items": {
                 "allOf": [
@@ -210,6 +220,12 @@
                         "type": "object",
                         "properties": {
                             "body": {
+                                "suggestSortText": "2",
+                                "defaultSnippets": [
+                                    {
+                                        "body": "$1"
+                                    }
+                                ],
                                 "anyOf": [
                                     {
                                         "type": "array",
@@ -222,43 +238,8 @@
                                     }
                                 ]
                             },
-                            "executeCommand": {
-                                "description": "Execute custom command on snippet accept, doesn't work with resolveImports",
-                                "anyOf": [
-                                    {
-                                        "type": "object",
-                                        "properties": {
-                                            "command": {
-                                                "type": "string"
-                                            },
-                                            "arguments": {
-                                                "type": "array",
-                                                "items": {}
-                                            }
-                                        },
-                                        "required": [
-                                            "arguments",
-                                            "command"
-                                        ]
-                                    },
-                                    {
-                                        "type": "string"
-                                    }
-                                ]
-                            },
-                            "resolveImports": {
-                                "description": "For JS langs only. How to resolve suggested imports if any",
-                                "type": "object",
-                                "additionalProperties": {
-                                    "type": "object",
-                                    "properties": {
-                                        "package": {
-                                            "type": "string"
-                                        }
-                                    }
-                                }
-                            },
                             "when": {
+                                "suggestSortText": "3",
                                 "type": "object",
                                 "properties": {
                                     "lineHasRegex": {
@@ -302,6 +283,42 @@
                                         "type": "string"
                                     }
                                 }
+                            },
+                            "resolveImports": {
+                                "description": "For JS langs only. How to resolve suggested imports if any",
+                                "type": "object",
+                                "additionalProperties": {
+                                    "type": "object",
+                                    "properties": {
+                                        "package": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            },
+                            "executeCommand": {
+                                "description": "Execute custom command on snippet accept, doesn't work with resolveImports",
+                                "anyOf": [
+                                    {
+                                        "type": "object",
+                                        "properties": {
+                                            "command": {
+                                                "type": "string"
+                                            },
+                                            "arguments": {
+                                                "type": "array",
+                                                "items": {}
+                                            }
+                                        },
+                                        "required": [
+                                            "arguments",
+                                            "command"
+                                        ]
+                                    },
+                                    {
+                                        "type": "string"
+                                    }
+                                ]
                             }
                         },
                         "required": [
@@ -313,6 +330,7 @@
                         "properties": {
                             "sequence": {
                                 "description": "Snippet will be accepted only after typing THE EXACT sequence of characters on the keyboard. Using arrows or mouse for navigating will reset the sequence (see settings)",
+                                "suggestSortText": "!",
                                 "type": "string"
                             }
                         },
@@ -328,10 +346,12 @@
             "type": "boolean"
         },
         "snippetCreator.showSnippetAfterCreation": {
-            "default": "false Open snippet after its creation",
+            "description": "Reveal snippet in settings.json after its creation",
+            "default": true,
             "type": "boolean"
         },
         "customSnippetDefaults": {
+            "description": "Override default values for every snippet",
             "type": "object",
             "properties": {
                 "sortText": {
@@ -380,7 +400,7 @@
                     "type": "string"
                 },
                 "description": {
-                    "description": "Displayed in completion widget",
+                    "description": "Should be short. Always displayed in completion widget on the same raw as label. Default is 'Better Snippet'",
                     "type": "string"
                 },
                 "group": {
@@ -440,6 +460,7 @@
         "enableExperimentalSnippets",
         "languageSupersets",
         "snippetCreator.showSnippetAfterCreation",
+        "snippetsDirs",
         "typingSnippets",
         "typingSnippetsUndoStops",
         "useParamMode"

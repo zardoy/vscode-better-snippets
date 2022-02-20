@@ -12,17 +12,16 @@ type CommandDefinition =
 type SnippetType = keyof typeof vscode.CompletionItemKind | number
 
 export type GeneralSnippet = {
+    /**
+     * @suggestSortText "2"
+     * @defaultSnippets [{
+     *   "body": "$1"
+     * }]
+     */
     body: string | string[]
-    /** Execute custom command on snippet accept, doesn't work with resolveImports */
-    executeCommand?: CommandDefinition /* | CommandDefinition[] */
-    /** For JS langs only. How to resolve suggested imports if any */
-    resolveImports?: {
-        // specifier can be subst only for now
-        [importSpecifier: string]: {
-            package?: string // = specifier, true = best match
-            // export?: string // default or specifier if package is specified
-        }
-    }
+    /**
+     * @suggestSortText "3"
+     */
     when?: {
         /** Shouldn't be used with `Start` location as snippet would be hidden in that case */
         lineHasRegex?: string
@@ -45,11 +44,21 @@ export type GeneralSnippet = {
          */
         // npmDependencies?: string[]
     }
+    /** For JS langs only. How to resolve suggested imports if any */
+    resolveImports?: {
+        // specifier can be subst only for now
+        [importSpecifier: string]: {
+            package?: string // = specifier, true = best match
+            // export?: string // default or specifier if package is specified
+        }
+    }
+    /** Execute custom command on snippet accept, doesn't work with resolveImports */
+    executeCommand?: CommandDefinition /* | CommandDefinition[] */
 }
 
 export type Configuration = {
     /**
-     * Include builtin JS snippets
+     * Include builtin JS/MD snippets
      * @default true
      *  */
     enableBuiltinSnippets: boolean
@@ -75,10 +84,16 @@ export type Configuration = {
      * Whether to enable builtin postfix snippets. They may be moved to another extension in future releases
      * @default false */
     enableExperimentalSnippets: boolean
+    /**
+     * @suggestSortText betterSnippets.1
+     */
     customSnippets: Array<
         GeneralSnippet & {
+            /**
+             * @suggestSortText !
+             */
             name: string
-            /** Displayed in completion widget */
+            /** Should be short. Always displayed in completion widget on the same raw as label. */
             description?: string
             /** @deprecated */
             group?: string
@@ -99,9 +114,15 @@ export type Configuration = {
             type?: string
         }
     >
+    /**
+     * @suggestSortText betterSnippets.2
+     */
     typingSnippets: Array<
         GeneralSnippet & {
-            /** Snippet will be accepted only after typing THE EXACT sequence of characters on the keyboard. Using arrows or mouse for navigating will reset the sequence (see settings) */
+            /**
+             * Snippet will be accepted only after typing THE EXACT sequence of characters on the keyboard. Using arrows or mouse for navigating will reset the sequence (see settings)
+             * @suggestSortText !
+             */
             sequence: string
         }
     >
@@ -113,14 +134,18 @@ export type Configuration = {
     // 'nativeSnippetCreator.globalSnippetName': false | string
     // /** @default false (for native snippets) Open snippet after its creation */
     // 'nativeSnippetCreator.showSnippetAfterCreation': boolean
-    /** @default false Open snippet after its creation */
+    /**
+     * Reveal snippet in settings.json after its creation
+     * @default true
+     * */
     'snippetCreator.showSnippetAfterCreation': boolean
+    /** Override default values for every snippet */
     customSnippetDefaults: {
         sortText?: string
         iconType?: SnippetType
         /** @deprecated */
         type?: string
-        /** Displayed in completion widget */
+        /** Should be short. Always displayed in completion widget on the same raw as label. Default is 'Better Snippet' */
         description?: string
         /** @deprecated */
         group?: string
