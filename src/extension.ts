@@ -3,7 +3,7 @@ import { ConditionalPick } from 'type-fest'
 import { SnippetParser } from 'vscode-snippet-parser'
 import { mergeDeepRight } from 'rambda'
 import { DeepRequired } from 'ts-essentials'
-import { extensionCtx, getExtensionCommandId, getExtensionSetting, getExtensionSettingId } from 'vscode-framework'
+import { extensionCtx, getExtensionCommandId, getExtensionSetting, getExtensionSettingId, registerActiveDevelopmentCommand } from 'vscode-framework'
 import { omitObj, oneOf, pickObj } from '@zardoy/utils'
 import escapeStringRegexp from 'escape-string-regexp'
 import { Configuration } from './configurationType'
@@ -13,6 +13,8 @@ import { registerExperimentalSnippets } from './experimentalSnippets'
 import { CompletionInsertArg, registerCompletionInsert } from './completionInsert'
 import { registerSpecialCommand } from './specialCommand'
 import { registerCreateSnippetFromSelection } from './createSnippetFromSelection'
+import { readAllRegisteredLanguages } from './readLanguages'
+import { registerSnippetsFromDirs } from './snippetsDirs'
 
 type CustomSnippetUnresolved = Configuration['customSnippets'][number]
 type TypingSnippetUnresolved = Configuration['typingSnippets'][number]
@@ -123,78 +125,92 @@ export const activate = () => {
             return [...globalValue, ...workspaceValue, ...workspaceFolderValue]
         }
 
-        const snippetsToLoad = [...getMergedConfig('customSnippets'), ...(getExtensionSetting('enableBuiltinSnippets') ? builtinSnippets : [])]
+        const snippetsToLoadFromSettings = [...getMergedConfig('customSnippets'), ...(getExtensionSetting('enableBuiltinSnippets') ? builtinSnippets : [])]
 
-        const languageSnippets: { [language: string]: CustomSnippet[] } = {}
-        for (const snippetToLoad of snippetsToLoad) {
-            const customSnippet = mergeSnippetWithDefaults(snippetToLoad)
-            for (const language of customSnippet.when.languages) {
-                if (!languageSnippets[language]) languageSnippets[language] = []
-                languageSnippets[language]!.push(mergeSnippetWithDefaults(customSnippet))
+        const registerSnippets = (snippetsToLoad: Configuration['customSnippets']) => {
+            const snippetsByLanguage: { [language: string]: CustomSnippet[] } = {}
+            for (const snippetToLoad of snippetsToLoad) {
+                const customSnippet = mergeSnippetWithDefaults(snippetToLoad)
+                for (const language of customSnippet.when.languages) {
+                    if (!snippetsByLanguage[language]) snippetsByLanguage[language] = []
+                    snippetsByLanguage[language]!.push(mergeSnippetWithDefaults(customSnippet))
+                }
             }
-        }
 
-        for (const [language, snippets] of Object.entries(languageSnippets)) {
-            let triggerFromInner = false
-            const disposable = vscode.languages.registerCompletionItemProvider(normalizeLanguages(language, langsSupersets), {
-                provideCompletionItems(document, position, _token, context) {
-                    // if (context.triggerKind !== vscode.CompletionTriggerKind.Invoke) return
-                    if (triggerFromInner) {
-                        triggerFromInner = false
-                        return []
-                    }
+            const completionProviderDisposables = [] as vscode.Disposable[]
+            for (const [language, snippets] of Object.entries(snippetsByLanguage)) {
+                let triggerFromInner = false
+                const disposable = vscode.languages.registerCompletionItemProvider(normalizeLanguages(language, langsSupersets), {
+                    provideCompletionItems(document, position, _token, context) {
+                        // if (context.triggerKind !== vscode.CompletionTriggerKind.Invoke) return
+                        if (triggerFromInner) {
+                            triggerFromInner = false
+                            return []
+                        }
 
-                    const includedSnippets = getCurrentSnippets('completion', snippets, document, position, language)
-                    return includedSnippets.map(
-                        ({ body, name, sortText, executeCommand, resolveImports, fileIcon, folderIcon, description, iconType, group, type }) => {
-                            if (group) description = group
-                            if (type) iconType = type as any
-                            //
-                            const completion = new vscode.CompletionItem({ label: name, description }, vscode.CompletionItemKind[iconType as string | number])
-                            completion.sortText = sortText
-                            const snippetString = new vscode.SnippetString(body)
-                            completion.insertText = snippetString
-                            const snippetPreview = new vscode.MarkdownString().appendCodeblock(new SnippetParser().text(body), document.languageId)
-                            if (fileIcon) {
-                                completion.kind = vscode.CompletionItemKind.File
-                                completion.detail = fileIcon
-                            }
-
-                            if (folderIcon) {
-                                completion.kind = vscode.CompletionItemKind.Folder
-                                completion.detail = folderIcon
-                            }
-
-                            completion.documentation = snippetPreview
-                            if (resolveImports) {
-                                const arg: CompletionInsertArg = {
-                                    action: 'resolve-imports',
-                                    importsConfig: resolveImports,
-                                    insertPos: position,
-                                    snippetLines: body.split('\n').length,
-                                }
-                                completion.command = {
-                                    command: getExtensionCommandId('completionInsert'),
-                                    title: '',
-                                    arguments: [arg],
-                                }
-                            }
-
-                            if (executeCommand)
-                                completion.command = {
-                                    ...(typeof executeCommand === 'string' ? { command: executeCommand } : executeCommand),
-                                    title: '',
+                        const includedSnippets = getCurrentSnippets('completion', snippets, document, position, language)
+                        return includedSnippets.map(
+                            ({ body, name, sortText, executeCommand, resolveImports, fileIcon, folderIcon, description, iconType, group, type }) => {
+                                if (group) description = group
+                                if (type) iconType = type as any
+                                //
+                                const completion = new vscode.CompletionItem(
+                                    { label: name, description },
+                                    vscode.CompletionItemKind[iconType as string | number],
+                                )
+                                completion.sortText = sortText
+                                const snippetString = new vscode.SnippetString(body)
+                                completion.insertText = snippetString
+                                const snippetPreview = new vscode.MarkdownString().appendCodeblock(new SnippetParser().text(body), document.languageId)
+                                if (fileIcon) {
+                                    completion.kind = vscode.CompletionItemKind.File
+                                    completion.detail = fileIcon
                                 }
 
-                            if (!body || !completion.documentation) completion.documentation = undefined
-                            return completion
-                        },
-                    )
-                },
-            })
-            disposables.push(disposable)
+                                if (folderIcon) {
+                                    completion.kind = vscode.CompletionItemKind.Folder
+                                    completion.detail = folderIcon
+                                }
+
+                                completion.documentation = snippetPreview
+                                if (resolveImports) {
+                                    const arg: CompletionInsertArg = {
+                                        action: 'resolve-imports',
+                                        importsConfig: resolveImports,
+                                        insertPos: position,
+                                        snippetLines: body.split('\n').length,
+                                    }
+                                    completion.command = {
+                                        command: getExtensionCommandId('completionInsert'),
+                                        title: '',
+                                        arguments: [arg],
+                                    }
+                                }
+
+                                if (executeCommand)
+                                    completion.command = {
+                                        ...(typeof executeCommand === 'string' ? { command: executeCommand } : executeCommand),
+                                        title: '',
+                                    }
+
+                                if (!body || !completion.documentation) completion.documentation = undefined
+                                return completion
+                            },
+                        )
+                    },
+                })
+                completionProviderDisposables.push(disposable)
+            }
+
+            disposables.push(...completionProviderDisposables)
             extensionCtx.subscriptions.push(...disposables)
+            return completionProviderDisposables
         }
+
+        registerSnippets(snippetsToLoadFromSettings)
+
+        // TODO! move this out of this fn as changing any snippet settings would force reload all snippets from disk
+        registerSnippetsFromDirs(registerSnippets)
 
         const typingSnippetsToLoad = getMergedConfig('typingSnippets')
         if (typingSnippetsToLoad.length > 0) {
