@@ -9,6 +9,7 @@ specifiers:
   '@types/chai': ^4.3.0
   '@types/glob': ^7.2.0
   '@types/jest': ^27.4.0
+  '@types/js-yaml': ^4.0.5
   '@types/mocha': ^9.1.0
   '@types/node': ^16.11.25
   '@types/path-browserify': ^1.0.0
@@ -26,6 +27,7 @@ specifiers:
   glob: ^7.2.0
   got: ^11.8.3
   jest: ^27.5.1
+  js-yaml: ^4.1.0
   jsonc-parser: ^3.0.0
   mocha: ^9.2.0
   modify-json-file: ^1.2.2
@@ -37,6 +39,7 @@ specifiers:
   tsc-watch: ^4.6.0
   tsm: ^2.2.1
   type-fest: ^2.11.2
+  typed-jsonfile: ^0.2.0
   typescript: ^4.5.5
   vscode-framework: ^0.0.18
   vscode-manifest: ^0.0.8
@@ -50,6 +53,7 @@ dependencies:
   escape-string-regexp: 5.0.0
   got: 11.8.3
   jest: 27.5.1
+  js-yaml: 4.1.0
   jsonc-parser: 3.0.0
   modify-json-file: 1.2.2
   path-browserify: 1.0.1
@@ -59,6 +63,7 @@ dependencies:
   ts-essentials: 9.1.2_typescript@4.5.5
   tsc-watch: 4.6.0_typescript@4.5.5
   type-fest: 2.11.2
+  typed-jsonfile: 0.2.0
   vscode-framework: 0.0.18_556254d3519f12a4da058e8b89ce2140
   vscode-snippet-parser: 0.0.5
 
@@ -67,6 +72,7 @@ devDependencies:
   '@types/chai': 4.3.0
   '@types/glob': 7.2.0
   '@types/jest': 27.4.0
+  '@types/js-yaml': 4.0.5
   '@types/mocha': 9.1.0
   '@types/node': 16.11.25
   '@types/path-browserify': 1.0.0
@@ -865,6 +871,10 @@ packages:
       pretty-format: 27.5.1
     dev: true
 
+  /@types/js-yaml/4.0.5:
+    resolution: {integrity: sha512-FhpRzf927MNQdRZP0J5DLIdTXhjLYzeUTmLAu69mnVksLH9CJY3IuSeEgbKUki7GQZm0WqDkGzyxju2EZGD2wA==}
+    dev: true
+
   /@types/json-schema/7.0.9:
     resolution: {integrity: sha512-qcUXuemtEu+E5wZSJHNxUXeCZhAfXKQ41D+duX+VYPde7xyEVZci+/oXKJL13tnRs9lR2pr4fod59GT6/X1/yQ==}
 
@@ -1258,7 +1268,6 @@ packages:
 
   /argparse/2.0.1:
     resolution: {integrity: sha512-8+9WqebbFzpX9OR+Wa6O29asIogeRMzcGtAINdpMHHyAg10f05aSFVBbcEqGf/PXw1EjAZ+q2/bEBg3DvurK3Q==}
-    dev: true
 
   /array-includes/3.1.4:
     resolution: {integrity: sha512-ZTNSQkmWumEbiHO2GF4GmWxYVTiQyJy2XOTa15sdQSrvKn7l+180egQMqlrMOUMCyLMD7pmyQe4mMDUT6Behrw==}
@@ -4126,7 +4135,6 @@ packages:
     hasBin: true
     dependencies:
       argparse: 2.0.1
-    dev: true
 
   /jsdom/16.7.0:
     resolution: {integrity: sha512-u9Smc2G1USStM+s/x1ru5Sxrl6mPYCbByG1U/hUmqaVsm4tbNyS7CicOSRyuGQYZhTu0h84qkZZQ/I+dzizSVw==}

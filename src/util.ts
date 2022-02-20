@@ -1,3 +1,4 @@
+import * as vscode from 'vscode'
 // import ts from 'typescript'
 import { ensureArray } from '@zardoy/utils'
 import { equals } from 'rambda'
@@ -27,6 +28,21 @@ export const normalizeFilePathRegex = (input: string, fileType: NonNullable<Conf
 }
 
 export const langsEquals = (a: string[], b: string[]) => equals(a.sort(), b.sort())
+
+// FS
+
+export const fsExists = async (uri: vscode.Uri, isFile?: boolean) => {
+    const { fs } = vscode.workspace
+    try {
+        const stats = await fs.stat(uri)
+        // eslint-disable-next-line no-bitwise
+        return isFile === undefined ? true : isFile ? stats.type & vscode.FileType.File : stats.type & vscode.FileType.Directory
+    } catch {
+        return false
+    }
+}
+
+// TYPESCRIPT (not used)
 
 // const findNodeAtPosition = (source: ts.SourceFile, character: number) => {
 //     const matchingNodes: INode[] = []

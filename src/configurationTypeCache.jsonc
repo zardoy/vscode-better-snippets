@@ -1,5 +1,5 @@
 // GENERATED. DON'T EDIT MANUALLY
-// md5hash: 55e3557ab79566d1de77d75601b8a623
+// md5hash: e3ce42b9d5d54a85ae2c04d4be8cb045
 {
     "type": "object",
     "properties": {
@@ -450,6 +450,21 @@
                     "type": "string"
                 }
             }
+        },
+        "snippetsDirs": {
+            "description": "A list of paths to directories to load additional snippets from. Paths are relative from each workspace root. Each directory should contain files with snippet metadata on top (metadata can also be extracted to seperate .snippet file).",
+            "default": [
+                ".better-snippets"
+            ],
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
+        "snippetsDirs.autoDetectPrimaryExtensions": {
+            "description": "This configuration only affects implicit behavior\nSnippet with file with primaray extension will be available in all secondary-extensions\nFor example compare two snippet files: someCode.ts and someAnotherCode.mts\nSnippet with name someCode will be available in all files with typescript language (including files with secondary extension, .mts).\nSnippet with name someAnotherCode will be available only in files with .mts extension\nAlso snippets that are defined with unknown language id will be treated as secondary\nAlso remember that snippet defined with .ts extension won't be available in react until you override language or enable family-mode in directory/via setting.",
+            "default": true,
+            "type": "boolean"
         }
     },
     "required": [
@@ -461,6 +476,7 @@
         "languageSupersets",
         "snippetCreator.showSnippetAfterCreation",
         "snippetsDirs",
+        "snippetsDirs.autoDetectPrimaryExtensions",
         "typingSnippets",
         "typingSnippetsUndoStops",
         "useParamMode"

@@ -169,6 +169,27 @@ export type Configuration = {
     // TODO default is set in prepare.ts
     // * Note that family name can overlap with language id, contributed by other extension. If this is case rename the family or set it to null (in case if family is builtin)
     languageSupersets: { [family: string]: string[] }
+    // TODO implement suggest
+    // TODO implement merge
+    // TODO test in multiroot workspace with workspace file
+    /**
+     * A list of paths to directories to load additional snippets from. Paths are relative from each workspace root. Each directory should contain files with snippet metadata on top (metadata can also be extracted to seperate .snippet file).
+     * @default [".better-snippets"]
+     * @suggest folder
+     */
+    snippetsDirs: string[]
+    /**
+     * This configuration only affects implicit behavior
+     * Snippet with file with primaray extension will be available in all secondary-extensions
+     * For example compare two snippet files: someCode.ts and someAnotherCode.mts
+     * Snippet with name someCode will be available in all files with typescript language (including files with secondary extension, .mts).
+     * Snippet with name someAnotherCode will be available only in files with .mts extension
+     * Also snippets that are defined with unknown language id will be treated as secondary
+     * Also remember that snippet defined with .ts extension won't be available in react until you override language or enable family-mode in directory/via setting.
+     * @default true
+     */
+    'snippetsDirs.autoDetectPrimaryExtensions': boolean
+    // TODO family mode
 }
 
 export const defaultLanguageSupersets = {
