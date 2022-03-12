@@ -28,7 +28,7 @@ export type GeneralSnippet = {
         /** Same as `lineHasRegex`, but the line will be tested from first character till current cursor position */
         lineRegex?: string
         /**
-         * Language identifier. Special ones: styles (css, scss...), js (js, ts, jsx, tsx)
+         * Language identifier. Family name from `languageSupersets` can be used instead (e.g. js or react)
          */
         languages?: string[]
         // Unimplemented: inComments. topLineStart means line start without indendation, useful for top-level declaration snippets, like `export const`
@@ -171,10 +171,4 @@ export type Configuration = {
     languageSupersets: { [family: string]: string[] }
 }
 
-export const defaultLanguageSupersets = {
-    js: ['typescript', 'javascript', 'typescriptreact', 'javascriptreact'],
-    react: ['javascriptreact', 'typescriptreact'],
-    ts: ['typescript', 'typescriptreact'],
-
-    styles: ['css', 'scss', 'sass', 'source.css.styled'],
-}
+export { defaultLanguageSupersets } from '@zardoy/vscode-utils/build/langs'

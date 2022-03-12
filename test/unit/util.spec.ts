@@ -1,5 +1,7 @@
+import { normalizeLanguages as normalizeLanguagesOriginal, areLangsEquals } from '@zardoy/vscode-utils/build/langs'
 import { defaultLanguageSupersets } from '../../src/configurationType'
-import { normalizeLanguages as normalizeLanguagesOriginal, langsEquals } from '../../src/util'
+
+// After refactoring, now its weird that lib function being tested there
 
 const normalizeLanguages = (langs: string | string[]) => normalizeLanguagesOriginal(langs, defaultLanguageSupersets)
 
@@ -37,6 +39,6 @@ test('normalizeLanguages', () => {
     expect(normalizeLanguages([])).toMatchInlineSnapshot(`Array []`)
 })
 
-test('langEquals', () => {
-    expect(langsEquals(defaultLanguageSupersets.js, normalizeLanguages('js'))).toMatchInlineSnapshot(`true`)
+test('areLangsEquals', () => {
+    expect(areLangsEquals(defaultLanguageSupersets.js, normalizeLanguages('js'))).toMatchInlineSnapshot(`true`)
 })

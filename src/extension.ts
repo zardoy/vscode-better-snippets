@@ -1,4 +1,6 @@
 import * as vscode from 'vscode'
+import { normalizeRegex } from '@zardoy/vscode-utils/build/settings'
+import { normalizeLanguages } from '@zardoy/vscode-utils/build/langs'
 import { ConditionalPick } from 'type-fest'
 import { SnippetParser } from 'vscode-snippet-parser'
 import { mergeDeepRight } from 'rambda'
@@ -7,7 +9,7 @@ import { extensionCtx, getExtensionCommandId, getExtensionSetting, getExtensionS
 import { omitObj, oneOf, pickObj } from '@zardoy/utils'
 import escapeStringRegexp from 'escape-string-regexp'
 import { Configuration } from './configurationType'
-import { normalizeFilePathRegex, normalizeLanguages, normalizeRegex } from './util'
+import { normalizeFilePathRegex } from './util'
 import { builtinSnippets } from './builtinSnippets'
 import { registerExperimentalSnippets } from './experimentalSnippets'
 import { CompletionInsertArg, registerCompletionInsert } from './completionInsert'
@@ -55,9 +57,10 @@ export const activate = () => {
         displayLanguage = document.languageId,
     ): Array<Omit<T, 'body'> & { body: string }> => {
         const log = (...args) => console.log(`[${debugType}]`, ...args)
+        const debug = (...args) => console.debug(`[${debugType}]`, ...args)
         log(displayLanguage, 'for', snippets.length, 'snippets')
         const getSnippetDebugName = (snippet: typeof snippets[number]) => ('name' in snippet ? snippet.name : snippet.sequence)
-        console.debug(`[${debugType}]`, 'Loaded snippets:', snippets.map(getSnippetDebugName))
+        debug('Active snippets:', snippets.map(getSnippetDebugName))
         // const source = ts.createSourceFile('test.ts', document.getText(), ts.ScriptTarget.ES5, true)
         // const pos = source.getPositionOfLineAndCharacter(position.line, position.character)
         // const node = findNodeAtPosition(source, pos)

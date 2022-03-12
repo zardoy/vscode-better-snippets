@@ -3,8 +3,8 @@ import delay from 'delay'
 import stringDedent from 'string-dedent'
 import { getExtensionSetting, getExtensionSettingId, registerExtensionCommand, showQuickPick, VSCodeQuickPickItem } from 'vscode-framework'
 import { parseTree, findNodeAtLocation } from 'jsonc-parser'
+import { normalizeLanguages, areLangsEquals } from '@zardoy/vscode-utils/build/langs'
 import { Configuration } from './configurationType'
-import { langsEquals, normalizeLanguages } from './util'
 import { getSnippetsDefaults } from './extension'
 
 export const registerCreateSnippetFromSelection = () => {
@@ -26,7 +26,7 @@ export const registerCreateSnippetFromSelection = () => {
                 : await showQuickPick<string>(
                       [
                           ...foundSupportedSupersets.map(([superset, supsersetLangs]): VSCodeQuickPickItem => {
-                              const isDefault = langsEquals(defaultLanguages, supsersetLangs)
+                              const isDefault = areLangsEquals(defaultLanguages, supsersetLangs)
                               let description = `(${supsersetLangs.join(', ')})`
                               if (isDefault) description = `Default ${description}`
                               return {
@@ -55,7 +55,7 @@ export const registerCreateSnippetFromSelection = () => {
         })
         if (snippetName === undefined) return
         const snippetWhen: Configuration['customSnippets'][number]['when'] = {
-            ...(langsEquals(defaultLanguages, normalizeLanguages(langId, langsSupersets)) ? null : { languages: [langId] }),
+            ...(areLangsEquals(defaultLanguages, normalizeLanguages(langId, langsSupersets)) ? null : { languages: [langId] }),
         }
         const configuration = vscode.workspace.getConfiguration(process.env.IDS_PREFIX)
         const existingCustomSnippets = configuration.get<any[]>('customSnippets') ?? []

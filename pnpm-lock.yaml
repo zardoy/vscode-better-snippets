@@ -16,6 +16,7 @@ specifiers:
   '@vscode/test-electron': ^2.1.2
   '@zardoy/tsconfig': ^1.4.0
   '@zardoy/utils': ^0.0.4
+  '@zardoy/vscode-utils': ^0.0.2
   chai: ^4.3.6
   cross-env: ^7.0.3
   delay: ^5.0.0
@@ -44,6 +45,7 @@ specifiers:
 
 dependencies:
   '@zardoy/utils': 0.0.4
+  '@zardoy/vscode-utils': 0.0.2_@types+vscode@1.64.0
   chai: 4.3.6
   delay: 5.0.0
   esbuild-runner: 2.2.1
@@ -1132,6 +1134,17 @@ packages:
       lodash.compact: 3.0.1
       rambda: 6.9.0
       type-fest: 2.11.2
+    dev: false
+
+  /@zardoy/vscode-utils/0.0.2_@types+vscode@1.64.0:
+    resolution: {integrity: sha512-BoSGY0JC6Oc0vqMBthbHANY8/0nxw1B0CTa7FyqK3g6BUxAWfRwdNq+wTc62XCNwA84K9GZIBcq7q/UUxIyjFw==}
+    engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
+    peerDependencies:
+      '@types/vscode': ^1.65.0
+    dependencies:
+      '@types/vscode': 1.64.0
+      '@zardoy/utils': 0.0.4
+      rambda: 7.0.3
     dev: false
 
   /abab/2.0.5:
@@ -5163,6 +5176,10 @@ packages:
 
   /rambda/6.9.0:
     resolution: {integrity: sha512-yosVdGg1hNGkXPzqGiOYNEpXKjEOxzUCg2rB0l+NKdyCaSf4z+i5ojbN0IqDSezMMf71YEglI+ZUTgTffn5afw==}
+    dev: false
+
+  /rambda/7.0.3:
+    resolution: {integrity: sha512-vRkFoukpx9PTmYyOjMZ6+anbDI9BrjaAepigsSOVQcgy7dZKMHM26m1/r8BvegeBCM8qBwr1m/+rufgNKRrofw==}
     dev: false
 
   /randombytes/2.1.0:

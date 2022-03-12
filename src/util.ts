@@ -1,19 +1,6 @@
 // import ts from 'typescript'
-import { ensureArray } from '@zardoy/utils'
-import { equals } from 'rambda'
+import { normalizeRegex } from '@zardoy/vscode-utils/build/settings'
 import { Configuration } from './configurationType'
-
-export const normalizeLanguages = (language: string | string[], loadedLanguageSupersets: Configuration['languageSupersets']) =>
-    ensureArray(language).flatMap(language => loadedLanguageSupersets[language] ?? language)
-
-// tests: https://github.com/zardoy/github-manager/tree/main/test/normalizeRegex.test.ts
-export const normalizeRegex = (input: string) => {
-    const regexMatch = /^\/.+\/(.*)$/.exec(input)
-    if (!regexMatch) return input
-    const pattern = input.slice(1, -regexMatch[1]!.length - 1)
-    const flags = regexMatch[1]
-    return new RegExp(pattern, flags)
-}
 
 export const normalizeFilePathRegex = (input: string, fileType: NonNullable<Configuration['customSnippets'][number]['when']>['fileType']) => {
     if (!fileType) return normalizeRegex(input)
@@ -25,8 +12,6 @@ export const normalizeFilePathRegex = (input: string, fileType: NonNullable<Conf
             return /(t|j)sconfig(\..+)?.json$/
     }
 }
-
-export const langsEquals = (a: string[], b: string[]) => equals(a.sort(), b.sort())
 
 // const findNodeAtPosition = (source: ts.SourceFile, character: number) => {
 //     const matchingNodes: INode[] = []
