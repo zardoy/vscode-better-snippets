@@ -11,6 +11,24 @@ type CommandDefinition =
 
 type SnippetType = keyof typeof vscode.CompletionItemKind | number
 
+type TestProp =
+    | {
+          /**
+           * @suggestSortText "4"
+           */
+          testRegex: string
+      }
+    | {
+          /**
+           * @suggestSortText "3"
+           */
+          testString: string
+          /**
+           * @default "startsWith"
+           */
+          matchWith?: 'startsWith' | 'includes' | 'endsWith'
+      }
+
 export type GeneralSnippet = {
     /**
      * @suggestSortText "2"
@@ -39,6 +57,30 @@ export type GeneralSnippet = {
         pathRegex?: string
         /** Shortcuts for complex path regexs. If specified, `pathRegex` is ignored */
         fileType?: 'package.json' | 'tsconfig.json'
+        otherLines?: Array<
+            (TestProp | { preset: 'function' }) &
+                (
+                    | {
+                          /**
+                           * Which line to pick (relative to current)
+                           * @suggestSortText "1"
+                           */
+                          line: number /*  | number[] */
+                          /** @default false */
+                          displayIfNoLine?: boolean
+                      }
+                    | {
+                          // TODO support negative
+                          /**
+                           * How many levels up of indendation to look? By default 0 - any. Example: `-1`
+                           * @suggestSortText "2"
+                           * @default 0
+                           * @max 0
+                           */
+                          ident: number
+                      }
+                )
+        >
         /**
          * Enable snippet only when following NPM dependencies are installed locally. TODO: implement
          */

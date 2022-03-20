@@ -11,10 +11,7 @@
         "useParamMode": {
             "description": "Choose the output for useSnippet type:\n```ts\n// generic\nconst params = useParams<'groupId'>()\n// cast\nconst params = useParams() as { groupId: string }\n```\n[see issue for more](https://github.com/remix-run/react-router/issues/8498)",
             "default": "cast",
-            "enum": [
-                "cast",
-                "generic"
-            ],
+            "enum": ["cast", "generic"],
             "type": "string"
         },
         "enableExperimentalSnippets": {
@@ -72,13 +69,7 @@
                                         "description": "Specify to restrict showing suggest in specific location",
                                         "type": "array",
                                         "items": {
-                                            "enum": [
-                                                "code",
-                                                "comment",
-                                                "fileStart",
-                                                "lineStart",
-                                                "topLineStart"
-                                            ],
+                                            "enum": ["code", "comment", "fileStart", "lineStart", "topLineStart"],
                                             "type": "string"
                                         }
                                     },
@@ -87,10 +78,7 @@
                                     },
                                     "fileType": {
                                         "description": "Shortcuts for complex path regexs. If specified, `pathRegex` is ignored",
-                                        "enum": [
-                                            "package.json",
-                                            "tsconfig.json"
-                                        ],
+                                        "enum": ["package.json", "tsconfig.json"],
                                         "type": "string"
                                     }
                                 }
@@ -121,10 +109,7 @@
                                                 "items": {}
                                             }
                                         },
-                                        "required": [
-                                            "arguments",
-                                            "command"
-                                        ]
+                                        "required": ["arguments", "command"]
                                     },
                                     {
                                         "type": "string"
@@ -132,9 +117,7 @@
                                 ]
                             }
                         },
-                        "required": [
-                            "body"
-                        ]
+                        "required": ["body"]
                     },
                     {
                         "type": "object",
@@ -204,9 +187,7 @@
                                 "type": "string"
                             }
                         },
-                        "required": [
-                            "name"
-                        ]
+                        "required": ["name"]
                     }
                 ]
             }
@@ -261,13 +242,7 @@
                                         "description": "Specify to restrict showing suggest in specific location",
                                         "type": "array",
                                         "items": {
-                                            "enum": [
-                                                "code",
-                                                "comment",
-                                                "fileStart",
-                                                "lineStart",
-                                                "topLineStart"
-                                            ],
+                                            "enum": ["code", "comment", "fileStart", "lineStart", "topLineStart"],
                                             "type": "string"
                                         }
                                     },
@@ -276,10 +251,7 @@
                                     },
                                     "fileType": {
                                         "description": "Shortcuts for complex path regexs. If specified, `pathRegex` is ignored",
-                                        "enum": [
-                                            "package.json",
-                                            "tsconfig.json"
-                                        ],
+                                        "enum": ["package.json", "tsconfig.json"],
                                         "type": "string"
                                     }
                                 }
@@ -310,10 +282,7 @@
                                                 "items": {}
                                             }
                                         },
-                                        "required": [
-                                            "arguments",
-                                            "command"
-                                        ]
+                                        "required": ["arguments", "command"]
                                     },
                                     {
                                         "type": "string"
@@ -321,9 +290,7 @@
                                 ]
                             }
                         },
-                        "required": [
-                            "body"
-                        ]
+                        "required": ["body"]
                     },
                     {
                         "type": "object",
@@ -334,9 +301,7 @@
                                 "type": "string"
                             }
                         },
-                        "required": [
-                            "sequence"
-                        ]
+                        "required": ["sequence"]
                     }
                 ]
             }
@@ -418,13 +383,7 @@
                         "locations": {
                             "type": "array",
                             "items": {
-                                "enum": [
-                                    "code",
-                                    "comment",
-                                    "fileStart",
-                                    "lineStart",
-                                    "topLineStart"
-                                ],
+                                "enum": ["code", "comment", "fileStart", "lineStart", "topLineStart"],
                                 "type": "string"
                             }
                         },

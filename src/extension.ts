@@ -3,7 +3,7 @@ import { normalizeRegex } from '@zardoy/vscode-utils/build/settings'
 import { normalizeLanguages } from '@zardoy/vscode-utils/build/langs'
 import { ConditionalPick } from 'type-fest'
 import { SnippetParser } from 'vscode-snippet-parser'
-import { mergeDeepRight } from 'rambda'
+import { mergeDeepRight, partition } from 'rambda'
 import { DeepRequired } from 'ts-essentials'
 import { extensionCtx, getExtensionCommandId, getExtensionSetting, getExtensionSettingId } from 'vscode-framework'
 import { omitObj, oneOf, pickObj } from '@zardoy/utils'
@@ -48,6 +48,7 @@ export const activate = () => {
             snippet,
         )
 
+    // eslint-disable-next-line complexity
     const getCurrentSnippets = <T extends CustomSnippet | CustomTypingSnippet>(
         debugType: 'completion' | 'typing',
         snippets: T[],
@@ -87,6 +88,68 @@ export const activate = () => {
                 const doesntMatch = !match
                 if (doesntMatch) log(`Snippet ${name} skipped due to regex: ${regexName} (${regex as string} against ${testingString})`)
                 return doesntMatch
+            }
+
+            if (when.otherLines) {
+                const [lineDiffs, indentDiffs] = partition(otherLine => 'line' in otherLine, when.otherLines)
+
+                const isStringMatches = (lineText: string, testAgainst: typeof when.otherLines[number]) => {
+                    // method or arrow func also included
+                    const functionRegex = /(\([^()]*)\)(?:: .+)? (?:=>|{)/
+                    if ('preset' in testAgainst) {
+                        if (testAgainst.preset === 'function') return functionRegex.test(lineText)
+                        return false
+                    }
+                    if ('testString' in testAgainst) {
+                        return lineText[testAgainst.matchWith ?? 'startsWith'](testAgainst.testString)
+                    }
+
+                    // TODO(perf) investigate time for creating RegExp instance
+                    return new RegExp(normalizeRegex(testAgainst.testRegex)).test(lineText)
+                }
+
+                for (const lineDiff of lineDiffs) {
+                    // TODO-low debug message
+                    if (!isStringMatches(document.lineAt(position.line + (lineDiff as Extract<typeof lineDiff, {line: any}>).line).text, lineDiff)) continue
+                }
+
+                function changeIndentDiffsType(arg: any): asserts arg is Extract<typeof indentDiffs[0], {ident: any}>[] {}
+                changeIndentDiffsType(indentDiffs)
+
+                if (indentDiffs.length) {
+                                  let identDiff = 0
+                                  let ident = document.lineAt(position).firstNonWhitespaceCharacterIndex
+                                  for (let i = position.line; i >= 0; i--) {
+                                      const line = document.lineAt(i)
+                                      const lineText = line.text
+                                      const currentIdent = line.firstNonWhitespaceCharacterIndex
+                                      // skip empty lines
+                                      if (lineText === '') continue
+                                      // console.log(i + 1, ident, nextIndent)
+                                      if (i !== position.line && currentIdent >= ident) continue
+                                      // console.log(i + 1, 'text', lineText)
+                                      if (currentIdent < ident) ident = currentIdent
+                                      identDiff++
+                    // TODO(perf) investigate optimization
+                                      const indexes = [] as number[]
+                                      let index = 0
+                                      while((index = indentDiffs.slice(index).findIndex(({ident}) => ident === currentIdent))) {
+
+                                          indexes.push(index)
+
+                                      }
+                                      if (match) {
+                                          const newPos = new vscode.Position(i, match.index + (match[1]?.length ?? match[2]!.length))
+                                          if (position.isEqual(newPos)) continue
+                                          activeTextEditor.selections = [new vscode.Selection(newPos, newPos)]
+                                          activeTextEditor.revealRange(activeTextEditor.selection)
+                                          return
+                                      }
+                                  }
+
+                                  return ident
+                              })()
+                }
             }
 
             if (
