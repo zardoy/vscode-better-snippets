@@ -5,7 +5,7 @@ overrides:
   typescript-json-schema: ^0.53.0
 
 specifiers:
-  '@milahu/patch-package-with-pnpm-support': github:milahu/patch-package#pnpm-support-2
+  '@milahu/patch-package-with-pnpm-support': ^6.4.8
   '@types/chai': ^4.3.0
   '@types/glob': ^7.2.0
   '@types/jest': ^27.4.0
@@ -65,7 +65,7 @@ dependencies:
   vscode-snippet-parser: 0.0.5
 
 devDependencies:
-  '@milahu/patch-package-with-pnpm-support': github.com/milahu/patch-package/6b85a8bc1562d1482f30c1b65c9f4e91ba657d39
+  '@milahu/patch-package-with-pnpm-support': 6.4.8
   '@types/chai': 4.3.0
   '@types/glob': 7.2.0
   '@types/jest': 27.4.0
@@ -691,6 +691,28 @@ packages:
       brfs: 1.6.1
       unicode-trie: 0.3.1
     dev: false
+
+  /@milahu/patch-package-with-pnpm-support/6.4.8:
+    resolution: {integrity: sha512-aPb7vokV6kIhoEP8ZrygK6zfVMGp0zP9RJL6GvX3YziQelmnEWa58x7aZrAk9/q66LQPZDnZ5/aNhsp7l8TbfQ==}
+    engines: {npm: '>5'}
+    hasBin: true
+    dependencies:
+      '@types/dashdash': 1.14.1
+      '@yarnpkg/lockfile': 1.1.0
+      chalk: 2.4.2
+      cross-spawn: 6.0.5
+      dashdash: 2.0.0
+      find-yarn-workspace-root: 2.0.0
+      fs-extra: 7.0.1
+      is-ci: 2.0.0
+      klaw-sync: 6.0.0
+      open: 7.4.2
+      rimraf: 2.7.1
+      semver: 5.7.1
+      shlex: 2.1.0
+      slash: 2.0.0
+      tmp: 0.0.33
+    dev: true
 
   /@nodelib/fs.scandir/2.1.5:
     resolution: {integrity: sha512-vq24Bq3ym5HEQm2NKCr3yXDwjc7vTsEThRDnkp2DK9p1uqLR+DHurm/NOTo0KG7HYHU7eppKZj3MyqYuMBf62g==}
@@ -6422,29 +6444,3 @@ packages:
   /yocto-queue/0.1.0:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
-
-  github.com/milahu/patch-package/6b85a8bc1562d1482f30c1b65c9f4e91ba657d39:
-    resolution: {tarball: https://codeload.github.com/milahu/patch-package/tar.gz/6b85a8bc1562d1482f30c1b65c9f4e91ba657d39}
-    name: '@milahu/patch-package-with-pnpm-support'
-    version: 6.4.8
-    engines: {npm: '>5'}
-    hasBin: true
-    prepare: true
-    requiresBuild: true
-    dependencies:
-      '@types/dashdash': 1.14.1
-      '@yarnpkg/lockfile': 1.1.0
-      chalk: 2.4.2
-      cross-spawn: 6.0.5
-      dashdash: 2.0.0
-      find-yarn-workspace-root: 2.0.0
-      fs-extra: 7.0.1
-      is-ci: 2.0.0
-      klaw-sync: 6.0.0
-      open: 7.4.2
-      rimraf: 2.7.1
-      semver: 5.7.1
-      shlex: 2.1.0
-      slash: 2.0.0
-      tmp: 0.0.33
-    dev: true
