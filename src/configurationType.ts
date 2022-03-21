@@ -78,7 +78,7 @@ export type GeneralSnippet = {
                            * @default 0
                            * @max 0
                            */
-                          ident: number
+                          indent: number
                       }
                 )
         >

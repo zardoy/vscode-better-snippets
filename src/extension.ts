@@ -115,33 +115,36 @@ export const activate = () => {
                         continue snippet
 
                 // eslint-disable-next-line no-inner-declarations
-                function changeIndentDiffsType(arg: any): asserts arg is Array<Extract<typeof indentDiffs[0], { ident: any }>> {}
+                function changeIndentDiffsType(arg: any): asserts arg is Array<Extract<typeof indentDiffs[0], { indent: any }>> {}
                 changeIndentDiffsType(indentDiffs)
 
-                if (indentDiffs.length > 0) {
-                    let identDiff = 0
-                    let ident = document.lineAt(position).firstNonWhitespaceCharacterIndex
-                    for (let i = position.line; i >= 0; i--) {
+                if (indentDiffs.length > 0 && position.line !== 0) {
+                    let indentDiffLevel = 0
+                    let indent = document.lineAt(position).firstNonWhitespaceCharacterIndex
+                    for (let i = position.line - 1; i >= 0; i--) {
                         const line = document.lineAt(i)
                         const lineText = line.text
-                        const currentIdent = line.firstNonWhitespaceCharacterIndex
+                        const currentIndent = line.firstNonWhitespaceCharacterIndex
                         // skip empty lines
                         if (lineText === '') continue
-                        // console.log(i + 1, ident, nextIndent)
-                        if (i !== position.line && currentIdent >= ident) continue
-                        // console.log(i + 1, 'text', lineText)
-                        if (currentIdent < ident) ident = currentIdent
-                        identDiff++
+                        // console.log(i + 1, indent, nextIndent)
+                        if (currentIndent >= indent) continue
+                        if (currentIndent < indent) indent = currentIndent
+                        indentDiffLevel++
                         // TODO(perf) investigate optimization
                         for (let i = 0; i < indentDiffs.length; i++) {
-                            const { ident, ...matchingParams } = indentDiffs[i]!
-                            if (ident === currentIdent) {
+                            const { indent: requiredIndentDiff, ...matchingParams } = indentDiffs[i]!
+                            if (-indentDiffLevel === requiredIndentDiff) {
                                 if (!isStringMatches(lineText, matchingParams as any)) continue snippet
                                 indentDiffs.splice(i, 1)
                                 i--
                             }
                         }
+
+                        if (indentDiffs.length === 0) break
                     }
+
+                    if (indentDiffs.length > 0) continue
                 }
             }
 
