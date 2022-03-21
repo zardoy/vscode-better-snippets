@@ -1,3 +1,5 @@
+/* eslint-disable no-labels */
+/* eslint-disable max-depth */
 import * as vscode from 'vscode'
 import { normalizeRegex } from '@zardoy/vscode-utils/build/settings'
 import { normalizeLanguages } from '@zardoy/vscode-utils/build/langs'
@@ -73,7 +75,7 @@ export const activate = () => {
         const lineText = line.text
         const includedSnippets: Array<T & { body: string }> = []
 
-        for (const snippet of snippets) {
+        snippet: for (const snippet of snippets) {
             const { body, when } = snippet
             const name = getSnippetDebugName(snippet)
 
@@ -100,55 +102,46 @@ export const activate = () => {
                         if (testAgainst.preset === 'function') return functionRegex.test(lineText)
                         return false
                     }
-                    if ('testString' in testAgainst) {
-                        return lineText[testAgainst.matchWith ?? 'startsWith'](testAgainst.testString)
-                    }
+
+                    if ('testString' in testAgainst) return lineText[testAgainst.matchWith ?? 'startsWith'](testAgainst.testString)
 
                     // TODO(perf) investigate time for creating RegExp instance
                     return new RegExp(normalizeRegex(testAgainst.testRegex)).test(lineText)
                 }
 
-                for (const lineDiff of lineDiffs) {
-                    // TODO-low debug message
-                    if (!isStringMatches(document.lineAt(position.line + (lineDiff as Extract<typeof lineDiff, {line: any}>).line).text, lineDiff)) continue
-                }
+                // TODO-low debug message
+                for (const lineDiff of lineDiffs)
+                    if (!isStringMatches(document.lineAt(position.line + (lineDiff as Extract<typeof lineDiff, { line: any }>).line).text, lineDiff))
+                        continue snippet
 
-                function changeIndentDiffsType(arg: any): asserts arg is Extract<typeof indentDiffs[0], {ident: any}>[] {}
+                // eslint-disable-next-line no-inner-declarations
+                function changeIndentDiffsType(arg: any): asserts arg is Array<Extract<typeof indentDiffs[0], { ident: any }>> {}
                 changeIndentDiffsType(indentDiffs)
 
-                if (indentDiffs.length) {
-                                  let identDiff = 0
-                                  let ident = document.lineAt(position).firstNonWhitespaceCharacterIndex
-                                  for (let i = position.line; i >= 0; i--) {
-                                      const line = document.lineAt(i)
-                                      const lineText = line.text
-                                      const currentIdent = line.firstNonWhitespaceCharacterIndex
-                                      // skip empty lines
-                                      if (lineText === '') continue
-                                      // console.log(i + 1, ident, nextIndent)
-                                      if (i !== position.line && currentIdent >= ident) continue
-                                      // console.log(i + 1, 'text', lineText)
-                                      if (currentIdent < ident) ident = currentIdent
-                                      identDiff++
-                    // TODO(perf) investigate optimization
-                                      const indexes = [] as number[]
-                                      let index = 0
-                                      while((index = indentDiffs.slice(index).findIndex(({ident}) => ident === currentIdent))) {
-
-                                          indexes.push(index)
-
-                                      }
-                                      if (match) {
-                                          const newPos = new vscode.Position(i, match.index + (match[1]?.length ?? match[2]!.length))
-                                          if (position.isEqual(newPos)) continue
-                                          activeTextEditor.selections = [new vscode.Selection(newPos, newPos)]
-                                          activeTextEditor.revealRange(activeTextEditor.selection)
-                                          return
-                                      }
-                                  }
-
-                                  return ident
-                              })()
+                if (indentDiffs.length > 0) {
+                    let identDiff = 0
+                    let ident = document.lineAt(position).firstNonWhitespaceCharacterIndex
+                    for (let i = position.line; i >= 0; i--) {
+                        const line = document.lineAt(i)
+                        const lineText = line.text
+                        const currentIdent = line.firstNonWhitespaceCharacterIndex
+                        // skip empty lines
+                        if (lineText === '') continue
+                        // console.log(i + 1, ident, nextIndent)
+                        if (i !== position.line && currentIdent >= ident) continue
+                        // console.log(i + 1, 'text', lineText)
+                        if (currentIdent < ident) ident = currentIdent
+                        identDiff++
+                        // TODO(perf) investigate optimization
+                        for (let i = 0; i < indentDiffs.length; i++) {
+                            const { ident, ...matchingParams } = indentDiffs[i]!
+                            if (ident === currentIdent) {
+                                if (!isStringMatches(lineText, matchingParams as any)) continue snippet
+                                indentDiffs.splice(i, 1)
+                                i--
+                            }
+                        }
+                    }
                 }
             }
 

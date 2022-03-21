@@ -73,6 +73,7 @@ export type GeneralSnippet = {
                           // TODO support negative
                           /**
                            * How many levels up of indendation to look? By default 0 - any. Example: `-1`
+                           * Currently it is possible to lookup only above (negative number)
                            * @suggestSortText "2"
                            * @default 0
                            * @max 0
