@@ -7,5 +7,20 @@ export const activate = someData => {
     // 2
     if (someData || false) {
         // 3
+        const someObj = {
+            'a-:/b/'(): Partial<Record<string, any>> | void {
+                // 4
+                if (false) {
+                    // 5
+                }
+                // 6
+            },
+            c: 56,
+        }
+    }
+    for (const iterator of []) {
+        // 7
     }
 }
+
+const stringsArr = ['']

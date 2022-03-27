@@ -1,31 +1,50 @@
-import { promises as fs } from 'fs'
+import fs from 'fs'
 import { join } from 'path'
 import * as vscode from 'vscode'
 import { Configuration } from '../../../src/configurationType'
+
+const content = fs.readFileSync(join(__dirname, '../fixtures/otherLines.ts'), 'utf-8')
 
 describe('otherLines', () => {
     let document: vscode.TextDocument
 
     before(done => {
-        void fs
-            .readFile(join(__dirname, '../fixtures/otherLines.ts'), 'utf-8')
-            .then(async content =>
-                vscode.workspace.openTextDocument({
-                    content,
-                    language: 'markdown',
-                }),
-            )
+        void vscode.workspace
+            .openTextDocument({
+                content,
+                language: 'markdown',
+            })
             .then(async editor => {
                 document = editor
                 const configKey: keyof Configuration = 'customSnippets'
                 const configValue: Configuration['customSnippets'] = [
                     {
-                        name: 'falseyValue',
+                        name: 'reactHook',
                         body: '',
                         sortText: '!',
                         when: {
-                            languages: ['markdown'],
-                            locations: ['fileStart'],
+                            locations: ['lineStart'],
+                            otherLines: [
+                                {
+                                    indent: -1,
+                                    preset: 'function',
+                                },
+                            ],
+                        },
+                    },
+                    {
+                        // actually should a typing snippet
+                        name: 'c',
+                        body: '',
+                        sortText: '!',
+                        when: {
+                            // locations: [],
+                            otherLines: [
+                                {
+                                    indent: -1,
+                                    testString: 'for',
+                                },
+                            ],
                         },
                     },
                 ]
@@ -34,6 +53,5 @@ describe('otherLines', () => {
             .then(done)
     })
 
-    for (const iterator of /\/\/ (\d+)/g.exec(document.getText())!) {
-    }
+    for (const match of /\/\/ (\d+)/g.exec(content)!) console.log()
 })
