@@ -35,7 +35,7 @@ describe('otherLines', () => {
                     {
                         // actually should a typing snippet
                         name: 'c',
-                        body: '',
+                        body: 'countinue',
                         sortText: '!',
                         when: {
                             // locations: [],
@@ -47,11 +47,31 @@ describe('otherLines', () => {
                             ],
                         },
                     },
+                    {
+                        // actually should a typing snippet
+                        name: 'f',
+                        body: '\n} else {\n',
+                        sortText: '!',
+                        when: {
+                            // locations: [],
+                            otherLines: [
+                                {
+                                    indent: -1,
+                                    testString: 'if',
+                                },
+                            ],
+                        },
+                    },
                 ]
                 await vscode.workspace.getConfiguration('betterSnippets').update(configKey, configValue, vscode.ConfigurationTarget.Global)
             })
             .then(done)
     })
 
-    for (const match of /\/\/ (\d+)/g.exec(content)!) console.log()
+    const toTest = [...content.matchAll(/\/\/ (\d+) ((?:!?\w ?)+)/gm)].map(item => ({
+        position: document.positionAt(item.index!),
+        labelBase: item[1]!,
+        cases: item[2]!.split(' '),
+    }))
+    for (const { labelBase, cases, position } of toTest) for (const testingCase of cases) test(`${labelBase} - ${testingCase}`)
 })
