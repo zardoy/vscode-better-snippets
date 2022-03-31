@@ -1,77 +1,102 @@
+/* eslint-disable no-promise-executor-return */
+/* eslint-disable @typescript-eslint/no-loop-func */
 import fs from 'fs'
 import { join } from 'path'
 import * as vscode from 'vscode'
+import { expect } from 'chai'
 import { Configuration } from '../../../src/configurationType'
 
-const content = fs.readFileSync(join(__dirname, '../fixtures/otherLines.ts'), 'utf-8')
+const content = fs.readFileSync(join(__dirname, '../../test/integration/fixtures/otherLines.ts'), 'utf-8')
 
 describe('otherLines', () => {
-    let document: vscode.TextDocument
+    let documentPromise: Thenable<vscode.TextDocument>
+    return
 
+    // eslint-disable-next-line no-unreachable
     before(done => {
-        void vscode.workspace
-            .openTextDocument({
-                content,
-                language: 'markdown',
-            })
-            .then(async editor => {
-                document = editor
-                const configKey: keyof Configuration = 'customSnippets'
-                const configValue: Configuration['customSnippets'] = [
-                    {
-                        name: 'reactHook',
-                        body: '',
-                        sortText: '!',
-                        when: {
-                            locations: ['lineStart'],
-                            otherLines: [
-                                {
-                                    indent: -1,
-                                    preset: 'function',
-                                },
-                            ],
+        console.log('basic')
+        documentPromise = vscode.workspace.openTextDocument({
+            content,
+            language: 'typescript',
+        })
+        describe('Generated spec', () => {
+            void documentPromise
+                .then(async () => {
+                    const configKey: keyof Configuration = 'customSnippets'
+                    const configValue: Configuration['customSnippets'] = [
+                        {
+                            name: 'reactHook',
+                            body: '',
+                            sortText: '!',
+                            when: {
+                                locations: ['lineStart'],
+                                otherLines: [
+                                    {
+                                        indent: -1,
+                                        preset: 'function',
+                                    },
+                                ],
+                            },
                         },
-                    },
-                    {
-                        // actually should a typing snippet
-                        name: 'c',
-                        body: 'countinue',
-                        sortText: '!',
-                        when: {
-                            // locations: [],
-                            otherLines: [
-                                {
-                                    indent: -1,
-                                    testString: 'for',
-                                },
-                            ],
+                        {
+                            // actually should a typing snippet
+                            name: 'c',
+                            body: 'countinue',
+                            sortText: '!',
+                            when: {
+                                // locations: [],
+                                otherLines: [
+                                    {
+                                        indent: -1,
+                                        testString: 'for',
+                                    },
+                                ],
+                            },
                         },
-                    },
-                    {
-                        // actually should a typing snippet
-                        name: 'f',
-                        body: '\n} else {\n',
-                        sortText: '!',
-                        when: {
-                            // locations: [],
-                            otherLines: [
-                                {
-                                    indent: -1,
-                                    testString: 'if',
-                                },
-                            ],
+                        {
+                            // actually should a typing snippet
+                            name: 'f',
+                            body: '',
+                            sortText: '!',
+                            when: {
+                                // locations: [],
+                                otherLines: [
+                                    {
+                                        indent: -1,
+                                        testString: 'if',
+                                    },
+                                ],
+                            },
                         },
-                    },
-                ]
-                await vscode.workspace.getConfiguration('betterSnippets').update(configKey, configValue, vscode.ConfigurationTarget.Global)
-            })
-            .then(done)
+                    ]
+                    console.log('before update')
+                    await new Promise(resolve => setTimeout(resolve, 200))
+                    await vscode.commands.executeCommand('workbench.action.closeActiveEditor')
+                    await vscode.workspace.getConfiguration('betterSnippets').update(configKey, configValue, vscode.ConfigurationTarget.Global)
+                    console.log(2)
+                    await new Promise(resolve => setTimeout(resolve, 100))
+                    const activeEditor = vscode.window.activeTextEditor!
+                    const toTest = [...content.matchAll(/\/\/ (\d+) ((?:!?\w ?)+)/gm)].map(item => ({
+                        offset: item.index!,
+                        labelBase: item[1]!,
+                        cases: item[2]!.split(' '),
+                    }))
+                    // TODO adjust arch, think in Jest
+                    for (const { labelBase, cases, offset } of toTest)
+                        for (const testingCase of cases)
+                            it(`${labelBase} - ${testingCase}`, async () => {
+                                const document = await documentPromise
+                                const activeEditor = vscode.window.activeTextEditor!
+                                await activeEditor.edit(builder => {
+                                    const pos = document.positionAt(offset)
+                                    builder.delete(new vscode.Range(pos, pos.with({ character: Number.POSITIVE_INFINITY })))
+                                })
+                                await new Promise(resolve => setTimeout(resolve, 25_000))
+                            })
+                })
+                .then(done)
+        })
     })
 
-    const toTest = [...content.matchAll(/\/\/ (\d+) ((?:!?\w ?)+)/gm)].map(item => ({
-        position: document.positionAt(item.index!),
-        labelBase: item[1]!,
-        cases: item[2]!.split(' '),
-    }))
-    for (const { labelBase, cases, position } of toTest) for (const testingCase of cases) test(`${labelBase} - ${testingCase}`)
+    it('Dummy test case, so before is executed', () => expect(1).equal(1))
 })

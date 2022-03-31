@@ -11,7 +11,7 @@ export const activate = someData => {
             'a-:/b/'(): Partial<Record<string, any>> | void {
                 // 4
                 if (false) {
-                    // 5
+                    // 5 !c
                 }
                 // 6
             },
@@ -19,7 +19,7 @@ export const activate = someData => {
         }
     }
     for (const iterator of []) {
-        // 7
+        // 7 c
     }
 }
 
