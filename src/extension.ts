@@ -97,16 +97,18 @@ export const activate = () => {
 
                 const isStringMatches = (lineText: string, testAgainst: typeof when.otherLines[number]) => {
                     // method or arrow func also included
-                    const functionRegex = /(\([^()]*)\)(?:: .+)? (?:=>|{)/
-                    if ('preset' in testAgainst) {
-                        if (testAgainst.preset === 'function') return functionRegex.test(lineText)
+                    // const functionRegex = /(\([^()]*)\)(?:: .+)? (?:=>|{)/
+                    if ('preset' in testAgainst)
+                        // if (testAgainst.preset === 'function') return functionRegex.test(lineText)
                         return false
-                    }
 
-                    if ('testString' in testAgainst) return lineText[testAgainst.matchWith ?? 'startsWith'](testAgainst.testString)
+                    if ('testString' in testAgainst) return lineText.trim()[testAgainst.matchWith ?? 'startsWith'](testAgainst.testString)
 
                     // TODO(perf) investigate time for creating RegExp instance
-                    return new RegExp(normalizeRegex(testAgainst.testRegex)).test(lineText)
+                    const match = new RegExp(normalizeRegex(testAgainst.testRegex)).exec(lineText)
+                    Object.assign(regexGroups, match?.groups)
+                    if (!match) debug(`Snippet ${name} skipped due to line regex: (${testAgainst.testRegex} against ${lineText})`)
+                    return !!match
                 }
 
                 // TODO-low debug message
@@ -182,10 +184,14 @@ export const activate = () => {
                 workspaceValue = [],
                 workspaceFolderValue = [],
             } = vscode.workspace.getConfiguration(process.env.IDS_PREFIX, null).inspect<any[]>(configKey)!
-            return [...globalValue, ...workspaceValue, ...workspaceFolderValue]
+            return [...globalValue, ...workspaceValue, ...workspaceFolderValue] as any
         }
 
-        const snippetsToLoadFromSettings = [...getMergedConfig('customSnippets'), ...(getExtensionSetting('enableBuiltinSnippets') ? builtinSnippets : [])]
+        const disableBuiltinSnippets = getMergedConfig('experimental.disableBuiltinSnippets')
+        const snippetsToLoadFromSettings = [
+            ...getMergedConfig('customSnippets'),
+            ...(getExtensionSetting('enableBuiltinSnippets') ? builtinSnippets.filter(snippet => !disableBuiltinSnippets.includes(snippet.name as any)) : []),
+        ]
 
         const registerSnippets = (snippetsToLoad: Configuration['customSnippets']) => {
             const snippetsByLanguage: { [language: string]: CustomSnippet[] } = {}
@@ -381,6 +387,7 @@ export const activate = () => {
             affectsConfiguration(getExtensionSettingId('typingSnippets')) ||
             affectsConfiguration(getExtensionSettingId('enableBuiltinSnippets')) ||
             affectsConfiguration(getExtensionSettingId('enableExperimentalSnippets')) ||
+            affectsConfiguration(getExtensionSettingId('experimental.disableBuiltinSnippets')) ||
             affectsConfiguration(getExtensionSettingId('languageSupersets'))
         ) {
             console.log('Snippets configuration updated')

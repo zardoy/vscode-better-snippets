@@ -33,7 +33,8 @@ describe('otherLines', () => {
                                 otherLines: [
                                     {
                                         indent: -1,
-                                        preset: 'function',
+                                        testRegex: "function|=>|React.FC"
+                                        // preset: 'function',
                                     },
                                 ],
                             },

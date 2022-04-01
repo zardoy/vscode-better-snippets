@@ -1,5 +1,5 @@
 // GENERATED. DON'T EDIT MANUALLY
-// md5hash: 7a67efeb82a69d8c27167c13c6863bd1
+// md5hash: 5590f68b0826f738ebff3c978280711f
 {
     "type": "object",
     "properties": {
@@ -103,6 +103,7 @@
                                                             "type": "object",
                                                             "properties": {
                                                                 "testRegex": {
+                                                                    "description": "Tests against original string (with whitespaces)",
                                                                     "suggestSortText": "4",
                                                                     "type": "string"
                                                                 }
@@ -136,6 +137,7 @@
                                                             "type": "object",
                                                             "properties": {
                                                                 "testRegex": {
+                                                                    "description": "Tests against original string (with whitespaces)",
                                                                     "suggestSortText": "4",
                                                                     "type": "string"
                                                                 }
@@ -166,6 +168,7 @@
                                                             "type": "object",
                                                             "properties": {
                                                                 "testString": {
+                                                                    "description": "Tests against trimmed string",
                                                                     "suggestSortText": "3",
                                                                     "type": "string"
                                                                 },
@@ -208,6 +211,7 @@
                                                             "type": "object",
                                                             "properties": {
                                                                 "testString": {
+                                                                    "description": "Tests against trimmed string",
                                                                     "suggestSortText": "3",
                                                                     "type": "string"
                                                                 },
@@ -223,73 +227,6 @@
                                                             },
                                                             "required": [
                                                                 "testString"
-                                                            ]
-                                                        },
-                                                        {
-                                                            "type": "object",
-                                                            "properties": {
-                                                                "indent": {
-                                                                    "description": "How many levels up of indendation to look? By default 0 - any. Example: `-1`\nCurrently it is possible to lookup only above (negative number)",
-                                                                    "suggestSortText": "2",
-                                                                    "default": 0,
-                                                                    "type": "number"
-                                                                }
-                                                            },
-                                                            "required": [
-                                                                "indent"
-                                                            ]
-                                                        }
-                                                    ]
-                                                },
-                                                {
-                                                    "allOf": [
-                                                        {
-                                                            "type": "object",
-                                                            "properties": {
-                                                                "preset": {
-                                                                    "type": "string",
-                                                                    "enum": [
-                                                                        "function"
-                                                                    ]
-                                                                }
-                                                            },
-                                                            "required": [
-                                                                "preset"
-                                                            ]
-                                                        },
-                                                        {
-                                                            "type": "object",
-                                                            "properties": {
-                                                                "line": {
-                                                                    "description": "Which line to pick (relative to current)",
-                                                                    "suggestSortText": "1",
-                                                                    "type": "number"
-                                                                },
-                                                                "displayIfNoLine": {
-                                                                    "default": false,
-                                                                    "type": "boolean"
-                                                                }
-                                                            },
-                                                            "required": [
-                                                                "line"
-                                                            ]
-                                                        }
-                                                    ]
-                                                },
-                                                {
-                                                    "allOf": [
-                                                        {
-                                                            "type": "object",
-                                                            "properties": {
-                                                                "preset": {
-                                                                    "type": "string",
-                                                                    "enum": [
-                                                                        "function"
-                                                                    ]
-                                                                }
-                                                            },
-                                                            "required": [
-                                                                "preset"
                                                             ]
                                                         },
                                                         {
@@ -510,6 +447,7 @@
                                                             "type": "object",
                                                             "properties": {
                                                                 "testRegex": {
+                                                                    "description": "Tests against original string (with whitespaces)",
                                                                     "suggestSortText": "4",
                                                                     "type": "string"
                                                                 }
@@ -543,6 +481,7 @@
                                                             "type": "object",
                                                             "properties": {
                                                                 "testRegex": {
+                                                                    "description": "Tests against original string (with whitespaces)",
                                                                     "suggestSortText": "4",
                                                                     "type": "string"
                                                                 }
@@ -573,6 +512,7 @@
                                                             "type": "object",
                                                             "properties": {
                                                                 "testString": {
+                                                                    "description": "Tests against trimmed string",
                                                                     "suggestSortText": "3",
                                                                     "type": "string"
                                                                 },
@@ -615,6 +555,7 @@
                                                             "type": "object",
                                                             "properties": {
                                                                 "testString": {
+                                                                    "description": "Tests against trimmed string",
                                                                     "suggestSortText": "3",
                                                                     "type": "string"
                                                                 },
@@ -630,73 +571,6 @@
                                                             },
                                                             "required": [
                                                                 "testString"
-                                                            ]
-                                                        },
-                                                        {
-                                                            "type": "object",
-                                                            "properties": {
-                                                                "indent": {
-                                                                    "description": "How many levels up of indendation to look? By default 0 - any. Example: `-1`\nCurrently it is possible to lookup only above (negative number)",
-                                                                    "suggestSortText": "2",
-                                                                    "default": 0,
-                                                                    "type": "number"
-                                                                }
-                                                            },
-                                                            "required": [
-                                                                "indent"
-                                                            ]
-                                                        }
-                                                    ]
-                                                },
-                                                {
-                                                    "allOf": [
-                                                        {
-                                                            "type": "object",
-                                                            "properties": {
-                                                                "preset": {
-                                                                    "type": "string",
-                                                                    "enum": [
-                                                                        "function"
-                                                                    ]
-                                                                }
-                                                            },
-                                                            "required": [
-                                                                "preset"
-                                                            ]
-                                                        },
-                                                        {
-                                                            "type": "object",
-                                                            "properties": {
-                                                                "line": {
-                                                                    "description": "Which line to pick (relative to current)",
-                                                                    "suggestSortText": "1",
-                                                                    "type": "number"
-                                                                },
-                                                                "displayIfNoLine": {
-                                                                    "default": false,
-                                                                    "type": "boolean"
-                                                                }
-                                                            },
-                                                            "required": [
-                                                                "line"
-                                                            ]
-                                                        }
-                                                    ]
-                                                },
-                                                {
-                                                    "allOf": [
-                                                        {
-                                                            "type": "object",
-                                                            "properties": {
-                                                                "preset": {
-                                                                    "type": "string",
-                                                                    "enum": [
-                                                                        "function"
-                                                                    ]
-                                                                }
-                                                            },
-                                                            "required": [
-                                                                "preset"
                                                             ]
                                                         },
                                                         {
@@ -886,6 +760,26 @@
                     "type": "string"
                 }
             }
+        },
+        "experimental.disableBuiltinSnippets": {
+            "description": "Experimental way to disable builtin snippets. Will be removed in future in favor of something else.",
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+                "enum": [
+                    "codeblock",
+                    "dropdown",
+                    "ed",
+                    "ef",
+                    "em",
+                    "er",
+                    "et",
+                    "ts",
+                    "tsx",
+                    "useParam"
+                ],
+                "type": "string"
+            }
         }
     },
     "required": [
@@ -894,6 +788,7 @@
         "diagnosticTimeout",
         "enableBuiltinSnippets",
         "enableExperimentalSnippets",
+        "experimental.disableBuiltinSnippets",
         "languageSupersets",
         "snippetCreator.showSnippetAfterCreation",
         "typingSnippets",

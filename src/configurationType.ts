@@ -14,12 +14,14 @@ type SnippetType = keyof typeof vscode.CompletionItemKind | number
 type TestProp =
     | {
           /**
+           * Tests against original string (with whitespaces)
            * @suggestSortText "4"
            */
           testRegex: string
       }
     | {
           /**
+           * Tests against trimmed string
            * @suggestSortText "3"
            */
           testString: string
@@ -58,7 +60,7 @@ export type GeneralSnippet = {
         /** Shortcuts for complex path regexs. If specified, `pathRegex` is ignored */
         fileType?: 'package.json' | 'tsconfig.json'
         otherLines?: Array<
-            (TestProp | { preset: 'function' }) &
+            TestProp /*  | { preset: 'function' } */ &
                 (
                     | {
                           /**
@@ -212,6 +214,11 @@ export type Configuration = {
     // TODO default is set in prepare.ts
     // * Note that family name can overlap with language id, contributed by other extension. If this is case rename the family or set it to null (in case if family is builtin)
     languageSupersets: { [family: string]: string[] }
+    /**
+     * Experimental way to disable builtin snippets. Will be removed in future in favor of something else.
+     * @uniqueItems true
+     *  */
+    'experimental.disableBuiltinSnippets': Array<'er' | 'et' | 'em' | 'ef' | 'ed' | 'useParam' | 'ts' | 'tsx' | 'codeblock' | 'dropdown'>
 }
 
 export { defaultLanguageSupersets } from '@zardoy/vscode-utils/build/langs'
