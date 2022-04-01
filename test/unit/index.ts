@@ -1,1 +1,1 @@
-/// <reference types="jest" />
+/// <reference types="vitest/globals" />

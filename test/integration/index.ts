@@ -17,6 +17,7 @@ export const run = async () => {
     // )
     const mocha = new Mocha({
         color: true,
+        parallel: false,
     })
     const testsRoot = join(__dirname, './suite')
     await new Promise<void>(resolve => {
