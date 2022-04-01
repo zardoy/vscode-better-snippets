@@ -1,5 +1,8 @@
 import { normalizeLanguages as normalizeLanguagesOriginal, areLangsEquals } from '@zardoy/vscode-utils/build/langs'
+import { vi } from 'vitest'
 import { defaultLanguageSupersets } from '../../src/configurationType'
+
+vi.mock('vscode', () => ({}))
 
 // After refactoring, now its weird that lib function being tested there
 
@@ -7,36 +10,36 @@ const normalizeLanguages = (langs: string | string[]) => normalizeLanguagesOrigi
 
 test('normalizeLanguages', () => {
     expect(normalizeLanguages('javascriptreact')).toMatchInlineSnapshot(`
-    Array [
-      "javascriptreact",
-    ]
-  `)
+      [
+        "javascriptreact",
+      ]
+    `)
     expect(normalizeLanguages('*')).toMatchInlineSnapshot(`
-    Array [
-      "*",
-    ]
-  `)
+      [
+        "*",
+      ]
+    `)
     expect(normalizeLanguages('js')).toMatchInlineSnapshot(`
-    Array [
-      "typescript",
-      "javascript",
-      "typescriptreact",
-      "javascriptreact",
-    ]
-  `)
+      [
+        "typescript",
+        "javascript",
+        "typescriptreact",
+        "javascriptreact",
+      ]
+    `)
     expect(normalizeLanguages(['typescriptreact', 'typescript', 'ts', 'styles'])).toMatchInlineSnapshot(`
-    Array [
-      "typescriptreact",
-      "typescript",
-      "typescript",
-      "typescriptreact",
-      "css",
-      "scss",
-      "sass",
-      "source.css.styled",
-    ]
-  `)
-    expect(normalizeLanguages([])).toMatchInlineSnapshot(`Array []`)
+      [
+        "typescriptreact",
+        "typescript",
+        "typescript",
+        "typescriptreact",
+        "css",
+        "scss",
+        "sass",
+        "source.css.styled",
+      ]
+    `)
+    expect(normalizeLanguages([])).toMatchInlineSnapshot('[]')
 })
 
 test('areLangsEquals', () => {
