@@ -4,8 +4,8 @@ import * as vscode from 'vscode'
 import { getExtensionCommandId, getExtensionSetting, registerExtensionCommand } from 'vscode-framework'
 import delay from 'delay'
 import { range } from 'rambda'
-import { CustomSnippet } from './extension'
 import { oneOf } from '@zardoy/utils'
+import { CustomSnippet } from './extension'
 
 export interface CompletionInsertArg {
     action: 'resolve-imports'
