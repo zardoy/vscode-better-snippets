@@ -27,7 +27,7 @@
             },
             {
                 "command": "applySpecialSnippet",
-                "title": "applySpecialSnippet"
+                "title": "ApplySpecialSnippet"
             },
             {
                 "command": "createSnippetFromSelection",
@@ -38,6 +38,10 @@
             "commandPalette": [
                 {
                     "command": "completionInsert",
+                    "when": "false"
+                },
+                {
+                    "command": "applySpecialSnippet",
                     "when": "false"
                 }
             ]
