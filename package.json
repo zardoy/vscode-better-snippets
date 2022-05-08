@@ -15,7 +15,7 @@
     "keywords": [
         "snippets",
         "snippets alternative",
-        "insane snippets",
+        "typing snippets",
         "live templates",
         "templates"
     ],
@@ -32,6 +32,21 @@
             {
                 "command": "createSnippetFromSelection",
                 "title": "Create Snippet From Selection"
+            },
+            {
+                "command": "revealSnippetInSettingsJson",
+                "title": "Reveal Snippet in Settings Json",
+                "icon": "$(gear)"
+            },
+            {
+                "command": "groupBy#none",
+                "title": "Disable Grouping",
+                "enablement": "better-snippets.grouping != disabled"
+            },
+            {
+                "command": "groupBy#language",
+                "title": "Group by Language",
+                "enablement": "better-snippets.grouping != language"
             }
         ],
         "menus": {
@@ -44,8 +59,75 @@
                     "command": "applySpecialSnippet",
                     "when": "false"
                 }
+            ],
+            "view/item/context": [
+                {
+                    "command": "revealSnippetInSettingsJson",
+                    "group": "inline",
+                    "when": "view =~ /^(globalSnippets|globalTypingSnippets|workspaceSnippets|workspaceTypingSnippets)$/"
+                }
+            ],
+            "view/title": [
+                {
+                    "command": "groupBy#none",
+                    "group": "1",
+                    "when": "view =~ /^(globalSnippets|globalTypingSnippets|workspaceSnippets|workspaceTypingSnippets)$/"
+                },
+                {
+                    "command": "groupBy#language",
+                    "group": "1",
+                    "when": "view =~ /^(globalSnippets|globalTypingSnippets|workspaceSnippets|workspaceTypingSnippets)$/"
+                }
             ]
-        }
+        },
+        "views": {
+            "betterSnippets": [
+                {
+                    "id": "globalSnippets",
+                    "name": "Global Snippets"
+                },
+                {
+                    "id": "globalTypingSnippets",
+                    "name": "Global Typing Snippets"
+                },
+                {
+                    "id": "workspaceSnippets",
+                    "name": "Workspace Snippets",
+                    "visibility": "collapsed"
+                },
+                {
+                    "id": "workspaceTypingSnippets",
+                    "name": "Workspace Typing Snippets",
+                    "visibility": "collapsed"
+                },
+                {
+                    "id": "packs",
+                    "name": "Packs",
+                    "visibility": "collapsed"
+                }
+            ]
+        },
+        "viewsContainers": {
+            "activitybar": [
+                {
+                    "id": "betterSnippets",
+                    "title": "Better Snippets",
+                    "icon": "$(file-code)"
+                }
+            ]
+        },
+        "submenus": [
+            {
+                "id": "betterSnippets.groupBy",
+                "label": "test"
+            }
+        ],
+        "typescriptServerPlugins": [
+            {
+                "name": "better-snippets-typescript-plugin",
+                "enableForWorkspaceTypeScriptVersions": true
+            }
+        ]
     },
     "activationEvents": [
         "*"
@@ -59,7 +141,8 @@
     "scripts": {
         "start": "vscode-framework start",
         "start-web": "vscode-framework start --web",
-        "build": "vscode-framework build",
+        "build": "vscode-framework build && node buildTsPlugin.mjs",
+        "watch-plugin": "tsc -p typescript-plugin -w",
         "integration-test": "tsc -p tsconfig.test.json && node testsOut/runTests.js",
         "integration-test:watch": "tsc-watch -p tsconfig.test.json --onSuccess \"node testsOut/runTests.js\"",
         "unit-test": "vitest --globals",
@@ -98,12 +181,15 @@
     },
     "dependencies": {
         "@zardoy/utils": "^0.0.4",
-        "@zardoy/vscode-utils": "^0.0.5",
+        "@zardoy/vscode-utils": "^0.0.9",
+        "better-snippets-typescript-plugin": "workspace:*",
         "chai": "^4.3.6",
         "delay": "^5.0.0",
+        "esbuild": "^0.14.10",
         "escape-string-regexp": "^5.0.0",
         "got": "^11.8.3",
         "jsonc-parser": "^3.0.0",
+        "lodash.orderby": "^4.6.0",
         "modify-json-file": "^1.2.2",
         "path-browserify": "^1.0.1",
         "prettier": "^2.5.1",
@@ -112,6 +198,7 @@
         "ts-essentials": "^9.1.2",
         "tsc-watch": "^4.6.0",
         "type-fest": "^2.11.2",
+        "typed-jsonfile": "^0.2.1",
         "vscode-framework": "^0.0.18",
         "vscode-snippet-parser": "^0.0.5"
     },

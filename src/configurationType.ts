@@ -1,4 +1,5 @@
 import * as vscode from 'vscode'
+import { SyntaxKind } from 'typescript/lib/tsserverlibrary'
 
 export type SnippetLocation = 'fileStart' | 'comment' | 'lineStart' | 'topLineStart' | 'code'
 
@@ -80,7 +81,7 @@ export type GeneralSnippet = {
                            * @default 0
                            * @max 0
                            */
-                          indent: number
+                          indent: number | 'up'
                       }
                 )
         >
@@ -214,11 +215,16 @@ export type Configuration = {
     // TODO default is set in prepare.ts
     // * Note that family name can overlap with language id, contributed by other extension. If this is case rename the family or set it to null (in case if family is builtin)
     languageSupersets: { [family: string]: string[] }
+    typescriptLocations: {
+        [location: string]: {
+            mode: 'exclude' | 'include'
+            /** In which enable/disable tokens (final) */
+            kinds: keyof typeof SyntaxKind
+        }
+    }
     /**
      * Experimental way to disable builtin snippets. Will be removed in future in favor of something else.
      * @uniqueItems true
      *  */
     'experimental.disableBuiltinSnippets': Array<'er' | 'et' | 'em' | 'ef' | 'ed' | 'useParam' | 'ts' | 'tsx' | 'codeblock' | 'dropdown'>
 }
-
-export { defaultLanguageSupersets } from '@zardoy/vscode-utils/build/langs.js'

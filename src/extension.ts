@@ -17,6 +17,8 @@ import { registerExperimentalSnippets } from './experimentalSnippets'
 import { CompletionInsertArg, registerCompletionInsert } from './completionInsert'
 import { registerSpecialCommand } from './specialCommand'
 import { registerCreateSnippetFromSelection } from './createSnippetFromSelection'
+import { registerViews } from './views'
+import { registerRevealSnippetInSettingsJson } from './revealSnippetInSettingsJson'
 
 type CustomSnippetUnresolved = Configuration['customSnippets'][number]
 type TypingSnippetUnresolved = Configuration['typingSnippets'][number]
@@ -136,8 +138,14 @@ export const activate = () => {
                         // TODO(perf) investigate optimization
                         for (let i = 0; i < indentDiffs.length; i++) {
                             const { indent: requiredIndentDiff, ...matchingParams } = indentDiffs[i]!
-                            if (-indentDiffLevel === requiredIndentDiff) {
-                                if (!isStringMatches(lineText, matchingParams as any)) continue snippet
+                            if (-indentDiffLevel === requiredIndentDiff || requiredIndentDiff === 'up') {
+                                if (!isStringMatches(lineText, matchingParams as any)) console.log('false', currentIndent, line.lineNumber)
+
+                                if (
+                                    !isStringMatches(lineText, matchingParams as any) &&
+                                    (requiredIndentDiff !== 'up' || currentIndent === 0 || line.lineNumber === 0)
+                                )
+                                    continue snippet
                                 indentDiffs.splice(i, 1)
                                 i--
                             }
@@ -399,6 +407,25 @@ export const activate = () => {
     registerCompletionInsert()
     registerSpecialCommand()
     registerCreateSnippetFromSelection()
+    registerViews()
+    registerRevealSnippetInSettingsJson()
+
+    void registerExt()
+}
+
+const registerExt = async () => {
+    const tsExtension = vscode.extensions.getExtension('vscode.typescript-language-features')
+    if (!tsExtension) return
+
+    await tsExtension.activate()
+
+    // Get the API from the TS extension
+    if (!tsExtension.exports || !tsExtension.exports.getAPI) return
+
+    const api = tsExtension.exports.getAPI(0)
+    if (!api) return
+
+    api.configurePlugin('better-snippets-typescript-plugin', {})
 }
 
 const unmergedSnippetDefaults: DeepRequired<Configuration['customSnippetDefaults']> = {
