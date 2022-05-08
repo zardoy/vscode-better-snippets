@@ -1,0 +1,5 @@
+{
+    "name": "better-snippets-typescript-plugin",
+    "version": "0.0.0",
+    "main": "build/index.js"
+}

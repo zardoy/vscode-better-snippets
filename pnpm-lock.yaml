@@ -4,87 +4,99 @@ overrides:
   esbuild: ^0.14.10
   typescript-json-schema: ^0.53.0
 
-specifiers:
-  '@milahu/patch-package-with-pnpm-support': ^6.4.8
-  '@types/chai': ^4.3.0
-  '@types/fs-extra': ^9.0.13
-  '@types/glob': ^7.2.0
-  '@types/jest': ^27.4.0
-  '@types/mocha': ^9.1.0
-  '@types/node': ^16.11.25
-  '@types/path-browserify': ^1.0.0
-  '@types/vscode': ^1.64.0
-  '@vscode/test-electron': ^2.1.2
-  '@zardoy/tsconfig': ^1.4.0
-  '@zardoy/utils': ^0.0.4
-  '@zardoy/vscode-utils': ^0.0.5
-  chai: ^4.3.6
-  cross-env: ^7.0.3
-  delay: ^5.0.0
-  escape-string-regexp: ^5.0.0
-  eslint: ^8.9.0
-  eslint-config-zardoy: ^0.2.8
-  fs-extra: ^10.0.1
-  glob: ^7.2.0
-  got: ^11.8.3
-  jsonc-parser: ^3.0.0
-  mocha: ^9.2.0
-  modify-json-file: ^1.2.2
-  path-browserify: ^1.0.1
-  prettier: ^2.5.1
-  rambda: ^6.9.0
-  string-dedent: ^2.0.0
-  ts-essentials: ^9.1.2
-  tsc-watch: ^4.6.0
-  tsm: ^2.2.1
-  type-fest: ^2.11.2
-  typescript: ^4.5.5
-  vitest: ^0.8.1
-  vscode-framework: ^0.0.18
-  vscode-manifest: ^0.0.8
-  vscode-snippet-parser: ^0.0.5
+importers:
 
-dependencies:
-  '@zardoy/utils': 0.0.4
-  '@zardoy/vscode-utils': 0.0.5_dglpivvyc4e67exhhadou2fmk4
-  chai: 4.3.6
-  delay: 5.0.0
-  escape-string-regexp: 5.0.0
-  got: 11.8.3
-  jsonc-parser: 3.0.0
-  modify-json-file: 1.2.2
-  path-browserify: 1.0.1
-  prettier: 2.5.1
-  rambda: 6.9.0
-  string-dedent: 2.0.0
-  ts-essentials: 9.1.2_typescript@4.5.5
-  tsc-watch: 4.6.0_typescript@4.5.5
-  type-fest: 2.11.2
-  vscode-framework: 0.0.18_kvrfju2rt4jkjwqfr2fyttrbia
-  vscode-snippet-parser: 0.0.5
+  .:
+    specifiers:
+      '@milahu/patch-package-with-pnpm-support': ^6.4.8
+      '@types/chai': ^4.3.0
+      '@types/fs-extra': ^9.0.13
+      '@types/glob': ^7.2.0
+      '@types/jest': ^27.4.0
+      '@types/mocha': ^9.1.0
+      '@types/node': ^16.11.25
+      '@types/path-browserify': ^1.0.0
+      '@types/vscode': ^1.64.0
+      '@vscode/test-electron': ^2.1.2
+      '@zardoy/tsconfig': ^1.4.0
+      '@zardoy/utils': ^0.0.4
+      '@zardoy/vscode-utils': ^0.0.9
+      better-snippets-typescript-plugin: workspace:*
+      chai: ^4.3.6
+      cross-env: ^7.0.3
+      delay: ^5.0.0
+      esbuild: ^0.14.10
+      escape-string-regexp: ^5.0.0
+      eslint: ^8.9.0
+      eslint-config-zardoy: ^0.2.8
+      fs-extra: ^10.0.1
+      glob: ^7.2.0
+      got: ^11.8.3
+      jsonc-parser: ^3.0.0
+      lodash.orderby: ^4.6.0
+      mocha: ^9.2.0
+      modify-json-file: ^1.2.2
+      path-browserify: ^1.0.1
+      prettier: ^2.5.1
+      rambda: ^6.9.0
+      string-dedent: ^2.0.0
+      ts-essentials: ^9.1.2
+      tsc-watch: ^4.6.0
+      tsm: ^2.2.1
+      type-fest: ^2.11.2
+      typed-jsonfile: ^0.2.1
+      typescript: ^4.5.5
+      vitest: ^0.8.1
+      vscode-framework: ^0.0.18
+      vscode-manifest: ^0.0.8
+      vscode-snippet-parser: ^0.0.5
+    dependencies:
+      '@zardoy/utils': 0.0.4
+      '@zardoy/vscode-utils': 0.0.9_dglpivvyc4e67exhhadou2fmk4
+      better-snippets-typescript-plugin: link:typescript-plugin
+      chai: 4.3.6
+      delay: 5.0.0
+      esbuild: 0.14.23
+      escape-string-regexp: 5.0.0
+      got: 11.8.3
+      jsonc-parser: 3.0.0
+      lodash.orderby: 4.6.0
+      modify-json-file: 1.2.2
+      path-browserify: 1.0.1
+      prettier: 2.5.1
+      rambda: 6.9.0
+      string-dedent: 2.0.0
+      ts-essentials: 9.1.2_typescript@4.5.5
+      tsc-watch: 4.6.0_typescript@4.5.5
+      type-fest: 2.11.2
+      typed-jsonfile: 0.2.1
+      vscode-framework: 0.0.18_kvrfju2rt4jkjwqfr2fyttrbia
+      vscode-snippet-parser: 0.0.5
+    devDependencies:
+      '@milahu/patch-package-with-pnpm-support': 6.4.8
+      '@types/chai': 4.3.0
+      '@types/fs-extra': 9.0.13
+      '@types/glob': 7.2.0
+      '@types/jest': 27.4.0
+      '@types/mocha': 9.1.0
+      '@types/node': 16.11.25
+      '@types/path-browserify': 1.0.0
+      '@types/vscode': 1.64.0
+      '@vscode/test-electron': 2.1.2
+      '@zardoy/tsconfig': 1.4.0_typescript@4.5.5
+      cross-env: 7.0.3
+      eslint: 8.9.0
+      eslint-config-zardoy: 0.2.8_fhzmdq77bspfhxkfuzq4fbrdsy
+      fs-extra: 10.0.1
+      glob: 7.2.0
+      mocha: 9.2.0
+      tsm: 2.2.1
+      typescript: 4.5.5
+      vitest: 0.8.1
+      vscode-manifest: 0.0.8
 
-devDependencies:
-  '@milahu/patch-package-with-pnpm-support': 6.4.8
-  '@types/chai': 4.3.0
-  '@types/fs-extra': 9.0.13
-  '@types/glob': 7.2.0
-  '@types/jest': 27.4.0
-  '@types/mocha': 9.1.0
-  '@types/node': 16.11.25
-  '@types/path-browserify': 1.0.0
-  '@types/vscode': 1.64.0
-  '@vscode/test-electron': 2.1.2
-  '@zardoy/tsconfig': 1.4.0_typescript@4.5.5
-  cross-env: 7.0.3
-  eslint: 8.9.0
-  eslint-config-zardoy: 0.2.8_fhzmdq77bspfhxkfuzq4fbrdsy
-  fs-extra: 10.0.1
-  glob: 7.2.0
-  mocha: 9.2.0
-  tsm: 2.2.1
-  typescript: 4.5.5
-  vitest: 0.8.1
-  vscode-manifest: 0.0.8
+  typescript-plugin:
+    specifiers: {}
 
 packages:
 
@@ -583,8 +595,8 @@ packages:
     resolution: {integrity: sha512-bSlAWz5WtcSL3cO9tAT/KpEH9rv5OBnm93OIIFwdCshaAiqr2bp1AUyEwW9MWeCvZBHEXc3V0fTYVdVyzDNwHA==}
     dev: true
 
-  /@types/yauzl/2.9.2:
-    resolution: {integrity: sha512-8uALY5LTvSuHgloDVUvWP3pIauILm+8/0pDMokuDYIoNsOkSwd5AiHBTSEJjKTDcZr5z8UpgOWZkxBF4iJftoA==}
+  /@types/yauzl/2.10.0:
+    resolution: {integrity: sha512-Cn6WYCm0tXv8p6k+A8PvbDG763EDpBoTzHdA+Q/MF6H3sapGjCm9NzoaJncJS9tUKSuCoDs9XHxYYsQDgxR6kw==}
     requiresBuild: true
     dependencies:
       '@types/node': 16.11.25
@@ -778,8 +790,8 @@ packages:
       type-fest: 2.11.2
     dev: false
 
-  /@zardoy/vscode-utils/0.0.5_dglpivvyc4e67exhhadou2fmk4:
-    resolution: {integrity: sha512-ksUblvC0bb7p2YHKFJWJKl8pP2WUKB/HEtrMLQTiyi3osyuUUegsSsJdyNVuUrYOlTDpS/AsFmazd4KWNfbg4g==}
+  /@zardoy/vscode-utils/0.0.9_dglpivvyc4e67exhhadou2fmk4:
+    resolution: {integrity: sha512-U0JD2gWSYh8g0w/ppuVVhWpkSknxzF+3CYMBIoi3R5/tooT8dsVA5dt4YS0/6uUuq/phEeckCPkRGR53OTJqVA==}
     engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
     peerDependencies:
       '@types/vscode': ^1.65.0
@@ -791,7 +803,8 @@ packages:
       '@types/vscode': 1.64.0
       '@zardoy/utils': 0.0.4
       chokidar: 3.5.3
-      rambda: 7.0.3
+      execa: 5.1.1
+      rambda: 7.1.0
       untildify: 4.0.0
       vscode-framework: 0.0.18_kvrfju2rt4jkjwqfr2fyttrbia
       vscode-manifest: 0.0.8
@@ -2264,7 +2277,7 @@ packages:
       get-stream: 5.2.0
       yauzl: 2.10.0
     optionalDependencies:
-      '@types/yauzl': 2.9.2
+      '@types/yauzl': 2.10.0
     transitivePeerDependencies:
       - supports-color
     dev: false
@@ -3215,6 +3228,10 @@ packages:
     resolution: {integrity: sha512-0KpjqXRVvrYyCsX1swR/XTK0va6VQkQM6MNo7PqW77ByjAhoARA8EfrP1N4+KlKj8YS0ZUCtRT/YUuhyYDujIQ==}
     dev: true
 
+  /lodash.orderby/4.6.0:
+    resolution: {integrity: sha1-5pfwTOXXhSL1TZM4syuBozk+TrM=}
+    dev: false
+
   /lodash/4.17.21:
     resolution: {integrity: sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==}
 
@@ -3955,8 +3972,8 @@ packages:
     resolution: {integrity: sha512-yosVdGg1hNGkXPzqGiOYNEpXKjEOxzUCg2rB0l+NKdyCaSf4z+i5ojbN0IqDSezMMf71YEglI+ZUTgTffn5afw==}
     dev: false
 
-  /rambda/7.0.3:
-    resolution: {integrity: sha512-vRkFoukpx9PTmYyOjMZ6+anbDI9BrjaAepigsSOVQcgy7dZKMHM26m1/r8BvegeBCM8qBwr1m/+rufgNKRrofw==}
+  /rambda/7.1.0:
+    resolution: {integrity: sha512-HkqheuvgfSxj+Pyg4yT1fpX1KzPL9ghG5z5lAfbkwRcwIVx8P657MgrGWGaHRNI+j2Mr1d88AdHKgm8Qy0I10w==}
     dev: false
 
   /randombytes/2.1.0:
@@ -4643,8 +4660,9 @@ packages:
       mime-types: 2.1.34
     dev: false
 
-  /typed-jsonfile/0.2.0:
-    resolution: {integrity: sha512-YJs08UqB0/YZfCIfNUW4k8sIso3OOUyVBsUaQkO2B2jGB2Tr7NCI/Mf6ninvKb/Idja4XOpG+ksbL9sHm2HZ6g==}
+  /typed-jsonfile/0.2.1:
+    resolution: {integrity: sha512-8G2jqDOjg2reeq0Af3LYb1hY9bbmDYdnleAPQ6o74IPBJ5OxTjbG89TNoXGVGhy1+M16oFHmLIFfMEthQo3lYA==}
+    engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
     dependencies:
       jsonc-parser: 3.0.0
       jsonfile: 6.1.0
@@ -4668,7 +4686,7 @@ packages:
       lodash: 4.17.21
       quicktype-core: 6.0.70
       type-fest: 2.11.2
-      typed-jsonfile: 0.2.0
+      typed-jsonfile: 0.2.1
     transitivePeerDependencies:
       - typescript
     dev: false
@@ -4895,7 +4913,7 @@ packages:
       nanoid: 3.3.1
       pkg-dir: 5.0.0
       pretty-format: 27.5.1
-      typed-jsonfile: 0.2.0
+      typed-jsonfile: 0.2.1
       typed-vscode: 0.0.5_kvrfju2rt4jkjwqfr2fyttrbia
       typescript-json-schema: 0.53.0
       vscode-extra: 0.0.4_@types+vscode@1.64.0
