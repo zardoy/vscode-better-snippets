@@ -11,6 +11,26 @@ type CommandDefinition =
 
 type SnippetType = keyof typeof vscode.CompletionItemKind | number
 
+type TestProp =
+    | {
+          /**
+           * Tests against original string (with whitespaces)
+           * @suggestSortText "4"
+           */
+          testRegex: string
+      }
+    | {
+          /**
+           * Tests against trimmed string
+           * @suggestSortText "3"
+           */
+          testString: string
+          /**
+           * @default "startsWith"
+           */
+          matchWith?: 'startsWith' | 'includes' | 'endsWith'
+      }
+
 export type GeneralSnippet = {
     /**
      * @suggestSortText "2"
@@ -39,6 +59,31 @@ export type GeneralSnippet = {
         pathRegex?: string
         /** Shortcuts for complex path regexs. If specified, `pathRegex` is ignored */
         fileType?: 'package.json' | 'tsconfig.json'
+        otherLines?: Array<
+            TestProp /*  | { preset: 'function' } */ &
+                (
+                    | {
+                          /**
+                           * Which line to pick (relative to current)
+                           * @suggestSortText "1"
+                           */
+                          line: number /*  | number[] */
+                          /** @default false */
+                          displayIfNoLine?: boolean
+                      }
+                    | {
+                          // TODO support negative
+                          /**
+                           * How many levels up of indendation to look? By default 0 - any. Example: `-1`
+                           * Currently it is possible to lookup only above (negative number)
+                           * @suggestSortText "2"
+                           * @default 0
+                           * @max 0
+                           */
+                          indent: number
+                      }
+                )
+        >
         /**
          * Enable snippet only when following NPM dependencies are installed locally. TODO: implement
          */
@@ -169,6 +214,11 @@ export type Configuration = {
     // TODO default is set in prepare.ts
     // * Note that family name can overlap with language id, contributed by other extension. If this is case rename the family or set it to null (in case if family is builtin)
     languageSupersets: { [family: string]: string[] }
+    /**
+     * Experimental way to disable builtin snippets. Will be removed in future in favor of something else.
+     * @uniqueItems true
+     *  */
+    'experimental.disableBuiltinSnippets': Array<'er' | 'et' | 'em' | 'ef' | 'ed' | 'useParam' | 'ts' | 'tsx' | 'codeblock' | 'dropdown'>
 }
 
-export { defaultLanguageSupersets } from '@zardoy/vscode-utils/build/langs'
+export { defaultLanguageSupersets } from '@zardoy/vscode-utils/build/langs.js'

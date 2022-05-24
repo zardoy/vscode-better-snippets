@@ -37,7 +37,6 @@ export const builtinSnippets: Configuration['customSnippets'] = (
             name: 'useParam',
             body: '',
             // experimentaly
-            sortText: '10',
             type: 'Event',
             executeCommand: {
                 command: getExtensionCommandId('applySpecialSnippet'),
@@ -46,6 +45,10 @@ export const builtinSnippets: Configuration['customSnippets'] = (
             when: {
                 locations: ['lineStart'],
                 languages: ['react'],
+                otherLines: [{
+                    indent: -1,
+                    testRegex: "function|=>|React.FC"
+                }]
             },
         },
         // md

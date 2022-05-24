@@ -1,9 +1,11 @@
+/* eslint-disable no-labels */
+/* eslint-disable max-depth */
 import * as vscode from 'vscode'
 import { normalizeRegex } from '@zardoy/vscode-utils/build/settings'
 import { normalizeLanguages } from '@zardoy/vscode-utils/build/langs'
 import { ConditionalPick } from 'type-fest'
 import { SnippetParser } from 'vscode-snippet-parser'
-import { mergeDeepRight } from 'rambda'
+import { mergeDeepRight, partition } from 'rambda'
 import { DeepRequired } from 'ts-essentials'
 import { extensionCtx, getExtensionCommandId, getExtensionSetting, getExtensionSettingId } from 'vscode-framework'
 import { omitObj, oneOf, pickObj } from '@zardoy/utils'
@@ -48,6 +50,7 @@ export const activate = () => {
             snippet,
         )
 
+    // eslint-disable-next-line complexity
     const getCurrentSnippets = <T extends CustomSnippet | CustomTypingSnippet>(
         debugType: 'completion' | 'typing',
         snippets: T[],
@@ -72,7 +75,7 @@ export const activate = () => {
         const lineText = line.text
         const includedSnippets: Array<T & { body: string }> = []
 
-        for (const snippet of snippets) {
+        snippet: for (const snippet of snippets) {
             const { body, when } = snippet
             const name = getSnippetDebugName(snippet)
 
@@ -87,6 +90,64 @@ export const activate = () => {
                 const doesntMatch = !match
                 if (doesntMatch) log(`Snippet ${name} skipped due to regex: ${regexName} (${regex as string} against ${testingString})`)
                 return doesntMatch
+            }
+
+            if (when.otherLines) {
+                const [lineDiffs, indentDiffs] = partition(otherLine => 'line' in otherLine, when.otherLines)
+
+                const isStringMatches = (lineText: string, testAgainst: typeof when.otherLines[number]) => {
+                    // method or arrow func also included
+                    // const functionRegex = /(\([^()]*)\)(?:: .+)? (?:=>|{)/
+                    if ('preset' in testAgainst)
+                        // if (testAgainst.preset === 'function') return functionRegex.test(lineText)
+                        return false
+
+                    if ('testString' in testAgainst) return lineText.trim()[testAgainst.matchWith ?? 'startsWith'](testAgainst.testString)
+
+                    // TODO(perf) investigate time for creating RegExp instance
+                    const match = new RegExp(normalizeRegex(testAgainst.testRegex)).exec(lineText)
+                    Object.assign(regexGroups, match?.groups)
+                    if (!match) debug(`Snippet ${name} skipped due to line regex: (${testAgainst.testRegex} against ${lineText})`)
+                    return !!match
+                }
+
+                // TODO-low debug message
+                for (const lineDiff of lineDiffs)
+                    if (!isStringMatches(document.lineAt(position.line + (lineDiff as Extract<typeof lineDiff, { line: any }>).line).text, lineDiff))
+                        continue snippet
+
+                // eslint-disable-next-line no-inner-declarations
+                function changeIndentDiffsType(arg: any): asserts arg is Array<Extract<typeof indentDiffs[0], { indent: any }>> {}
+                changeIndentDiffsType(indentDiffs)
+
+                if (indentDiffs.length > 0 && position.line !== 0) {
+                    let indentDiffLevel = 0
+                    let indent = document.lineAt(position).firstNonWhitespaceCharacterIndex
+                    for (let i = position.line - 1; i >= 0; i--) {
+                        const line = document.lineAt(i)
+                        const lineText = line.text
+                        const currentIndent = line.firstNonWhitespaceCharacterIndex
+                        // skip empty lines
+                        if (lineText === '') continue
+                        // console.log(i + 1, indent, nextIndent)
+                        if (currentIndent >= indent) continue
+                        if (currentIndent < indent) indent = currentIndent
+                        indentDiffLevel++
+                        // TODO(perf) investigate optimization
+                        for (let i = 0; i < indentDiffs.length; i++) {
+                            const { indent: requiredIndentDiff, ...matchingParams } = indentDiffs[i]!
+                            if (-indentDiffLevel === requiredIndentDiff) {
+                                if (!isStringMatches(lineText, matchingParams as any)) continue snippet
+                                indentDiffs.splice(i, 1)
+                                i--
+                            }
+                        }
+
+                        if (indentDiffs.length === 0) break
+                    }
+
+                    if (indentDiffs.length > 0) continue
+                }
             }
 
             if (
@@ -123,10 +184,14 @@ export const activate = () => {
                 workspaceValue = [],
                 workspaceFolderValue = [],
             } = vscode.workspace.getConfiguration(process.env.IDS_PREFIX, null).inspect<any[]>(configKey)!
-            return [...globalValue, ...workspaceValue, ...workspaceFolderValue]
+            return [...globalValue, ...workspaceValue, ...workspaceFolderValue] as any
         }
 
-        const snippetsToLoadFromSettings = [...getMergedConfig('customSnippets'), ...(getExtensionSetting('enableBuiltinSnippets') ? builtinSnippets : [])]
+        const disableBuiltinSnippets = getMergedConfig('experimental.disableBuiltinSnippets')
+        const snippetsToLoadFromSettings = [
+            ...getMergedConfig('customSnippets'),
+            ...(getExtensionSetting('enableBuiltinSnippets') ? builtinSnippets.filter(snippet => !disableBuiltinSnippets.includes(snippet.name as any)) : []),
+        ]
 
         const registerSnippets = (snippetsToLoad: Configuration['customSnippets']) => {
             const snippetsByLanguage: { [language: string]: CustomSnippet[] } = {}
@@ -230,7 +295,7 @@ export const activate = () => {
                     ;(async () => {
                         const editor = vscode.window.activeTextEditor
                         if (document.uri !== editor?.document.uri) return
-                        if (internalDocumentChange) return
+                        if (internalDocumentChange || vscode.workspace.fs.isWritableFileSystem(document.uri.scheme) !== true) return
 
                         if (oneOf(reason, vscode.TextDocumentChangeReason.Undo, vscode.TextDocumentChangeReason.Redo)) {
                             resetSelection()
@@ -322,6 +387,7 @@ export const activate = () => {
             affectsConfiguration(getExtensionSettingId('typingSnippets')) ||
             affectsConfiguration(getExtensionSettingId('enableBuiltinSnippets')) ||
             affectsConfiguration(getExtensionSettingId('enableExperimentalSnippets')) ||
+            affectsConfiguration(getExtensionSettingId('experimental.disableBuiltinSnippets')) ||
             affectsConfiguration(getExtensionSettingId('languageSupersets'))
         ) {
             console.log('Snippets configuration updated')

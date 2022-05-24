@@ -1,10 +1,10 @@
 /* eslint-disable unicorn/consistent-destructuring */
 /* eslint-disable no-await-in-loop */
 import * as vscode from 'vscode'
-import { oneOf } from '@zardoy/utils'
 import { getExtensionCommandId, getExtensionSetting, registerExtensionCommand } from 'vscode-framework'
 import delay from 'delay'
 import { range } from 'rambda'
+import { oneOf } from '@zardoy/utils'
 import { CustomSnippet } from './extension'
 
 export interface CompletionInsertArg {
@@ -43,9 +43,9 @@ export const registerCompletionInsert = () => {
                         range,
                     )) as any
                     const codeAction = codeFixes.find(({ title }) => {
-                        const match = /(?:Add|Import) '(.+?)'.+from.+"(.+?)"/.exec(title)
+                        const match = /(?:Add|Update) import from "(.+?)"/.exec(title)
                         if (!match) return false
-                        if (typeof specifier.package === 'string' && specifier.package !== match[2]!) return false
+                        if (typeof specifier.package === 'string' && specifier.package !== match[1]!) return false
                         return true
                     })
                     if (!codeAction) {

@@ -23,13 +23,13 @@ jobs:
           run_install: |
             args: [--frozen-lockfile, --strict-peer-dependencies]
       - run: pnpm lint
-      - run: pnpm jest
+      - run: pnpm unit-test
       # its fine, until we use version in bundle somewhere
       - run: pnpm build
       - uses: GabrielBB/xvfb-action@v1.6
         with:
           run: pnpm integration-test
-      - run: pnpx -y zardoy-release vscode-extension
+      - run: pnpx zardoy-release vscode-extension
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
           VSCE_PAT: ${{ secrets.VSCE_PAT }}
