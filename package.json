@@ -108,5 +108,14 @@
         "type-fest": "^2.11.2",
         "vscode-framework": "^0.0.18",
         "vscode-snippet-parser": "^0.0.5"
+    },
+    "prettier": {
+        "semi": false,
+        "singleQuote": true,
+        "proseWrap": "never",
+        "tabWidth": 4,
+        "trailingComma": "all",
+        "arrowParens": "avoid",
+        "printWidth": 150
     }
 }
