@@ -97,8 +97,8 @@
         "vscode-manifest": "^0.0.8"
     },
     "dependencies": {
-        "@zardoy/utils": "^0.0.4",
-        "@zardoy/vscode-utils": "^0.0.5",
+        "@zardoy/utils": "^0.0.6",
+        "@zardoy/vscode-utils": "^0.0.15",
         "chai": "^4.3.6",
         "delay": "^5.0.0",
         "escape-string-regexp": "^5.0.0",
