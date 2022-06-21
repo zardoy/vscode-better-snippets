@@ -26,7 +26,7 @@ Also, web is supported.
 
 ## Builtin Snippets
 
-This extension comes handy [top-line builtin snippets](src/builtinSnippets.ts) for JS and Markdown languages. They can be disabled.
+This extension comes with handy [top-line builtin snippets](src/builtinSnippets.ts) for JS and Markdown languages. They can be disabled.
 
 ## Typing Snippets
 
@@ -55,7 +55,7 @@ Note that:
 
 ## Experimental Snippets
 
-Can be disabled.
+Disabled by default, enable with `betterSnippets.enableExperimentalSnippets` setting!
 
 Postfixes:
 
@@ -63,7 +63,11 @@ Postfixes:
 
 Special:
 
-- `useParams` for `react-router`
+- `useParams` for `react-router`: [demo](https://twitter.com/i/status/1482817282145492993)
+
+## More
+
+More docs coming soon, for now, you can look at [changelog](https://github.com/zardoy/vscode-better-snippets/releases) to see more about features
 
 ## Similar Extensions
 
