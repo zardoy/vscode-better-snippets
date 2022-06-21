@@ -7,9 +7,10 @@ import { ConditionalPick } from 'type-fest'
 import { SnippetParser } from 'vscode-snippet-parser'
 import { mergeDeepRight, partition } from 'rambda'
 import { DeepRequired } from 'ts-essentials'
-import { extensionCtx, getExtensionCommandId, getExtensionSetting, getExtensionSettingId } from 'vscode-framework'
+import { extensionCtx, getExtensionCommandId, getExtensionSetting, getExtensionSettingId, registerActiveDevelopmentCommand } from 'vscode-framework'
 import { omitObj, oneOf, pickObj } from '@zardoy/utils'
 import escapeStringRegexp from 'escape-string-regexp'
+import { getActiveRegularEditor } from '@zardoy/vscode-utils'
 import { Configuration } from './configurationType'
 import { normalizeFilePathRegex } from './util'
 import { builtinSnippets } from './builtinSnippets'
@@ -410,10 +411,21 @@ export const activate = () => {
     registerViews()
     registerRevealSnippetInSettingsJson()
 
-    void registerExt()
+    registerActiveDevelopmentCommand(async () => {
+        const editor = getActiveRegularEditor()!
+        const result = await vscode.commands.executeCommand('typescript.tsserverRequest', 'completionInfo', {
+            _: '%%%',
+            file: editor.document.uri.path,
+            line: 0,
+            offset: 0,
+        })
+        console.log(result)
+    })
+
+    void activateTsPlugin()
 }
 
-const registerExt = async () => {
+const activateTsPlugin = async () => {
     const tsExtension = vscode.extensions.getExtension('vscode.typescript-language-features')
     if (!tsExtension) return
 

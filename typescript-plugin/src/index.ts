@@ -28,13 +28,10 @@ export = function ({ typescript: ts }: { typescript: typeof import('typescript/l
                 if (_configuration) {
                     if (sourceFile) {
                         const node = findChildContainingPosition(ts, sourceFile, position)
-                        const commentKind = [ts.SyntaxKind.JSDocComment, ts.SyntaxKind.MultiLineCommentTrivia, ts.SyntaxKind.SingleLineCommentTrivia]
-                        console.log('node', node?.kind)
-                        if (node && commentKind.includes(node.kind)) {
-                            console.log('stsldf')
+                        if (node && ts.isStringLiteralLike(node)) {
                             if (!prior) prior = { entries: [], isGlobalCompletion: false, isMemberCompletion: false, isNewIdentifierLocation: false }
                             prior.entries.push({
-                                name: 'inComment',
+                                name: 'inString',
                                 kind: 'directory' as any,
                                 sortText: '!',
                             })
@@ -44,6 +41,15 @@ export = function ({ typescript: ts }: { typescript: typeof import('typescript/l
                     console.log('no received configuration!')
                 }
                 return prior
+            }
+
+            proxy.getQuickInfoAtPosition = (fileName, position) => {
+                console.log('requested file', fileName)
+                if (fileName === '/virtual-better-snippets-ipc-file') {
+                    console.log('good')
+                    return
+                }
+                return info.languageService.getQuickInfoAtPosition(fileName, position)
             }
 
             return proxy
