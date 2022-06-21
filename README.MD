@@ -53,7 +53,19 @@ Note that:
 - any cursor movement (using arrows or mouse) will reset the typing sequence
 - they don't work with multiple selections (when there are multiple cursor in editor)
 
-## Experimental Snippets
+## TypeScript-only features
+
+### `code` location
+
+By default in all languages `code` locations means any location, except:
+
+- location after dot e.g. disabled in `something.mySnippet`
+
+However, in JS/TS language it also isn't showing in:
+
+- strings
+
+### Experimental Snippets
 
 Disabled by default, enable with `betterSnippets.enableExperimentalSnippets` setting!
 
