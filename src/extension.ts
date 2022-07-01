@@ -216,7 +216,7 @@ export const activate = () => {
 
                         const includedSnippets = getCurrentSnippets('completion', snippets, document, position, language)
                         return includedSnippets.map(
-                            ({ body, name, sortText, executeCommand, resolveImports, fileIcon, folderIcon, description, iconType, group, type }) => {
+                            ({ body, name, sortText, executeCommand, resolveImports, fileIcon, folderIcon, description, iconType, group, type, commitCharacters }) => {
                                 if (group) description = group
                                 if (type) iconType = type as any
                                 //
@@ -252,6 +252,8 @@ export const activate = () => {
                                         arguments: [arg],
                                     }
                                 }
+                                
+                                completion.commitCharacters = commitCharacters
 
                                 if (executeCommand)
                                     completion.command = {

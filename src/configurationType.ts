@@ -155,6 +155,8 @@ export type Configuration = {
             folderIcon?: string
             sortText?: string | null
             iconType?: SnippetType
+            /** `commitCharacters` API proxy: An optional set of characters that when pressed while this completion is active will accept it first and then type that character. Note that all commit characters should have length=1 and that superfluous characters will be ignored. */
+            commitCharacters?: string[]
             /** @deprecated */
             type?: string
         }
