@@ -97,7 +97,7 @@
         "vscode-manifest": "^0.0.8"
     },
     "dependencies": {
-        "@zardoy/utils": "^0.0.6",
+        "@zardoy/utils": "^0.0.7",
         "@zardoy/vscode-utils": "^0.0.15",
         "chai": "^4.3.6",
         "delay": "^5.0.0",
@@ -122,6 +122,6 @@
         "tabWidth": 4,
         "trailingComma": "all",
         "arrowParens": "avoid",
-        "printWidth": 150
+        "printWidth": 160
     }
 }
