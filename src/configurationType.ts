@@ -140,6 +140,14 @@ export type Configuration = {
             name: string
             /** Should be short. Always displayed in completion widget on the same raw as label. */
             description?: string
+            when?: {
+                /**
+                 * The snippet will be visible only after typing specific character on the keyboard
+                 * Add '' (empty string) so it'll be visible after regular triggering or typing
+                 * @length 1
+                 */
+                triggerCharacters?: string[]
+            }
             /** @deprecated */
             group?: string
             // formatting?: {
@@ -157,6 +165,11 @@ export type Configuration = {
             iconType?: SnippetType
             /** `commitCharacters` API proxy: An optional set of characters that when pressed while this completion is active will accept it first and then type that character. Note that all commit characters should have length=1 and that superfluous characters will be ignored. */
             commitCharacters?: string[]
+            /**
+             * Only if `when.triggerCharacters` is used
+             * @default false
+             */
+            replaceTriggerCharacter?: boolean
             /** @deprecated */
             type?: string
         }

@@ -16,7 +16,7 @@ specifiers:
   '@types/vscode': ^1.64.0
   '@vscode/test-electron': ^2.1.2
   '@zardoy/tsconfig': ^1.4.0
-  '@zardoy/utils': ^0.0.6
+  '@zardoy/utils': ^0.0.7
   '@zardoy/vscode-utils': ^0.0.15
   chai: ^4.3.6
   cross-env: ^7.0.3
@@ -45,7 +45,7 @@ specifiers:
   vscode-snippet-parser: ^0.0.5
 
 dependencies:
-  '@zardoy/utils': 0.0.6
+  '@zardoy/utils': 0.0.7
   '@zardoy/vscode-utils': 0.0.15_dglpivvyc4e67exhhadou2fmk4
   chai: 4.3.6
   delay: 5.0.0
@@ -584,8 +584,8 @@ packages:
   /@types/vscode/1.64.0:
     resolution: {integrity: sha512-bSlAWz5WtcSL3cO9tAT/KpEH9rv5OBnm93OIIFwdCshaAiqr2bp1AUyEwW9MWeCvZBHEXc3V0fTYVdVyzDNwHA==}
 
-  /@types/yauzl/2.9.2:
-    resolution: {integrity: sha512-8uALY5LTvSuHgloDVUvWP3pIauILm+8/0pDMokuDYIoNsOkSwd5AiHBTSEJjKTDcZr5z8UpgOWZkxBF4iJftoA==}
+  /@types/yauzl/2.10.0:
+    resolution: {integrity: sha512-Cn6WYCm0tXv8p6k+A8PvbDG763EDpBoTzHdA+Q/MF6H3sapGjCm9NzoaJncJS9tUKSuCoDs9XHxYYsQDgxR6kw==}
     requiresBuild: true
     dependencies:
       '@types/node': 16.11.25
@@ -779,13 +779,13 @@ packages:
       type-fest: 2.11.2
     dev: false
 
-  /@zardoy/utils/0.0.6:
-    resolution: {integrity: sha512-t2xWo2YIKurZvDyNJFWo2YH6EgYKw6eog3D8rXDPMPk1Zu76moLCPJp13LV82+n+jTZelZ2ztI4DWEJ9xA6igw==}
+  /@zardoy/utils/0.0.7:
+    resolution: {integrity: sha512-1giNsv3+IJo+xKMwRWT6FcxL27CrwWNtvGzlPF4fIlv2NaRvIUfttUiTJnNPp6XQ/mIBdM2hp5ueMio0m0H98Q==}
     engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
     dependencies:
       lodash.compact: 3.0.1
       rambda: 6.9.0
-      type-fest: 2.11.2
+      type-fest: 2.14.0
     dev: false
 
   /@zardoy/vscode-utils/0.0.15_dglpivvyc4e67exhhadou2fmk4:
@@ -2317,7 +2317,7 @@ packages:
       get-stream: 5.2.0
       yauzl: 2.10.0
     optionalDependencies:
-      '@types/yauzl': 2.9.2
+      '@types/yauzl': 2.10.0
     transitivePeerDependencies:
       - supports-color
     dev: false
@@ -4685,6 +4685,11 @@ packages:
 
   /type-fest/2.11.2:
     resolution: {integrity: sha512-reW2Y2Mpn0QNA/5fvtm5doROLwDPu2zOm5RtY7xQQS05Q7xgC8MOZ3yPNaP9m/s/sNjjFQtHo7VCNqYW2iI+Ig==}
+    engines: {node: '>=12.20'}
+    dev: false
+
+  /type-fest/2.14.0:
+    resolution: {integrity: sha512-hQnTQkFjL5ik6HF2fTAM8ycbr94UbQXK364wF930VHb0dfBJ5JBP8qwrR8TaK9zwUEk7meruo2JAUDMwvuxd/w==}
     engines: {node: '>=12.20'}
     dev: false
 

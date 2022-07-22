@@ -1,5 +1,5 @@
 // GENERATED. DON'T EDIT MANUALLY
-// md5hash: 11e93345b2cf33e68d8bd9e733819101
+// md5hash: 64d35ee6fe04d5cc65aceee223f6a2da
 {
     "type": "object",
     "properties": {
@@ -302,6 +302,18 @@
                                 "description": "Should be short. Always displayed in completion widget on the same raw as label.",
                                 "type": "string"
                             },
+                            "when": {
+                                "type": "object",
+                                "properties": {
+                                    "triggerCharacters": {
+                                        "description": "The snippet will be visible only after typing specific character on the keyboard\nAdd '' (empty string) so it'll be visible after regular triggering or typing",
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            },
                             "group": {
                                 "type": "string"
                             },
@@ -354,6 +366,11 @@
                                         "type": "number"
                                     }
                                 ]
+                            },
+                            "replaceTriggerCharacter": {
+                                "description": "Only if `when.triggerCharacters` is used",
+                                "default": false,
+                                "type": "boolean"
                             },
                             "type": {
                                 "type": "string"
