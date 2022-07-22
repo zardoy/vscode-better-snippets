@@ -181,7 +181,7 @@
     },
     "dependencies": {
         "@zardoy/utils": "^0.0.4",
-        "@zardoy/vscode-utils": "^0.0.9",
+        "@zardoy/vscode-utils": "^0.0.16",
         "better-snippets-typescript-plugin": "workspace:*",
         "chai": "^4.3.6",
         "delay": "^5.0.0",

@@ -20,7 +20,7 @@ importers:
       '@vscode/test-electron': ^2.1.2
       '@zardoy/tsconfig': ^1.4.0
       '@zardoy/utils': ^0.0.4
-      '@zardoy/vscode-utils': ^0.0.9
+      '@zardoy/vscode-utils': ^0.0.16
       better-snippets-typescript-plugin: workspace:*
       chai: ^4.3.6
       cross-env: ^7.0.3
@@ -52,7 +52,7 @@ importers:
       vscode-snippet-parser: ^0.0.5
     dependencies:
       '@zardoy/utils': 0.0.4
-      '@zardoy/vscode-utils': 0.0.9_dglpivvyc4e67exhhadou2fmk4
+      '@zardoy/vscode-utils': 0.0.16_dglpivvyc4e67exhhadou2fmk4
       better-snippets-typescript-plugin: link:typescript-plugin
       chai: 4.3.6
       delay: 5.0.0
@@ -276,6 +276,8 @@ packages:
     resolution: {integrity: sha512-7yJPvPV+ESz2IUTPbOL+YkIGyCqOyNIzdguKQuJGnH7bg1WTIifuM21YqokFt/THWh1AkCRn9IgoykTRCBVpzA==}
     engines: {node: '>=6.0.0'}
     hasBin: true
+    dependencies:
+      '@babel/types': 7.17.0
     dev: true
 
   /@babel/template/7.16.7:
@@ -593,7 +595,6 @@ packages:
 
   /@types/vscode/1.64.0:
     resolution: {integrity: sha512-bSlAWz5WtcSL3cO9tAT/KpEH9rv5OBnm93OIIFwdCshaAiqr2bp1AUyEwW9MWeCvZBHEXc3V0fTYVdVyzDNwHA==}
-    dev: true
 
   /@types/yauzl/2.10.0:
     resolution: {integrity: sha512-Cn6WYCm0tXv8p6k+A8PvbDG763EDpBoTzHdA+Q/MF6H3sapGjCm9NzoaJncJS9tUKSuCoDs9XHxYYsQDgxR6kw==}
@@ -790,8 +791,8 @@ packages:
       type-fest: 2.11.2
     dev: false
 
-  /@zardoy/vscode-utils/0.0.9_dglpivvyc4e67exhhadou2fmk4:
-    resolution: {integrity: sha512-U0JD2gWSYh8g0w/ppuVVhWpkSknxzF+3CYMBIoi3R5/tooT8dsVA5dt4YS0/6uUuq/phEeckCPkRGR53OTJqVA==}
+  /@zardoy/vscode-utils/0.0.16_dglpivvyc4e67exhhadou2fmk4:
+    resolution: {integrity: sha512-j0cMRweGK+6T+qE1NsH5Wx4ryIxfyFj6WF4UD/YGejKKStnAJiAxVL6hK0kPOw04p3Z8zOIOGVjgu7rUNrI4xA==}
     engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
     peerDependencies:
       '@types/vscode': ^1.65.0
@@ -804,10 +805,11 @@ packages:
       '@zardoy/utils': 0.0.4
       chokidar: 3.5.3
       execa: 5.1.1
-      rambda: 7.1.0
+      rambda: 7.1.4
       untildify: 4.0.0
       vscode-framework: 0.0.18_kvrfju2rt4jkjwqfr2fyttrbia
       vscode-manifest: 0.0.8
+      vscode-uri: 3.0.3
     dev: false
 
   /accepts/1.3.8:
@@ -1384,11 +1386,21 @@ packages:
 
   /debug/2.6.9:
     resolution: {integrity: sha512-bC7ElrdJaJnPbAP+1EotYvqZsb3ecl5wi6Bfi6BJTUcNowp6cvspg0jXznRTKDjm/E7AdgFBVeAPVMNcKGsHMA==}
+    peerDependencies:
+      supports-color: '*'
+    peerDependenciesMeta:
+      supports-color:
+        optional: true
     dependencies:
       ms: 2.0.0
 
   /debug/3.2.7:
     resolution: {integrity: sha512-CFjzYYAi4ThfiQvizrFQevTTXHtnCqWfe7x1AhgEscTz6ZbLbfoLRLPugTQyBth6f8ZERVUSyWHFD/7Wu4t1XQ==}
+    peerDependencies:
+      supports-color: '*'
+    peerDependenciesMeta:
+      supports-color:
+        optional: true
     dependencies:
       ms: 2.1.3
 
@@ -1963,12 +1975,14 @@ packages:
       eslint-config-xo-react: 0.25.0_eslint@8.9.0
       eslint-config-xo-typescript: 0.47.1_2nbcutbutztagt37wdpq54limu
       eslint-plugin-eslint-comments: 3.2.0_eslint@8.9.0
-      eslint-plugin-import: 2.25.4_eslint@8.9.0
+      eslint-plugin-import: 2.25.4_ejxzxsyv2dsrkmg64kmojwaw7u
       eslint-plugin-node: 11.1.0_eslint@8.9.0
       eslint-plugin-sonarjs: 0.11.0_eslint@8.9.0
       eslint-plugin-unicorn: 39.0.0_eslint@8.9.0
       typescript: 4.5.5
     transitivePeerDependencies:
+      - eslint-import-resolver-typescript
+      - eslint-import-resolver-webpack
       - supports-color
     dev: true
 
@@ -1977,14 +1991,34 @@ packages:
     dependencies:
       debug: 3.2.7
       resolve: 1.22.0
+    transitivePeerDependencies:
+      - supports-color
     dev: true
 
-  /eslint-module-utils/2.7.3:
+  /eslint-module-utils/2.7.3_u6wdthctpfvz27dbafug4zwjd4:
     resolution: {integrity: sha512-088JEC7O3lDZM9xGe0RerkOMd0EjFl+Yvd1jPWIkMT5u3H9+HC34mWWPnqPrN13gieT9pBOO+Qt07Nb/6TresQ==}
     engines: {node: '>=4'}
+    peerDependencies:
+      '@typescript-eslint/parser': '*'
+      eslint-import-resolver-node: '*'
+      eslint-import-resolver-typescript: '*'
+      eslint-import-resolver-webpack: '*'
+    peerDependenciesMeta:
+      '@typescript-eslint/parser':
+        optional: true
+      eslint-import-resolver-node:
+        optional: true
+      eslint-import-resolver-typescript:
+        optional: true
+      eslint-import-resolver-webpack:
+        optional: true
     dependencies:
+      '@typescript-eslint/parser': 5.12.0_fhzmdq77bspfhxkfuzq4fbrdsy
       debug: 3.2.7
+      eslint-import-resolver-node: 0.3.6
       find-up: 2.1.0
+    transitivePeerDependencies:
+      - supports-color
     dev: true
 
   /eslint-plugin-es/3.0.1_eslint@8.9.0:
@@ -2009,19 +2043,24 @@ packages:
       ignore: 5.2.0
     dev: true
 
-  /eslint-plugin-import/2.25.4_eslint@8.9.0:
+  /eslint-plugin-import/2.25.4_ejxzxsyv2dsrkmg64kmojwaw7u:
     resolution: {integrity: sha512-/KJBASVFxpu0xg1kIBn9AUa8hQVnszpwgE7Ld0lKAlx7Ie87yzEzCgSkekt+le/YVhiaosO4Y14GDAOc41nfxA==}
     engines: {node: '>=4'}
     peerDependencies:
+      '@typescript-eslint/parser': '*'
       eslint: ^2 || ^3 || ^4 || ^5 || ^6 || ^7.2.0 || ^8
+    peerDependenciesMeta:
+      '@typescript-eslint/parser':
+        optional: true
     dependencies:
+      '@typescript-eslint/parser': 5.12.0_fhzmdq77bspfhxkfuzq4fbrdsy
       array-includes: 3.1.4
       array.prototype.flat: 1.2.5
       debug: 2.6.9
       doctrine: 2.1.0
       eslint: 8.9.0
       eslint-import-resolver-node: 0.3.6
-      eslint-module-utils: 2.7.3
+      eslint-module-utils: 2.7.3_u6wdthctpfvz27dbafug4zwjd4
       has: 1.0.3
       is-core-module: 2.8.1
       is-glob: 4.0.3
@@ -2029,6 +2068,10 @@ packages:
       object.values: 1.1.5
       resolve: 1.22.0
       tsconfig-paths: 3.12.0
+    transitivePeerDependencies:
+      - eslint-import-resolver-typescript
+      - eslint-import-resolver-webpack
+      - supports-color
     dev: true
 
   /eslint-plugin-node/11.1.0_eslint@8.9.0:
@@ -3107,6 +3150,8 @@ packages:
     resolution: {integrity: sha1-CAUuDODYOdPEMXi5CluzQkvvH5k=}
     dependencies:
       morgan: 1.10.0
+    transitivePeerDependencies:
+      - supports-color
     dev: false
 
   /koa-mount/4.0.0:
@@ -3435,6 +3480,8 @@ packages:
       depd: 2.0.0
       on-finished: 2.3.0
       on-headers: 1.0.2
+    transitivePeerDependencies:
+      - supports-color
     dev: false
 
   /ms/2.0.0:
@@ -3972,8 +4019,8 @@ packages:
     resolution: {integrity: sha512-yosVdGg1hNGkXPzqGiOYNEpXKjEOxzUCg2rB0l+NKdyCaSf4z+i5ojbN0IqDSezMMf71YEglI+ZUTgTffn5afw==}
     dev: false
 
-  /rambda/7.1.0:
-    resolution: {integrity: sha512-HkqheuvgfSxj+Pyg4yT1fpX1KzPL9ghG5z5lAfbkwRcwIVx8P657MgrGWGaHRNI+j2Mr1d88AdHKgm8Qy0I10w==}
+  /rambda/7.1.4:
+    resolution: {integrity: sha512-bPK8sSiVHIC7CqdWga8R+hRi5hfc4hK6S01lZW4KrLwSNryQoKaCOJA9GNiF20J7Nbe1vejRfR37/ASQXFL5EA==}
     dev: false
 
   /randombytes/2.1.0:
