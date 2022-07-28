@@ -236,6 +236,7 @@ export const activate = () => {
                                     group,
                                     type,
                                     replaceTriggerCharacter,
+                                    commitCharacters,
                                 }) => {
                                     if (group) description = group
                                     if (type) iconType = type as any
@@ -272,6 +273,8 @@ export const activate = () => {
                                             arguments: [arg],
                                         }
                                     }
+
+                                    completion.commitCharacters = commitCharacters
 
                                     if (executeCommand)
                                         completion.command = {
