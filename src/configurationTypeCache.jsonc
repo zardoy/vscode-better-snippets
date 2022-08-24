@@ -1,5 +1,5 @@
 // GENERATED. DON'T EDIT MANUALLY
-// md5hash: 64d35ee6fe04d5cc65aceee223f6a2da
+// md5hash: 1b7de7a205d3c56cd365feb5cce7a591
 {
     "type": "object",
     "properties": {
@@ -672,6 +672,11 @@
             "default": true,
             "type": "boolean"
         },
+        "typingSnippetsEnableMulticursor": {
+            "description": "Note that, currently regex are executed against first position only for now!",
+            "default": true,
+            "type": "boolean"
+        },
         "snippetCreator.showSnippetAfterCreation": {
             "description": "Reveal snippet in settings.json after its creation",
             "default": true,
@@ -809,6 +814,7 @@
         "languageSupersets",
         "snippetCreator.showSnippetAfterCreation",
         "typingSnippets",
+        "typingSnippetsEnableMulticursor",
         "typingSnippetsUndoStops",
         "useParamMode"
     ]

@@ -17,7 +17,7 @@ specifiers:
   '@vscode/test-electron': ^2.1.2
   '@zardoy/tsconfig': ^1.4.0
   '@zardoy/utils': ^0.0.7
-  '@zardoy/vscode-utils': ^0.0.15
+  '@zardoy/vscode-utils': ^0.0.18
   chai: ^4.3.6
   cross-env: ^7.0.3
   delay: ^5.0.0
@@ -46,7 +46,7 @@ specifiers:
 
 dependencies:
   '@zardoy/utils': 0.0.7
-  '@zardoy/vscode-utils': 0.0.15_dglpivvyc4e67exhhadou2fmk4
+  '@zardoy/vscode-utils': 0.0.18_dglpivvyc4e67exhhadou2fmk4
   chai: 4.3.6
   delay: 5.0.0
   escape-string-regexp: 5.0.0
@@ -776,7 +776,7 @@ packages:
     dependencies:
       lodash.compact: 3.0.1
       rambda: 6.9.0
-      type-fest: 2.11.2
+      type-fest: 2.14.0
     dev: false
 
   /@zardoy/utils/0.0.7:
@@ -788,9 +788,10 @@ packages:
       type-fest: 2.14.0
     dev: false
 
-  /@zardoy/vscode-utils/0.0.15_dglpivvyc4e67exhhadou2fmk4:
-    resolution: {integrity: sha512-4efnm2Anv2p7DiBCb+uz7mijMSUuBf9xdzI2lEVkwpGrxy1qZC4zmYIrLTMFy9cceu0h5VPvF0vktXBTeQ/pxQ==}
+  /@zardoy/vscode-utils/0.0.18_dglpivvyc4e67exhhadou2fmk4:
+    resolution: {integrity: sha512-ejJgthnW3NcbSKf7qwhRcx+BRAit70FYyrk4U0d6vG33Us0dmeXbBJEr+FIRcIOrLS1vAS2CpMno9C0G7uXQzg==}
     engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
+    hasBin: true
     peerDependencies:
       '@types/vscode': ^1.65.0
       vscode-framework: ^0.0.18
@@ -801,6 +802,7 @@ packages:
       '@types/vscode': 1.64.0
       '@zardoy/utils': 0.0.4
       chokidar: 3.5.3
+      commander: 9.4.0
       execa: 5.1.1
       rambda: 7.0.3
       untildify: 4.0.0
@@ -1278,6 +1280,11 @@ packages:
   /commander/8.3.0:
     resolution: {integrity: sha512-OkTL9umf+He2DZkUq8f8J9of7yL6RJKI24dVITBmNfZBmri9zYZQrKkuXiKhyfPSu8tUhnVBB1iKXevvnlR4Ww==}
     engines: {node: '>= 12'}
+    dev: false
+
+  /commander/9.4.0:
+    resolution: {integrity: sha512-sRPT+umqkz90UA8M1yqYfnHlZA7fF6nSphDtxeywPZ49ysjxDQybzk13CL+mXekDRG92skbcqCLVovuCusNmFw==}
+    engines: {node: ^12.20.0 || >=14}
     dev: false
 
   /concat-map/0.0.1:

@@ -98,7 +98,7 @@
     },
     "dependencies": {
         "@zardoy/utils": "^0.0.7",
-        "@zardoy/vscode-utils": "^0.0.15",
+        "@zardoy/vscode-utils": "^0.0.18",
         "chai": "^4.3.6",
         "delay": "^5.0.0",
         "escape-string-regexp": "^5.0.0",

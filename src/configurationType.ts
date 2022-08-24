@@ -186,6 +186,11 @@ export type Configuration = {
     >
     /** @default true */
     typingSnippetsUndoStops: boolean
+    /**
+     * Note that, currently regex are executed against first position only for now!
+     * @default true
+     *  */
+    typingSnippetsEnableMulticursor: boolean
     // /** @default true Ask to which language add snippet, when adding native snippet, otherwise use current */
     // 'nativeSnippetCreator.askLanguageId': boolean
     // /** @default false */

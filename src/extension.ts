@@ -7,7 +7,7 @@ import { ConditionalPick } from 'type-fest'
 import { SnippetParser } from 'vscode-snippet-parser'
 import { mergeDeepRight, partition } from 'rambda'
 import { DeepRequired } from 'ts-essentials'
-import { extensionCtx, getExtensionCommandId, getExtensionSetting, getExtensionSettingId, registerActiveDevelopmentCommand } from 'vscode-framework'
+import { extensionCtx, getExtensionCommandId, getExtensionSetting, getExtensionSettingId } from 'vscode-framework'
 import { ensureHasProp, omitObj, oneOf, pickObj } from '@zardoy/utils'
 import escapeStringRegexp from 'escape-string-regexp'
 import { Configuration } from './configurationType'
@@ -331,16 +331,32 @@ export const activate = () => {
                             return
                         }
 
+                        const char = contentChanges[0]?.text
                         // also reseting on content pasting
-                        // TODO use typeof equals
-                        if (contentChanges.length !== 1 || contentChanges[0]!.text.length !== 1) {
+                        if (char?.length !== 1) {
                             resetSelection()
                             return
                         }
 
-                        lastTypedSeq += contentChanges[0]!.text
+                        if (!getExtensionSetting('typingSnippetsEnableMulticursor') && contentChanges.length > 1) {
+                            resetSelection()
+                            return
+                        }
+
+                        // ensure true multiselect typing
+                        if (contentChanges.some(({ text }) => text !== char)) {
+                            resetSelection()
+                            return
+                        }
 
                         const originalPos = contentChanges[0]!.range.end
+                        if (lastTypePosition && !lastTypePosition.isEqual(originalPos.translate(0, -1))) {
+                            resetSelection()
+                            return
+                        }
+
+                        lastTypedSeq += char
+
                         lastTypePosition = originalPos
                         // we're always ahead of 1 character
                         const endPosition = originalPos.translate(0, 1)
@@ -357,7 +373,6 @@ export const activate = () => {
                         const snippet = appliableTypingSnippets[0]
                         if (!snippet) return
                         console.log('Applying typing snippet', snippet.sequence)
-                        const startPosition = endPosition.translate(0, -snippet.sequence.length)
                         const { body, executeCommand, resolveImports } = snippet
                         await new Promise<void>(resolve => {
                             internalDocumentChange = true
@@ -367,10 +382,20 @@ export const activate = () => {
                                 dispose()
                                 resolve()
                             })
-                            void editor.edit(builder => builder.delete(new vscode.Selection(startPosition, endPosition)), {
-                                undoStopBefore: getExtensionSetting('typingSnippetsUndoStops'),
-                                undoStopAfter: false,
-                            })
+                            void editor.edit(
+                                builder => {
+                                    for (const { range } of contentChanges) {
+                                        // we're always ahead of 1 character
+                                        const endPosition = range.end.translate(0, 1)
+                                        const startPosition = endPosition.translate(0, -snippet.sequence.length)
+                                        builder.delete(new vscode.Range(startPosition, endPosition))
+                                    }
+                                },
+                                {
+                                    undoStopBefore: getExtensionSetting('typingSnippetsUndoStops'),
+                                    undoStopAfter: false,
+                                },
+                            )
                         })
 
                         await editor.insertSnippet(new vscode.SnippetString(body))
@@ -381,6 +406,7 @@ export const activate = () => {
                         }
 
                         if (resolveImports) {
+                            const startPosition = endPosition.translate(0, -snippet.sequence.length)
                             const arg: CompletionInsertArg = {
                                 action: 'resolve-imports',
                                 importsConfig: resolveImports,
@@ -394,7 +420,7 @@ export const activate = () => {
                 vscode.window.onDidChangeTextEditorSelection(({ textEditor, kind, selections }) => {
                     const { document } = textEditor
                     if (document.uri !== vscode.window.activeTextEditor?.document.uri) return
-                    if (oneOf(kind, vscode.TextEditorSelectionChangeKind.Mouse) || selections.length > 1 || !selections[0]!.start.isEqual(selections[0]!.end)) {
+                    if (oneOf(kind, vscode.TextEditorSelectionChangeKind.Mouse) || !selections[0]!.start.isEqual(selections[0]!.end)) {
                         resetSelection()
                         return
                     }
