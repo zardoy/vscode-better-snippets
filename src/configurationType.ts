@@ -238,5 +238,3 @@ export type Configuration = {
      *  */
     'experimental.disableBuiltinSnippets': Array<'er' | 'et' | 'em' | 'ef' | 'ed' | 'useParam' | 'ts' | 'tsx' | 'codeblock' | 'dropdown'>
 }
-
-export { defaultLanguageSupersets } from '@zardoy/vscode-utils/build/langs.js'
