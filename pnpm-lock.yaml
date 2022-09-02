@@ -14,7 +14,7 @@ specifiers:
   '@types/node': ^16.11.25
   '@types/path-browserify': ^1.0.0
   '@types/vscode': ^1.64.0
-  '@vscode/test-electron': ^2.1.2
+  '@vscode/test-electron': ^2.1.5
   '@zardoy/tsconfig': ^1.4.0
   '@zardoy/utils': ^0.0.7
   '@zardoy/vscode-utils': ^0.0.18
@@ -73,7 +73,7 @@ devDependencies:
   '@types/node': 16.11.25
   '@types/path-browserify': 1.0.0
   '@types/vscode': 1.64.0
-  '@vscode/test-electron': 2.1.2
+  '@vscode/test-electron': 2.1.5
   '@zardoy/tsconfig': 1.4.0_typescript@4.5.5
   cross-env: 7.0.3
   eslint: 8.9.0
@@ -722,8 +722,8 @@ packages:
     resolution: {integrity: sha512-sL/cEvJWAnClXw0wHk85/2L0G6Sj8UB0Ctc1TEMbKSsmpRosqhwj9gWgFRZSrBr2f9tiXISwNhCPmlfqUqyb9Q==}
     dev: true
 
-  /@vscode/test-electron/2.1.2:
-    resolution: {integrity: sha512-INjJ0YA9RgR1B/xBl8P4sxww4Dy2996f4Xn5oGTFfC0c2Mm45y/1Id8xmfuoba6tR5i8zZaUIHfEYWe7Rt4uZA==}
+  /@vscode/test-electron/2.1.5:
+    resolution: {integrity: sha512-O/ioqFpV+RvKbRykX2ItYPnbcZ4Hk5V0rY4uhQjQTLhGL9WZUvS7exzuYQCCI+ilSqJpctvxq2llTfGXf9UnnA==}
     engines: {node: '>=8.9.3'}
     dependencies:
       http-proxy-agent: 4.0.1
