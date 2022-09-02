@@ -123,5 +123,10 @@
         "trailingComma": "all",
         "arrowParens": "avoid",
         "printWidth": 160
+    },
+    "release": {
+        "sharedActionsOverride": {
+            "runTest": false
+        }
     }
 }
