@@ -27,8 +27,14 @@ export const run = async () => {
             for (const file of files) mocha.addFile(join(testsRoot, file))
 
             mocha.run(failures => {
-                if (failures > 0) throw new Error(`${failures} tests failed.`)
-                else resolve()
+                if (failures > 0) {
+                    console.error(`${failures} tests failed.`)
+                    setImmediate(() => {
+                        process.exit(1)
+                    })
+                } else {
+                    resolve()
+                }
             })
         })
     })
