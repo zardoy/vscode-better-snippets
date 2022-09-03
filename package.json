@@ -125,7 +125,7 @@
         "printWidth": 160
     },
     "release": {
-        "sharedActionsOverride": {
+        "preset": {
             "runTest": false
         }
     }
