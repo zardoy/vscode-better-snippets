@@ -10,6 +10,8 @@ jobs:
     timeout-minutes: 30
     # needs: test
     steps:
+      - run: npm -v
+      - run: node -v
       - uses: actions/checkout@v2
       - name: Cache pnpm modules
         uses: actions/cache@v2
