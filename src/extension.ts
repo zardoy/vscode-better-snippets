@@ -323,7 +323,7 @@ export const activate = () => {
                 vscode.workspace.onDidChangeTextDocument(({ contentChanges, document, reason }) => {
                     ;(async () => {
                         const editor = vscode.window.activeTextEditor
-                        if (document.uri !== editor?.document.uri) return
+                        if (document.uri !== editor?.document.uri || ['output'].includes(editor.document.uri.scheme)) return
                         if (internalDocumentChange || vscode.workspace.fs.isWritableFileSystem(document.uri.scheme) !== true) return
 
                         if (oneOf(reason, vscode.TextDocumentChangeReason.Undo, vscode.TextDocumentChangeReason.Redo)) {
