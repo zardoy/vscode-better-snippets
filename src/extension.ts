@@ -324,7 +324,7 @@ export const activate = () => {
                     ;(async () => {
                         const editor = vscode.window.activeTextEditor
                         if (document.uri !== editor?.document.uri || ['output'].includes(editor.document.uri.scheme)) return
-                        if (internalDocumentChange || vscode.workspace.fs.isWritableFileSystem(document.uri.scheme) !== true) return
+                        if (internalDocumentChange || vscode.workspace.fs.isWritableFileSystem(document.uri.scheme) === false) return
 
                         if (oneOf(reason, vscode.TextDocumentChangeReason.Undo, vscode.TextDocumentChangeReason.Redo)) {
                             resetSequence()
