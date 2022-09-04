@@ -350,10 +350,6 @@ export const activate = () => {
                         }
 
                         const originalPos = contentChanges[0]!.range.end
-                        if (lastTypePosition && !lastTypePosition.isEqual(originalPos.translate(0, -1))) {
-                            resetSequence()
-                            return
-                        }
 
                         lastTypedSeq += char
 
@@ -426,14 +422,15 @@ export const activate = () => {
                         return
                     }
 
+                    const newPos = selections[0]!.end
                     // reset on selection start
-                    if (!selections[0]!.start.isEqual(selections[0]!.end)) {
+                    if (!selections[0]!.start.isEqual(newPos)) {
                         resetSequence()
-                        // eslint-disable-next-line no-useless-return
                         return
                     }
 
-                    // if (lastTypePosition && lastTypePosition.isEqual(selections[0]!.end)) resetSequence()
+                    // curosr moved from last TYPING position? reset sequence!
+                    if (lastTypePosition && newPos.character !== 0 && !lastTypePosition.isEqual(newPos.translate(0, -1))) resetSequence()
                 }),
             )
         }

@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-loop-func */
-/// <reference types="jest" />
 import * as vscode from 'vscode'
 
 import { expect } from 'chai'
