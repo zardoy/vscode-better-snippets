@@ -309,10 +309,10 @@ export const activate = () => {
             const typingSnippets = typingSnippetsToLoad.map(snippet => mergeSnippetWithDefaults(snippet))
             let lastTypedSeq = ''
             let lastTypePosition = null as null | vscode.Position
-            const resetSelection = () => {
+            const resetSequence = () => {
                 lastTypedSeq = ''
                 lastTypePosition = null
-                console.debug('[typing] Selection reset')
+                console.debug('[typing] Sequence reset')
             }
 
             // TODO review implementation as its still blurry. Describe it graphically
@@ -327,31 +327,31 @@ export const activate = () => {
                         if (internalDocumentChange || vscode.workspace.fs.isWritableFileSystem(document.uri.scheme) !== true) return
 
                         if (oneOf(reason, vscode.TextDocumentChangeReason.Undo, vscode.TextDocumentChangeReason.Redo)) {
-                            resetSelection()
+                            resetSequence()
                             return
                         }
 
                         const char = contentChanges[0]?.text
                         // also reseting on content pasting
                         if (char?.length !== 1) {
-                            resetSelection()
+                            resetSequence()
                             return
                         }
 
                         if (!getExtensionSetting('typingSnippetsEnableMulticursor') && contentChanges.length > 1) {
-                            resetSelection()
+                            resetSequence()
                             return
                         }
 
                         // ensure true multiselect typing
                         if (contentChanges.some(({ text }) => text !== char)) {
-                            resetSelection()
+                            resetSequence()
                             return
                         }
 
                         const originalPos = contentChanges[0]!.range.end
                         if (lastTypePosition && !lastTypePosition.isEqual(originalPos.translate(0, -1))) {
-                            resetSelection()
+                            resetSequence()
                             return
                         }
 
@@ -420,13 +420,20 @@ export const activate = () => {
                 vscode.window.onDidChangeTextEditorSelection(({ textEditor, kind, selections }) => {
                     const { document } = textEditor
                     if (document.uri !== vscode.window.activeTextEditor?.document.uri) return
-                    if (oneOf(kind, vscode.TextEditorSelectionChangeKind.Mouse) || !selections[0]!.start.isEqual(selections[0]!.end)) {
-                        resetSelection()
+                    // reset on mouse click
+                    if (oneOf(kind, vscode.TextEditorSelectionChangeKind.Mouse)) {
+                        resetSequence()
                         return
                     }
 
-                    if (!lastTypePosition || !lastTypePosition.isEqual(selections[0]!.end)) return
-                    resetSelection()
+                    // reset on selection start
+                    if (!selections[0]!.start.isEqual(selections[0]!.end)) {
+                        resetSequence()
+                        // eslint-disable-next-line no-useless-return
+                        return
+                    }
+
+                    // if (lastTypePosition && lastTypePosition.isEqual(selections[0]!.end)) resetSequence()
                 }),
             )
         }
