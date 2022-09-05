@@ -7,7 +7,7 @@ import { clearEditorText } from './utils'
 
 describe('Typing snippets', () => {
     const resultingBody = 'EXAMPLE'
-    const testingSequence = 'cb '
+    const triggerSequence = 'cb '
 
     let editor: vscode.TextEditor
     let document: vscode.TextDocument
@@ -29,7 +29,7 @@ describe('Typing snippets', () => {
             const configKey: keyof Configuration = 'typingSnippets'
             const configValue: Configuration['typingSnippets'] = [
                 {
-                    sequence: testingSequence,
+                    sequence: triggerSequence,
                     body: resultingBody,
                     when: {
                         languages: ['markdown'],
@@ -43,20 +43,20 @@ describe('Typing snippets', () => {
     })
 
     it('Fresh document', async () => {
-        await typeSequenceWithDelay(testingSequence)
+        await typeSequenceWithDelay(triggerSequence)
         expect(document.getText()).to.equal(resultingBody)
     })
 
     it('Repeat the same', async () => {
         await clearEditorText(editor)
-        await typeSequenceWithDelay(testingSequence)
+        await typeSequenceWithDelay(triggerSequence)
         expect(document.getText()).to.equal(resultingBody)
     })
 
     it('Typing from second line two times', async () => {
         await clearEditorText(editor)
-        await typeSequenceWithDelay(`test\n${testingSequence}`)
-        await typeSequenceWithDelay(`\n${testingSequence}`)
+        await typeSequenceWithDelay(`test\n${triggerSequence}`)
+        await typeSequenceWithDelay(`\n${triggerSequence}`)
         expect(document.getText().split('\n').slice(1).join('\n')).to.equal(`${resultingBody}\n${resultingBody}`)
     })
 
@@ -65,7 +65,7 @@ describe('Typing snippets', () => {
         await typeSequence('\ntest')
         const pos = new vscode.Position(0, 0)
         editor.selection = new vscode.Selection(pos, pos)
-        await typeSequenceWithDelay(testingSequence)
+        await typeSequenceWithDelay(triggerSequence)
         expect(document.getText().split('\n')[0]).to.equal(resultingBody)
     })
 
@@ -76,5 +76,16 @@ describe('Typing snippets', () => {
         await vscode.commands.executeCommand('cursorMove', { to: 'right' })
         await typeSequenceWithDelay(' ')
         expect(document.getText().split('\n')[0]).to.equal('cb ')
+    })
+
+    // Actually it tests typing sequence after selecting
+    it('Works in snippet placeholders', async () => {
+        await clearEditorText(editor)
+        await typeSequence('1')
+        // Also simulates accepted completion with snippet
+        await editor.insertSnippet(new vscode.SnippetString('2${1:placeholder}'))
+        await delay(30)
+        await typeSequenceWithDelay(triggerSequence)
+        expect(document.getText().slice(2)).to.equal(resultingBody)
     })
 })

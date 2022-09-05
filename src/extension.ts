@@ -343,13 +343,13 @@ export const activate = () => {
                             return
                         }
 
-                        // ensure true multiselect typing
+                        // ensure true multicursor typing
                         if (contentChanges.some(({ text }) => text !== char)) {
                             resetSequence()
                             return
                         }
 
-                        const originalPos = contentChanges[0]!.range.end
+                        const originalPos = contentChanges[0]!.range.start
 
                         lastTypedSeq += char
 
