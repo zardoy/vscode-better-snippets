@@ -16,6 +16,7 @@ describe('Typing snippets', () => {
         for (const letter of seq) await vscode.commands.executeCommand('type', { text: letter })
     }
 
+    /** With delay, enough for comparing triggered result */
     const typeSequenceWithDelay = async (seq: string) => {
         await typeSequence(seq)
         await delay(150)
@@ -87,5 +88,19 @@ describe('Typing snippets', () => {
         await delay(30)
         await typeSequenceWithDelay(triggerSequence)
         expect(document.getText().slice(2)).to.equal(resultingBody)
+    })
+
+    it('Multicursor typing', async () => {
+        await clearEditorText(editor)
+        await typeSequence('-__\n')
+        // +make them unsorted
+        editor.selections = [new vscode.Position(0, 0), new vscode.Position(0, 3), new vscode.Position(0, 1), new vscode.Position(1, 0)].map(
+            pos => new vscode.Selection(pos, pos),
+        )
+        await delay(30)
+        await typeSequenceWithDelay(triggerSequence)
+        const lines = document.getText().split('\n')
+        expect(lines[0]).to.equal(`${resultingBody}-${resultingBody}__${resultingBody}`)
+        expect(lines[1]).to.equal(resultingBody)
     })
 })

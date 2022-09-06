@@ -313,6 +313,7 @@ export const activate = () => {
             // for easier debuging during development
             const statusBarSeq = process.env.NODE_ENV === 'development' ? vscode.window.createStatusBarItem() : undefined
             statusBarSeq?.show()
+            if (statusBarSeq) disposables.push(statusBarSeq)
             const updateStatusBarSeq = () => {
                 if (statusBarSeq) statusBarSeq.text = `[${lastTypedSeq}]`
             }
@@ -340,6 +341,9 @@ export const activate = () => {
                             return
                         }
 
+                        // since we don't work with selections (only cursor positions) we compare them by start
+                        // ensure we ALWAYS work with first position only in case of multicursor
+                        contentChanges = [...contentChanges].sort((a, b) => a.range.start.compareTo(b.range.start))
                         const char = contentChanges[0]?.text
                         // also reseting on content pasting
                         if (char?.length !== 1) {
@@ -390,9 +394,22 @@ export const activate = () => {
                             })
                             void editor.edit(
                                 builder => {
+                                    let previousLineNum = -1
+                                    let sameLinePos = 0
                                     for (const { range } of contentChanges) {
-                                        // we're always ahead of 1 character
-                                        const endPosition = range.end.translate(0, 1)
+                                        // we can safely do this, as contentChanges are sorted
+                                        if (previousLineNum === range.start.line) {
+                                            sameLinePos++
+                                        } else {
+                                            previousLineNum = range.start.line
+                                            sameLinePos = 0
+                                        }
+
+                                        // start = end, which indicates where a character was typed,
+                                        // so we're always ahead of 1+N character, where N is zero-based number of position on the same line
+                                        // because of just typed letter + just typed letter in previous positions
+                                        const endPosition = range.start.translate(0, 1 + sameLinePos)
+                                        // eslint-disable-next-line unicorn/consistent-destructuring
                                         const startPosition = endPosition.translate(0, -snippet.sequence.length)
                                         builder.delete(new vscode.Range(startPosition, endPosition))
                                     }
@@ -432,7 +449,9 @@ export const activate = () => {
                         return
                     }
 
-                    const newPos = selections[0]!.end
+                    // we do the same in onDidChangeTextDocument
+                    selections = [...selections].sort((a, b) => a.start.compareTo(b.start))
+                    const newPos = selections[0]!.start
                     // reset on selection start
                     if (!selections[0]!.start.isEqual(newPos)) {
                         resetSequence()
