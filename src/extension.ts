@@ -154,7 +154,10 @@ export const activate = () => {
                 regexFails(snippetDefaults.when.pathRegex, docPath, 'snippetDefaults.when.pathRegex') ||
                 regexFails(normalizeFilePathRegex(regexes.pathRegex, fileType), docPath, 'snippet.pathRegex') ||
                 regexFails(regexes.lineHasRegex, lineText, 'snippet.lineHasRegex') ||
-                regexFails(regexes.lineRegex, lineText.slice(0, position.character), 'snippet.lineRegex')
+                regexFails(regexes.lineRegex, lineText.slice(0, position.character), 'snippet.lineRegex') ||
+                ('sequence' in snippet &&
+                    'lineBeforeRegex' in regexes &&
+                    regexFails(regexes.lineBeforeRegex, lineText.slice(0, position.character - snippet.sequence.length), 'snippet.lineRegexBefore'))
             )
                 continue
             for (const location of locations)

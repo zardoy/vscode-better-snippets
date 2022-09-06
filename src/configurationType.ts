@@ -182,6 +182,20 @@ export type Configuration = {
              * @suggestSortText !
              */
             sequence: string
+            when?: {
+                // TODO support in regular snippets and move to GeneralSnippet
+                // TODO rewrite snippet example
+                /**
+                 * Recommnded instead of `lineRegex`, tests against what is before current snippet in the line
+                 * Example:
+                 * | - cursor, [...] - check position
+                 * For regular snippet `test` end position is before current word:
+                 * `[before] test|`, `[before] beforetest|`,
+                 * Typing snippet: cb
+                 * `[before]cb|`, `[before ]cb|`,
+                 */
+                lineBeforeRegex?: string
+            }
         }
     >
     /** @default true */
