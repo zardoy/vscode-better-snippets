@@ -309,10 +309,19 @@ export const activate = () => {
             const typingSnippets = typingSnippetsToLoad.map(snippet => mergeSnippetWithDefaults(snippet))
             let lastTypedSeq = ''
             let lastTypePosition = null as null | vscode.Position
+
+            // for easier debuging during development
+            const statusBarSeq = process.env.NODE_ENV === 'development' ? vscode.window.createStatusBarItem() : undefined
+            statusBarSeq?.show()
+            const updateStatusBarSeq = () => {
+                if (statusBarSeq) statusBarSeq.text = `[${lastTypedSeq}]`
+            }
+
+            updateStatusBarSeq()
             const resetSequence = () => {
                 lastTypedSeq = ''
                 lastTypePosition = null
-                console.debug('[typing] Sequence reset')
+                updateStatusBarSeq()
             }
 
             // TODO review implementation as its still blurry. Describe it graphically
@@ -352,6 +361,7 @@ export const activate = () => {
                         const originalPos = contentChanges[0]!.range.start
 
                         lastTypedSeq += char
+                        updateStatusBarSeq()
 
                         lastTypePosition = originalPos
                         // we're always ahead of 1 character
