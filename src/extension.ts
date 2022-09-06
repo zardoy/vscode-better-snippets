@@ -439,8 +439,9 @@ export const activate = () => {
                         return
                     }
 
-                    // curosr moved from last TYPING position? reset sequence!
-                    if (lastTypePosition && newPos.character !== 0 && !lastTypePosition.isEqual(newPos.translate(0, -1))) resetSequence()
+                    // curosr moved from last TYPING position or
+                    // curosr moved to the start of line: reset sequence!
+                    if (lastTypePosition && (newPos.character === 0 || !lastTypePosition.isEqual(newPos.translate(0, -1)))) resetSequence()
                 }),
             )
         }
