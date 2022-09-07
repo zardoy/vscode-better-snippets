@@ -97,7 +97,12 @@ export type GeneralSnippet = {
             // export?: string // default or specifier if package is specified
         }
     }
-    /** Execute custom command on snippet accept, doesn't work with resolveImports */
+    /**
+     * Execute custom command on snippet accept, doesn't work with resolveImports
+     * @defaultSnippets [{
+     *   "executeCommand": "$1"
+     * }]
+     */
     executeCommand?: CommandDefinition /* | CommandDefinition[] */
 }
 
