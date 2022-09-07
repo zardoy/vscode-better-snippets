@@ -17,6 +17,7 @@ import { registerExperimentalSnippets } from './experimentalSnippets'
 import { CompletionInsertArg, registerCompletionInsert } from './completionInsert'
 import { registerSpecialCommand } from './specialCommand'
 import { registerCreateSnippetFromSelection } from './createSnippetFromSelection'
+import settingsHelper from './settingsHelper'
 
 type CustomSnippetUnresolved = Configuration['customSnippets'][number]
 type TypingSnippetUnresolved = Configuration['typingSnippets'][number]
@@ -491,6 +492,7 @@ export const activate = () => {
     registerCompletionInsert()
     registerSpecialCommand()
     registerCreateSnippetFromSelection()
+    settingsHelper()
 }
 
 const unmergedSnippetDefaults: DeepRequired<Configuration['customSnippetDefaults']> = {
