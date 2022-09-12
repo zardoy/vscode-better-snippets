@@ -27,6 +27,7 @@ describe('Typing snippets', () => {
             editor = vscode.window.activeTextEditor!
             document = editor.document
             await vscode.languages.setTextDocumentLanguage(document, 'markdown')
+            await editor.edit((builder) => builder.setEndOfLine(vscode.EndOfLine.LF))
             const configKey: keyof Configuration = 'typingSnippets'
             const configValue: Configuration['typingSnippets'] = [
                 {

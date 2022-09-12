@@ -24,6 +24,7 @@ describe('Resolve imports', () => {
             .then(async newDocument => {
                 document = newDocument
                 editor = await vscode.window.showTextDocument(document)
+                await editor.edit((builder) => builder.setEndOfLine(vscode.EndOfLine.LF))
                 const configKey: keyof Configuration = 'customSnippets'
                 const configValue: Configuration['customSnippets'] = [
                     {
@@ -89,7 +90,7 @@ describe('Resolve imports', () => {
     it('Implicit resolveImports', async () => {
         await clearEditorText(editor)
         await triggerSuggest()
-        await delay(200)
+        await delay(600)
         await vscode.commands.executeCommand('selectNextSuggestion')
         await acceptAndWaitForChanges()
         expect(document.getText().split('\n')[0]).to.match(/import { readFileSync } from "(node:)?fs";/)
