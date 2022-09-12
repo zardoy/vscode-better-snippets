@@ -223,7 +223,8 @@ export const activate = () => {
                                 return []
                             }
 
-                            const snippetsToCheck = triggerCharacter ? snippetsByTriggerChar[triggerCharacter]! : snippets
+                            const snippetsToCheck = triggerCharacter ? snippetsByTriggerChar[triggerCharacter] : snippets
+                            if (!snippetsToCheck) return
 
                             const includedSnippets = getCurrentSnippets('completion', snippetsToCheck, document, position, language)
                             return includedSnippets.map(

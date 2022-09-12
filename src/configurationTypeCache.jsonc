@@ -1,5 +1,5 @@
 // GENERATED. DON'T EDIT MANUALLY
-// md5hash: 1b7de7a205d3c56cd365feb5cce7a591
+// md5hash: 4acde228953fd31a015870d4c7c2ade0
 {
     "type": "object",
     "properties": {
@@ -264,6 +264,11 @@
                             },
                             "executeCommand": {
                                 "description": "Execute custom command on snippet accept, doesn't work with resolveImports",
+                                "defaultSnippets": [
+                                    {
+                                        "executeCommand": "$1"
+                                    }
+                                ],
                                 "anyOf": [
                                     {
                                         "type": "object",
@@ -625,6 +630,11 @@
                             },
                             "executeCommand": {
                                 "description": "Execute custom command on snippet accept, doesn't work with resolveImports",
+                                "defaultSnippets": [
+                                    {
+                                        "executeCommand": "$1"
+                                    }
+                                ],
                                 "anyOf": [
                                     {
                                         "type": "object",
@@ -659,6 +669,15 @@
                                 "description": "Snippet will be accepted only after typing THE EXACT sequence of characters on the keyboard. Using arrows or mouse for navigating will reset the sequence (see settings)",
                                 "suggestSortText": "!",
                                 "type": "string"
+                            },
+                            "when": {
+                                "type": "object",
+                                "properties": {
+                                    "lineBeforeRegex": {
+                                        "description": "Recommnded instead of `lineRegex`, tests against what is before current snippet in the line\nExample:\n| - cursor, [...] - check position\nFor regular snippet `test` end position is before current word:\n`[before] test|`, `[before] beforetest|`,\nTyping snippet: cb\n`[before]cb|`, `[before ]cb|`,",
+                                        "type": "string"
+                                    }
+                                }
                             }
                         },
                         "required": [
