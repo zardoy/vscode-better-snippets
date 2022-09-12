@@ -45,6 +45,7 @@ describe('Resolve imports', () => {
                 ]
                 await vscode.workspace.getConfiguration('betterSnippets').update(configKey, configValue, vscode.ConfigurationTarget.Global)
                 // prepare TS completions
+                await delay(500)
                 await vscode.commands.executeCommand('vscode.executeCompletionItemProvider', document.uri, startPos)
                 // await vscode.commands.executeCommand('vscode.executeCompletionItemProvider', document.uri, startPos)
             })
@@ -56,13 +57,22 @@ describe('Resolve imports', () => {
 
     const triggerSuggest = () => vscode.commands.executeCommand('editor.action.triggerSuggest')
 
+    const acceptAndWaitForChanges = async () => {
+        await vscode.commands.executeCommand('acceptSelectedSuggestion')
+        await new Promise<void>(resolve => {
+            const { dispose } = vscode.workspace.onDidChangeTextDocument(({ document }) => {
+                if (document.uri !== editor.document.uri) return
+                dispose()
+                resolve()
+            })
+        })
+    }
+
     it('Explicit resolveImports', async () => {
         await delay(100)
         await triggerSuggest()
         await delay(800)
-        await vscode.commands.executeCommand('acceptSelectedSuggestion')
-        await delay(700)
-        // expect(item?.label).to.equal('__vsc_test_readFileSync')
+        await acceptAndWaitForChanges()
         expect(document.getText().split('\n')[0]).to.equal('import { readFileSync } from "node:fs";')
     })
 
@@ -71,8 +81,7 @@ describe('Resolve imports', () => {
         await vscode.commands.executeCommand('cursorBottom')
         await triggerSuggest()
         await delay(100)
-        await vscode.commands.executeCommand('acceptSelectedSuggestion')
-        await delay(700)
+        await acceptAndWaitForChanges()
         expect(document.getText().split('\n')[0]).to.equal('import { readFile, readFileSync } from "node:fs";')
     })
 
@@ -81,8 +90,7 @@ describe('Resolve imports', () => {
         await triggerSuggest()
         await delay(100)
         await vscode.commands.executeCommand('selectNextSuggestion')
-        await vscode.commands.executeCommand('acceptSelectedSuggestion')
-        await delay(700)
+        await acceptAndWaitForChanges()
         expect(document.getText().split('\n')[0]).to.equal('import { readFileSync } from "fs";')
     })
 })
