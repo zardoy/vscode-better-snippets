@@ -48,7 +48,9 @@ describe('Resolve imports', () => {
                 await vscode.workspace.getConfiguration('betterSnippets').update(configKey, configValue, vscode.ConfigurationTarget.Global)
                 // prepare TS completions
                 await delay(500)
+                console.time('ts-first-completion')
                 await vscode.commands.executeCommand('vscode.executeCompletionItemProvider', document.uri, startPos)
+                console.timeEnd('ts-first-completion')
                 // await vscode.commands.executeCommand('vscode.executeCompletionItemProvider', document.uri, startPos)
             })
             .then(done)
