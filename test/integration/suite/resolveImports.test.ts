@@ -75,7 +75,7 @@ describe('Resolve imports', () => {
         await delay(800)
         await acceptAndWaitForChanges()
         expect(document.getText().split('\n')[0]).to.equal('import { readFileSync } from "node:fs";')
-    }).timeout(4000)
+    }).timeout(4500)
 
     it('resolveImports with existing import', async () => {
         await clearEditorText(editor, 'import { readFile } from "node:fs";\n')
@@ -84,7 +84,7 @@ describe('Resolve imports', () => {
         await delay(900)
         await acceptAndWaitForChanges()
         expect(document.getText().split('\n')[0]).to.equal('import { readFile, readFileSync } from "node:fs";')
-    }).timeout(3500)
+    }).timeout(4000)
 
     it('Implicit resolveImports', async () => {
         await clearEditorText(editor)
@@ -93,5 +93,5 @@ describe('Resolve imports', () => {
         await vscode.commands.executeCommand('selectNextSuggestion')
         await acceptAndWaitForChanges()
         expect(document.getText().split('\n')[0]).to.match(/import { readFileSync } from "(node:)?fs";/)
-    })
+    }).timeout(4000)
 })
