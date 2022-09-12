@@ -51,9 +51,6 @@ describe('Resolve imports', () => {
             })
             .then(done)
     })
-    beforeEach(async () => {
-        await delay(500)
-    })
 
     const triggerSuggest = () => vscode.commands.executeCommand('editor.action.triggerSuggest')
 
@@ -69,28 +66,28 @@ describe('Resolve imports', () => {
     }
 
     it('Explicit resolveImports', async () => {
-        await delay(100)
+        await delay(200)
         await triggerSuggest()
         await delay(800)
         await acceptAndWaitForChanges()
         expect(document.getText().split('\n')[0]).to.equal('import { readFileSync } from "node:fs";')
-    })
+    }).timeout(3500)
 
     it('resolveImports with existing import', async () => {
         await clearEditorText(editor, 'import { readFile } from "node:fs";\n')
         await vscode.commands.executeCommand('cursorBottom')
         await triggerSuggest()
-        await delay(100)
+        await delay(900)
         await acceptAndWaitForChanges()
         expect(document.getText().split('\n')[0]).to.equal('import { readFile, readFileSync } from "node:fs";')
-    })
+    }).timeout(3500)
 
     it('Implicit resolveImports', async () => {
         await clearEditorText(editor)
         await triggerSuggest()
-        await delay(100)
+        await delay(200)
         await vscode.commands.executeCommand('selectNextSuggestion')
         await acceptAndWaitForChanges()
-        expect(document.getText().split('\n')[0]).to.equal('import { readFileSync } from "fs";')
+        expect(document.getText().split('\n')[0]).to.match(/import { readFileSync } from "(node:)?fs";/)
     })
 })
