@@ -45,7 +45,8 @@
                     "when": "false"
                 }
             ]
-        }
+        },
+        "betterSnippetsEngineExtension": true
     },
     "activationEvents": [
         "*"
