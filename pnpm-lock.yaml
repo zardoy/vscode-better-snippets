@@ -1,5 +1,8 @@
 lockfileVersion: 5.4
 
+neverBuiltDependencies:
+  - playwright
+
 overrides:
   esbuild: ^0.14.10
   typescript-json-schema: ^0.53.0
@@ -17,7 +20,7 @@ specifiers:
   '@vscode/test-electron': ^2.1.5
   '@zardoy/tsconfig': ^1.4.0
   '@zardoy/utils': ^0.0.7
-  '@zardoy/vscode-utils': ^0.0.18
+  '@zardoy/vscode-utils': ^0.0.28
   chai: ^4.3.6
   chokidar-cli: ^3.0.0
   cross-env: ^7.0.3
@@ -46,7 +49,7 @@ specifiers:
 
 dependencies:
   '@zardoy/utils': 0.0.7
-  '@zardoy/vscode-utils': 0.0.18_dglpivvyc4e67exhhadou2fmk4
+  '@zardoy/vscode-utils': 0.0.28_rjjopidhldhsctpqbobjgjsr6e
   chai: 4.3.6
   chokidar-cli: 3.0.0
   delay: 5.0.0
@@ -776,7 +779,7 @@ packages:
     dependencies:
       lodash.compact: 3.0.1
       rambda: 6.9.0
-      type-fest: 2.14.0
+      type-fest: 2.19.0
     dev: false
 
   /@zardoy/utils/0.0.7:
@@ -788,14 +791,20 @@ packages:
       type-fest: 2.14.0
     dev: false
 
-  /@zardoy/vscode-utils/0.0.18_dglpivvyc4e67exhhadou2fmk4:
-    resolution: {integrity: sha512-ejJgthnW3NcbSKf7qwhRcx+BRAit70FYyrk4U0d6vG33Us0dmeXbBJEr+FIRcIOrLS1vAS2CpMno9C0G7uXQzg==}
+  /@zardoy/vscode-utils/0.0.28_rjjopidhldhsctpqbobjgjsr6e:
+    resolution: {integrity: sha512-9vvlx6dXYktUlNCU3gvLKq4WKbILXBYXAAs2avpzP0ddAxsIJZkZydXdqcfN+rMrJV5VFSO8KrtMyDBCHb9hnQ==}
     engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
     hasBin: true
     peerDependencies:
       '@types/vscode': ^1.65.0
+      esbuild: '*'
+      jsonc-parser: ^3.2.0
       vscode-framework: ^0.0.18
     peerDependenciesMeta:
+      esbuild:
+        optional: true
+      jsonc-parser:
+        optional: true
       vscode-framework:
         optional: true
     dependencies:
@@ -804,7 +813,11 @@ packages:
       chokidar: 3.5.3
       commander: 9.4.0
       execa: 5.1.1
-      rambda: 7.0.3
+      fs-extra: 10.1.0
+      jsonc-parser: 3.0.0
+      lodash.throttle: 4.1.1
+      rambda: 7.2.1
+      typed-jsonfile: 0.2.1
       untildify: 4.0.0
       vscode-framework: 0.0.18_kvrfju2rt4jkjwqfr2fyttrbia
       vscode-manifest: 0.0.8
@@ -2499,6 +2512,15 @@ packages:
       jsonfile: 6.1.0
       universalify: 2.0.0
 
+  /fs-extra/10.1.0:
+    resolution: {integrity: sha512-oRXApq54ETRj4eMiFzGnHWGy+zo5raudjuxN0b8H7s/RU2oW0Wvsx9O0ACRN/kRq9E8Vu/ReskGB5o3ji+FzHQ==}
+    engines: {node: '>=12'}
+    dependencies:
+      graceful-fs: 4.2.10
+      jsonfile: 6.1.0
+      universalify: 2.0.0
+    dev: false
+
   /fs-extra/7.0.1:
     resolution: {integrity: sha512-YJDaCJZEnBmcbw13fvdAM9AwNOJwOzrE4pqMqBq5nFiEqXUqHwlK4B+3pUw6JNvfSPtX05xFHtYy/1ni01eGCw==}
     engines: {node: '>=6 <7 || >=8'}
@@ -2678,6 +2700,10 @@ packages:
       lowercase-keys: 2.0.0
       p-cancelable: 2.1.1
       responselike: 2.0.0
+    dev: false
+
+  /graceful-fs/4.2.10:
+    resolution: {integrity: sha512-9ByhssR2fPVsNZj478qUUbKfmL0+t5BDVyjShtyZZLiK7ZDAArFFfopyOTj0M05wE2tJPisA4iTnnXl2YoPvOA==}
     dev: false
 
   /graceful-fs/4.2.9:
@@ -3903,7 +3929,6 @@ packages:
     resolution: {integrity: sha512-JYNjhwWcfsBkg0FMGLbFO9e58FVdmICE4k97/glIQV7cBULL7oxNjRQC7Ffe+Y70XVNnP0HSJLaA0W5SukyftQ==}
     engines: {node: '>=12'}
     hasBin: true
-    requiresBuild: true
     dependencies:
       commander: 6.2.1
       debug: 4.3.3
@@ -4047,8 +4072,8 @@ packages:
     resolution: {integrity: sha512-yosVdGg1hNGkXPzqGiOYNEpXKjEOxzUCg2rB0l+NKdyCaSf4z+i5ojbN0IqDSezMMf71YEglI+ZUTgTffn5afw==}
     dev: false
 
-  /rambda/7.0.3:
-    resolution: {integrity: sha512-vRkFoukpx9PTmYyOjMZ6+anbDI9BrjaAepigsSOVQcgy7dZKMHM26m1/r8BvegeBCM8qBwr1m/+rufgNKRrofw==}
+  /rambda/7.2.1:
+    resolution: {integrity: sha512-Wswj8ZvzdI3VhaGPkZAxaCTwuMmGtgWt7Zxsgyo4P+iTmVnkojvyWaOep5q3ZjMIecW0wtQa66GWxaKkZ24RAA==}
     dev: false
 
   /randombytes/2.1.0:
@@ -4720,6 +4745,11 @@ packages:
     engines: {node: '>=12.20'}
     dev: false
 
+  /type-fest/2.19.0:
+    resolution: {integrity: sha512-RAH822pAdBgcNMAfWnCBU3CFZcfZ/i1eZjwFU/dsLKumyuuP3niueg2UAukXYF0E2AAoc82ZSSf9J0WQBinzHA==}
+    engines: {node: '>=12.20'}
+    dev: false
+
   /type-fest/2.3.4:
     resolution: {integrity: sha512-2UdQc7cx8F4Ky81Xj7NYQKPhZVtDFbtorrkairIW66rW7xQj5msAhioXa04HqEdP4MD4K2G6QAF7Zyiw/Hju1Q==}
     engines: {node: '>=12.20'}
@@ -4738,6 +4768,15 @@ packages:
       jsonc-parser: 3.0.0
       jsonfile: 6.1.0
       type-fest: 2.11.2
+    dev: false
+
+  /typed-jsonfile/0.2.1:
+    resolution: {integrity: sha512-8G2jqDOjg2reeq0Af3LYb1hY9bbmDYdnleAPQ6o74IPBJ5OxTjbG89TNoXGVGhy1+M16oFHmLIFfMEthQo3lYA==}
+    engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
+    dependencies:
+      jsonc-parser: 3.0.0
+      jsonfile: 6.1.0
+      type-fest: 2.19.0
     dev: false
 
   /typed-vscode/0.0.5_kvrfju2rt4jkjwqfr2fyttrbia:

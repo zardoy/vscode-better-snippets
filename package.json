@@ -72,7 +72,10 @@
         "overrides": {
             "esbuild": "^0.14.10",
             "typescript-json-schema": "^0.53.0"
-        }
+        },
+        "neverBuiltDependencies": [
+            "playwright"
+        ]
     },
     "devDependencies": {
         "@milahu/patch-package-with-pnpm-support": "^6.4.8",
@@ -99,7 +102,7 @@
     },
     "dependencies": {
         "@zardoy/utils": "^0.0.7",
-        "@zardoy/vscode-utils": "^0.0.18",
+        "@zardoy/vscode-utils": "^0.0.28",
         "chai": "^4.3.6",
         "chokidar-cli": "^3.0.0",
         "delay": "^5.0.0",
