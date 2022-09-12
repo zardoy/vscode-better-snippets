@@ -19,7 +19,7 @@ describe('Typing snippets', () => {
     /** With delay, enough for comparing triggered result */
     const typeSequenceWithDelay = async (seq: string) => {
         await typeSequence(seq)
-        await delay(150)
+        await delay(300)
     }
 
     before(done => {

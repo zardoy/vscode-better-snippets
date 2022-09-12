@@ -13,7 +13,9 @@ describe('Resolve imports', () => {
     let document: vscode.TextDocument
     let editor: vscode.TextEditor
     const startPos = new vscode.Position(0, 0)
-    before(done => {
+    // eslint-disable-next-line @typescript-eslint/space-before-function-paren
+    before(function (done) {
+        this.timeout(6000)
         void vscode.workspace
             .openTextDocument({
                 content,
