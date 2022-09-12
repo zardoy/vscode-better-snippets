@@ -9,9 +9,9 @@ export const normalizeFilePathRegex = (input: string, fileType: NonNullable<Conf
     // eslint-disable-next-line default-case
     switch (fileType) {
         case 'package.json':
-            return /package.json$/
+            return /\/package.json$/
         case 'tsconfig.json':
-            return /(t|j)sconfig(\..+)?.json$/
+            return /\/(t|j)sconfig(\..+)?.json$/
     }
 }
 
