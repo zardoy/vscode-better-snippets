@@ -13,7 +13,6 @@ describe('Resolve imports', () => {
     let document: vscode.TextDocument
     let editor: vscode.TextEditor
     const startPos = new vscode.Position(0, 0)
-    // eslint-disable-next-line @typescript-eslint/space-before-function-paren
     before(function (done) {
         this.timeout(6000)
         void vscode.workspace
@@ -73,10 +72,10 @@ describe('Resolve imports', () => {
     it('Explicit resolveImports', async () => {
         await delay(200)
         await triggerSuggest()
-        await delay(800)
+        await delay(1200)
         await acceptAndWaitForChanges()
         expect(document.getText().split('\n')[0]).to.equal('import { readFileSync } from "node:fs";')
-    }).timeout(4500)
+    }).timeout(5000)
 
     it('resolveImports with existing import', async () => {
         await clearEditorText(editor, 'import { readFile } from "node:fs";\n')
@@ -90,7 +89,7 @@ describe('Resolve imports', () => {
     it('Implicit resolveImports', async () => {
         await clearEditorText(editor)
         await triggerSuggest()
-        await delay(600)
+        await delay(800)
         await vscode.commands.executeCommand('selectNextSuggestion')
         await acceptAndWaitForChanges()
         expect(document.getText().split('\n')[0]).to.match(/import { readFileSync } from "(node:)?fs";/)
