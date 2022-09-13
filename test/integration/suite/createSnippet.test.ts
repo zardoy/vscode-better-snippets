@@ -1,6 +1,5 @@
 import * as vscode from 'vscode'
 import { expect } from 'chai'
-import delay from 'delay'
 import { Configuration } from '../../../src/configurationType'
 import { clearEditorText } from './utils'
 
@@ -14,7 +13,6 @@ describe('Create snippet', () => {
             editor = vscode.window.activeTextEditor!
             document = editor.document
             await vscode.languages.setTextDocumentLanguage(document, 'markdown')
-            await editor.edit(builder => builder.setEndOfLine(vscode.EndOfLine.CRLF))
             await vscode.workspace
                 .getConfiguration('betterSnippets')
                 .update('snippetCreator.showSnippetAfterCreation', false, vscode.ConfigurationTarget.Global)
@@ -23,7 +21,7 @@ describe('Create snippet', () => {
         })
     })
 
-    const insertTestSnippet = async () => clearEditorText(editor, 'function test() {\n\t\n}')
+    const insertTestSnippet = async () => clearEditorText(editor, 'function test() {\n\t0\t1\n\t\t2\n}')
 
     it('Create snippet from selection', async () => {
         await insertTestSnippet()
@@ -34,7 +32,7 @@ describe('Create snippet', () => {
             const configValue = vscode.workspace.getConfiguration('betterSnippets').get<Configuration['customSnippets']>('customSnippets')!
             const lastSnippet = configValue.slice(-1)[0]
             expect(lastSnippet?.name, snippetName).to.deep.equal(snippetName)
-            expect(lastSnippet?.body, snippetName).to.deep.equal(['function test() {', '\t', '}'])
+            expect(lastSnippet?.body, snippetName).to.deep.equal(['function test() {', '\t0\t1', '\t\t2', '}'])
         }
 
         assertSnippet(snippetName)

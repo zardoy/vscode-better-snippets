@@ -43,9 +43,7 @@ export const registerCreateSnippetFromSelection = () => {
                       },
                   )
         if (langId === undefined) return
-        let snippetLines = stringDedent(document.getText(activeEditor.selection)).split(/\r?\n/)
-        const { options } = activeEditor
-        snippetLines = options.insertSpaces ? replaceTabs(snippetLines, options.tabSize as number) : snippetLines
+        const snippetLines = stringDedent(document.getText(activeEditor.selection)).split(/\r?\n/)
         if (!snippetName)
             snippetName = await vscode.window.showInputBox({
                 ignoreFocusOut: true,
@@ -86,5 +84,3 @@ export const registerCreateSnippetFromSelection = () => {
         }
     })
 }
-
-const replaceTabs = (lines: string[], tabSize: number) => lines.map(line => line.replace(/^\s+/, match => '\t'.repeat(match.split(' '.repeat(tabSize)).length)))
