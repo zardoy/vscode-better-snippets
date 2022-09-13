@@ -337,6 +337,8 @@ export const activate = () => {
                 // TODO losing errors here for some reason
                 vscode.workspace.onDidChangeTextDocument(({ contentChanges, document, reason }) => {
                     ;(async () => {
+                        // ignore if nothing is changed
+                        if (contentChanges.length === 0) return
                         const editor = vscode.window.activeTextEditor
                         if (document.uri !== editor?.document.uri || ['output'].includes(editor.document.uri.scheme)) return
                         if (internalDocumentChange || vscode.workspace.fs.isWritableFileSystem(document.uri.scheme) === false) return
