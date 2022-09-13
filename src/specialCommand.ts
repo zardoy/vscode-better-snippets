@@ -16,8 +16,7 @@ export const registerSpecialCommand = () => {
                     activeEditor.document.uri,
                 )
                 const fileNameSymbol = fileSymbols.find(
-                    ({ name, kind }) =>
-                        name === fileName && oneOf(kind, vscode.SymbolKind.Constant, vscode.SymbolKind.Variable, vscode.SymbolKind.Function),
+                    ({ name, kind }) => name === fileName && oneOf(kind, vscode.SymbolKind.Constant, vscode.SymbolKind.Variable, vscode.SymbolKind.Function),
                 )
                 if (!fileNameSymbol) return
                 const componentUsage: vscode.Location[] = await vscode.commands.executeCommand(

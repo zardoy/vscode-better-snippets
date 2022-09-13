@@ -27,7 +27,7 @@ jobs:
             args: [--frozen-lockfile, --strict-peer-dependencies]
       - run: pnpm lint
       - run: pnpm unit-test
-      # its fine, until we use version in bundle somewhere
+      # its fine until we don't use version in bundle somewhere
       - run: pnpm build
       - uses: GabrielBB/xvfb-action@v1.6
         with:
