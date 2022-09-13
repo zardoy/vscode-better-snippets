@@ -19,7 +19,7 @@ describe('Typing snippets', () => {
     /** With delay, enough for comparing triggered result */
     const typeSequenceWithDelay = async (seq: string) => {
         await typeSequence(seq)
-        await delay(150)
+        await delay(300)
     }
 
     before(done => {
@@ -27,6 +27,7 @@ describe('Typing snippets', () => {
             editor = vscode.window.activeTextEditor!
             document = editor.document
             await vscode.languages.setTextDocumentLanguage(document, 'markdown')
+            await editor.edit((builder) => builder.setEndOfLine(vscode.EndOfLine.LF))
             const configKey: keyof Configuration = 'typingSnippets'
             const configValue: Configuration['typingSnippets'] = [
                 {
