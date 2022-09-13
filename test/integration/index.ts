@@ -18,7 +18,8 @@ export const run = async () => {
     const mocha = new Mocha({
         color: true,
         parallel: false,
-        timeout: process.env.CI ? 4000 : 2000
+        timeout: process.env.CI ? 4000 : 4000,
+        bail: true,
     })
     const testsRoot = join(__dirname, './suite')
     await new Promise<void>(resolve => {
@@ -31,7 +32,7 @@ export const run = async () => {
                 if (failures > 0) {
                     console.error(`${failures} tests failed.`)
                     setImmediate(() => {
-                        process.exit(1)
+                        // process.exit(1)
                     })
                 } else {
                     resolve()
