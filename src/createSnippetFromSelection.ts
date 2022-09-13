@@ -9,7 +9,7 @@ import { getSnippetsDefaults } from './extension'
 
 export const registerCreateSnippetFromSelection = () => {
     // createNativeSnippetFromSelection
-    registerExtensionCommand('createSnippetFromSelection', async () => {
+    registerExtensionCommand('createSnippetFromSelection', async (_, snippetName?: string) => {
         const isNativeCreator = false
         const activeEditor = vscode.window.activeTextEditor
         if (!activeEditor) return
@@ -43,16 +43,16 @@ export const registerCreateSnippetFromSelection = () => {
                       },
                   )
         if (langId === undefined) return
-        let snippetLines = stringDedent(document.getText(activeEditor.selection)).split('\n')
-        if (!activeEditor.options.insertSpaces)
-            snippetLines = activeEditor.options.insertSpaces
-                ? replaceTabs(snippetLines, activeEditor.options.tabSize as number)
-                : snippetLines.map(line => line.replace(/\t/, '\\t'))
-        const snippetName = await vscode.window.showInputBox({
-            ignoreFocusOut: true,
-            // TODO suggest templ if file selection (though its bad idea)
-            title: 'Enter name for the snippet',
-        })
+        let snippetLines = stringDedent(document.getText(activeEditor.selection)).split(/\r?\n/)
+        const { options } = activeEditor
+        snippetLines = options.insertSpaces ? replaceTabs(snippetLines, options.tabSize as number) : snippetLines
+        if (!snippetName)
+            snippetName = await vscode.window.showInputBox({
+                ignoreFocusOut: true,
+                // TODO suggest templ if file selection (though its bad idea)
+                title: 'Enter name for the snippet',
+            })
+
         if (snippetName === undefined) return
         const snippetWhen: Configuration['customSnippets'][number]['when'] = {
             ...(areLangsEquals(defaultLanguages, normalizeLanguages(langId, langsSupersets)) ? null : { languages: [langId] }),
@@ -87,5 +87,4 @@ export const registerCreateSnippetFromSelection = () => {
     })
 }
 
-const replaceTabs = (lines: string[], tabSize: number) =>
-    lines.map(line => line.replace(/^\s+/, match => '\\t'.repeat(match.split(' '.repeat(tabSize)).length)))
+const replaceTabs = (lines: string[], tabSize: number) => lines.map(line => line.replace(/^\s+/, match => '\t'.repeat(match.split(' '.repeat(tabSize)).length)))
