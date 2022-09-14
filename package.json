@@ -79,11 +79,8 @@
     },
     "devDependencies": {
         "@milahu/patch-package-with-pnpm-support": "^6.4.8",
-        "@types/chai": "^4.3.0",
         "@types/fs-extra": "^9.0.13",
-        "@types/glob": "^7.2.0",
         "@types/jest": "^27.4.0",
-        "@types/mocha": "^9.1.0",
         "@types/node": "^16.11.25",
         "@types/path-browserify": "^1.0.0",
         "@types/vscode": "1.64.0",
@@ -93,8 +90,6 @@
         "eslint": "^8.9.0",
         "eslint-config-zardoy": "^0.2.8",
         "fs-extra": "^10.0.1",
-        "glob": "^7.2.0",
-        "mocha": "^9.2.0",
         "tsm": "^2.2.1",
         "typescript": "^4.5.5",
         "vitest": "^0.8.1",
@@ -103,7 +98,6 @@
     "dependencies": {
         "@zardoy/utils": "^0.0.7",
         "@zardoy/vscode-utils": "^0.0.31",
-        "chai": "^4.3.6",
         "chokidar-cli": "^3.0.0",
         "delay": "^5.0.0",
         "escape-string-regexp": "^5.0.0",
