@@ -2,6 +2,7 @@
     "extends": "zardoy",
     "rules": {
         "no-template-curly-in-string": "off",
+        "@typescript-eslint/no-loop-func": "off",
         "@typescript-eslint/space-before-function-paren": "off"
     }
 }

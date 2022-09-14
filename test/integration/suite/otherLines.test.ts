@@ -1,19 +1,18 @@
 /* eslint-disable no-promise-executor-return */
-/* eslint-disable @typescript-eslint/no-loop-func */
+
 import fs from 'fs'
 import { join } from 'path'
 import * as vscode from 'vscode'
-import { expect } from 'chai'
 import { Configuration } from '../../../src/configurationType'
 
 const content = fs.readFileSync(join(__dirname, '../../test/integration/fixtures/otherLines.ts'), 'utf-8')
 
-describe('otherLines', () => {
+describe.skip('otherLines', () => {
     let documentPromise: Thenable<vscode.TextDocument>
     return
 
     // eslint-disable-next-line no-unreachable
-    before(done => {
+    beforeAll(done => {
         console.log('basic')
         documentPromise = vscode.workspace.openTextDocument({
             content,
@@ -33,7 +32,7 @@ describe('otherLines', () => {
                                 otherLines: [
                                     {
                                         indent: -1,
-                                        testRegex: "function|=>|React.FC"
+                                        testRegex: 'function|=>|React.FC',
                                         // preset: 'function',
                                     },
                                 ],
@@ -98,6 +97,4 @@ describe('otherLines', () => {
                 .then(done)
         })
     })
-
-    it('Dummy test case, so before is executed', () => expect(1).equal(1))
 })

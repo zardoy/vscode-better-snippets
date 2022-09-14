@@ -1,5 +1,4 @@
 import * as vscode from 'vscode'
-import { expect } from 'chai'
 import { Configuration } from '../../../src/configurationType'
 import { clearEditorText } from './utils'
 
@@ -7,8 +6,7 @@ describe('Create snippet', () => {
     let editor: vscode.TextEditor
     let document: vscode.TextDocument
 
-    before(function (done) {
-        this.timeout(6000)
+    beforeAll(done => {
         void vscode.commands.executeCommand('workbench.action.files.newUntitledFile').then(async () => {
             editor = vscode.window.activeTextEditor!
             document = editor.document
@@ -19,7 +17,7 @@ describe('Create snippet', () => {
             await vscode.workspace.getConfiguration('betterSnippets').update('customSnippets', [], vscode.ConfigurationTarget.Global)
             done()
         })
-    })
+    }, 6000)
 
     const insertTestSnippet = async () => clearEditorText(editor, 'function test() {\n\t0\t1\n\t\t2\n}')
 
@@ -31,8 +29,8 @@ describe('Create snippet', () => {
         const assertSnippet = (snippetName: string) => {
             const configValue = vscode.workspace.getConfiguration('betterSnippets').get<Configuration['customSnippets']>('customSnippets')!
             const lastSnippet = configValue.slice(-1)[0]
-            expect(lastSnippet?.name, snippetName).to.deep.equal(snippetName)
-            expect(lastSnippet?.body, snippetName).to.deep.equal(['function test() {', '\t0\t1', '\t\t2', '}'])
+            expect(lastSnippet?.name /* , snippetName */).toEqual(snippetName)
+            expect(lastSnippet?.body /* , snippetName */).toEqual(['function test() {', '\t0\t1', '\t\t2', '}'])
         }
 
         assertSnippet(snippetName)

@@ -1,6 +1,5 @@
 import * as vscode from 'vscode'
 
-import { expect } from 'chai'
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment, @typescript-eslint/prefer-ts-expect-error
 //@ts-ignore
 import delay from 'delay'
@@ -13,8 +12,7 @@ describe('Resolve imports', () => {
     let document: vscode.TextDocument
     let editor: vscode.TextEditor
     const startPos = new vscode.Position(0, 0)
-    before(function (done) {
-        this.timeout(6000)
+    beforeAll(done => {
         void vscode.workspace
             .openTextDocument({
                 content,
@@ -23,7 +21,7 @@ describe('Resolve imports', () => {
             .then(async newDocument => {
                 document = newDocument
                 editor = await vscode.window.showTextDocument(document)
-                await editor.edit((builder) => builder.setEndOfLine(vscode.EndOfLine.LF))
+                await editor.edit(builder => builder.setEndOfLine(vscode.EndOfLine.LF))
                 const configKey: keyof Configuration = 'customSnippets'
                 const configValue: Configuration['customSnippets'] = [
                     {
@@ -54,7 +52,7 @@ describe('Resolve imports', () => {
                 // await vscode.commands.executeCommand('vscode.executeCompletionItemProvider', document.uri, startPos)
             })
             .then(done)
-    })
+    }, 6000)
 
     const triggerSuggest = () => vscode.commands.executeCommand('editor.action.triggerSuggest')
 
@@ -74,8 +72,8 @@ describe('Resolve imports', () => {
         await triggerSuggest()
         await delay(1200)
         await acceptAndWaitForChanges()
-        expect(document.getText().split('\n')[0]).to.equal('import { readFileSync } from "node:fs";')
-    }).timeout(5000)
+        expect(document.getText().split('\n')[0]).toEqual('import { readFileSync } from "node:fs";')
+    }, 5000)
 
     it('resolveImports with existing import', async () => {
         await clearEditorText(editor, 'import { readFile } from "node:fs";\n')
@@ -83,8 +81,8 @@ describe('Resolve imports', () => {
         await triggerSuggest()
         await delay(900)
         await acceptAndWaitForChanges()
-        expect(document.getText().split('\n')[0]).to.equal('import { readFile, readFileSync } from "node:fs";')
-    }).timeout(4000)
+        expect(document.getText().split('\n')[0]).toEqual('import { readFile, readFileSync } from "node:fs";')
+    }, 4000)
 
     it('Implicit resolveImports', async () => {
         await clearEditorText(editor)
@@ -92,6 +90,6 @@ describe('Resolve imports', () => {
         await delay(800)
         await vscode.commands.executeCommand('selectNextSuggestion')
         await acceptAndWaitForChanges()
-        expect(document.getText().split('\n')[0]).to.match(/import { readFileSync } from "(node:)?fs";/)
-    }).timeout(4000)
+        expect(document.getText().split('\n')[0]).toMatch(/import { readFileSync } from "(node:)?fs";/)
+    }, 4000)
 })

@@ -1,6 +1,5 @@
 /* eslint-disable no-await-in-loop */
 import * as vscode from 'vscode'
-import { expect } from 'chai'
 import delay from 'delay'
 import { Configuration } from '../../../src/configurationType'
 import { clearEditorText } from './utils'
@@ -22,7 +21,7 @@ describe('Typing snippets', () => {
         await delay(300)
     }
 
-    before(done => {
+    beforeAll(done => {
         void vscode.commands.executeCommand('workbench.action.files.newUntitledFile').then(async () => {
             editor = vscode.window.activeTextEditor!
             document = editor.document
@@ -46,20 +45,20 @@ describe('Typing snippets', () => {
 
     it('Fresh document', async () => {
         await typeSequenceWithDelay(triggerSequence)
-        expect(document.getText()).to.equal(resultingBody)
+        expect(document.getText()).toEqual(resultingBody)
     })
 
     it('Repeat the same', async () => {
         await clearEditorText(editor)
         await typeSequenceWithDelay(triggerSequence)
-        expect(document.getText()).to.equal(resultingBody)
+        expect(document.getText()).toEqual(resultingBody)
     })
 
     it('Typing from second line two times', async () => {
         await clearEditorText(editor)
         await typeSequenceWithDelay(`test\n${triggerSequence}`)
         await typeSequenceWithDelay(`\n${triggerSequence}`)
-        expect(document.getText().split('\n').slice(1).join('\n')).to.equal(`${resultingBody}\n${resultingBody}`)
+        expect(document.getText().split('\n').slice(1).join('\n')).toEqual(`${resultingBody}\n${resultingBody}`)
     })
 
     it('Typing in first after second', async () => {
@@ -68,7 +67,7 @@ describe('Typing snippets', () => {
         const pos = new vscode.Position(0, 0)
         editor.selection = new vscode.Selection(pos, pos)
         await typeSequenceWithDelay(triggerSequence)
-        expect(document.getText().split('\n')[0]).to.equal(resultingBody)
+        expect(document.getText().split('\n')[0]).toEqual(resultingBody)
     })
 
     it('Change cursor pos does not trigger', async () => {
@@ -77,7 +76,7 @@ describe('Typing snippets', () => {
         await vscode.commands.executeCommand('cursorMove', { to: 'left' })
         await vscode.commands.executeCommand('cursorMove', { to: 'right' })
         await typeSequenceWithDelay(' ')
-        expect(document.getText().split('\n')[0]).to.equal('cb ')
+        expect(document.getText().split('\n')[0]).toEqual('cb ')
     })
 
     // Actually it tests typing sequence after selecting
@@ -88,7 +87,7 @@ describe('Typing snippets', () => {
         await editor.insertSnippet(new vscode.SnippetString('2${1:placeholder}'))
         await delay(30)
         await typeSequenceWithDelay(triggerSequence)
-        expect(document.getText().slice(2)).to.equal(resultingBody)
+        expect(document.getText().slice(2)).toEqual(resultingBody)
     })
 
     it('Multicursor typing', async () => {
@@ -101,7 +100,7 @@ describe('Typing snippets', () => {
         await delay(30)
         await typeSequenceWithDelay(triggerSequence)
         const lines = document.getText().split('\n')
-        expect(lines[0]).to.equal(`${resultingBody}-${resultingBody}__${resultingBody}`)
-        expect(lines[1]).to.equal(resultingBody)
+        expect(lines[0]).toEqual(`${resultingBody}-${resultingBody}__${resultingBody}`)
+        expect(lines[1]).toEqual(resultingBody)
     })
 })
