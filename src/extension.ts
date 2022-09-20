@@ -59,7 +59,7 @@ export const activate = () => {
         /** end position */
         position: vscode.Position,
         displayLanguage = document.languageId,
-    ): Array<Omit<T, 'body'> & { body: string }> => {
+    ): Array<T & { body: T extends CustomSnippet ? string : string | false }> => {
         const log = (...args) => console.log(`[${debugType}]`, ...args)
         const debug = (...args) => console.debug(`[${debugType}]`, ...args)
         log(displayLanguage, 'for', snippets.length, 'snippets')
@@ -170,10 +170,11 @@ export const activate = () => {
                 ) {
                     log(`Snippet ${name} included. Reason: ${location}`)
                     let newBody = Array.isArray(body) ? body.join('\n') : body
-                    for (const [groupName, groupValue] of Object.entries(regexGroups))
-                        newBody = newBody.replace(new RegExp(`(?<!\\\\)${escapeStringRegexp(`$${groupName}`)}`, 'g'), groupValue)
+                    if (newBody !== false)
+                        for (const [groupName, groupValue] of Object.entries(regexGroups))
+                            newBody = newBody.replace(new RegExp(`(?<!\\\\)${escapeStringRegexp(`$${groupName}`)}`, 'g'), groupValue)
 
-                    includedSnippets.push({ ...snippet, body: newBody })
+                    includedSnippets.push({ ...snippet, body: newBody as string })
                 }
         }
 
@@ -391,44 +392,47 @@ export const activate = () => {
                         if (!snippet) return
                         console.log('Applying typing snippet', snippet.sequence)
                         const { body, executeCommand, resolveImports } = snippet
-                        await new Promise<void>(resolve => {
-                            internalDocumentChange = true
-                            const { dispose } = vscode.workspace.onDidChangeTextDocument(({ document }) => {
-                                if (document.uri !== editor?.document.uri) return
-                                internalDocumentChange = false
-                                dispose()
-                                resolve()
-                            })
-                            void editor.edit(
-                                builder => {
-                                    let previousLineNum = -1
-                                    let sameLinePos = 0
-                                    for (const { range } of contentChanges) {
-                                        // we can safely do this, as contentChanges are sorted
-                                        if (previousLineNum === range.start.line) {
-                                            sameLinePos++
-                                        } else {
-                                            previousLineNum = range.start.line
-                                            sameLinePos = 0
+                        if (body !== false)
+                            // #region remove sequence content
+                            await new Promise<void>(resolve => {
+                                internalDocumentChange = true
+                                const { dispose } = vscode.workspace.onDidChangeTextDocument(({ document }) => {
+                                    if (document.uri !== editor?.document.uri) return
+                                    internalDocumentChange = false
+                                    dispose()
+                                    resolve()
+                                })
+                                void editor.edit(
+                                    builder => {
+                                        let previousLineNum = -1
+                                        let sameLinePos = 0
+                                        for (const { range } of contentChanges) {
+                                            // we can safely do this, as contentChanges are sorted
+                                            if (previousLineNum === range.start.line) {
+                                                sameLinePos++
+                                            } else {
+                                                previousLineNum = range.start.line
+                                                sameLinePos = 0
+                                            }
+
+                                            // start = end, which indicates where a character was typed,
+                                            // so we're always ahead of 1+N character, where N is zero-based number of position on the same line
+                                            // because of just typed letter + just typed letter in previous positions
+                                            const endPosition = range.start.translate(0, 1 + sameLinePos)
+                                            // eslint-disable-next-line unicorn/consistent-destructuring
+                                            const startPosition = endPosition.translate(0, -snippet.sequence.length)
+                                            builder.delete(new vscode.Range(startPosition, endPosition))
                                         }
+                                    },
+                                    {
+                                        undoStopBefore: getExtensionSetting('typingSnippetsUndoStops'),
+                                        undoStopAfter: false,
+                                    },
+                                )
+                            })
+                        // #endregion
 
-                                        // start = end, which indicates where a character was typed,
-                                        // so we're always ahead of 1+N character, where N is zero-based number of position on the same line
-                                        // because of just typed letter + just typed letter in previous positions
-                                        const endPosition = range.start.translate(0, 1 + sameLinePos)
-                                        // eslint-disable-next-line unicorn/consistent-destructuring
-                                        const startPosition = endPosition.translate(0, -snippet.sequence.length)
-                                        builder.delete(new vscode.Range(startPosition, endPosition))
-                                    }
-                                },
-                                {
-                                    undoStopBefore: getExtensionSetting('typingSnippetsUndoStops'),
-                                    undoStopAfter: false,
-                                },
-                            )
-                        })
-
-                        await editor.insertSnippet(new vscode.SnippetString(body))
+                        if (body !== false) await editor.insertSnippet(new vscode.SnippetString(body))
                         if (executeCommand) {
                             // TODO extract fn
                             const command = typeof executeCommand === 'string' ? { command: executeCommand, arguments: [] } : executeCommand
@@ -441,7 +445,7 @@ export const activate = () => {
                                 action: 'resolve-imports',
                                 importsConfig: resolveImports,
                                 insertPos: startPosition,
-                                snippetLines: body.split('\n').length,
+                                snippetLines: body === false ? 1 : body.split('\n').length,
                             }
                             await vscode.commands.executeCommand(getExtensionCommandId('completionInsert'), arg)
                         }

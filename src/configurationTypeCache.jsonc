@@ -1,5 +1,5 @@
 // GENERATED. DON'T EDIT MANUALLY
-// md5hash: 4acde228953fd31a015870d4c7c2ade0
+// md5hash: 7d732347733c9ebc36a37d9b2b7de42c
 {
     "type": "object",
     "properties": {
@@ -30,25 +30,6 @@
                     {
                         "type": "object",
                         "properties": {
-                            "body": {
-                                "suggestSortText": "2",
-                                "defaultSnippets": [
-                                    {
-                                        "body": "$1"
-                                    }
-                                ],
-                                "anyOf": [
-                                    {
-                                        "type": "array",
-                                        "items": {
-                                            "type": "string"
-                                        }
-                                    },
-                                    {
-                                        "type": "string"
-                                    }
-                                ]
-                            },
                             "when": {
                                 "suggestSortText": "3",
                                 "type": "object",
@@ -266,7 +247,7 @@
                                 "description": "Execute custom command on snippet accept, doesn't work with resolveImports",
                                 "defaultSnippets": [
                                     {
-                                        "executeCommand": "$1"
+                                        "body": "$1"
                                     }
                                 ],
                                 "anyOf": [
@@ -291,14 +272,30 @@
                                     }
                                 ]
                             }
-                        },
-                        "required": [
-                            "body"
-                        ]
+                        }
                     },
                     {
                         "type": "object",
                         "properties": {
+                            "body": {
+                                "suggestSortText": "2",
+                                "defaultSnippets": [
+                                    {
+                                        "body": "$1"
+                                    }
+                                ],
+                                "anyOf": [
+                                    {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    {
+                                        "type": "string"
+                                    }
+                                ]
+                            },
                             "name": {
                                 "suggestSortText": "!",
                                 "type": "string"
@@ -382,6 +379,7 @@
                             }
                         },
                         "required": [
+                            "body",
                             "name"
                         ]
                     }
@@ -396,25 +394,6 @@
                     {
                         "type": "object",
                         "properties": {
-                            "body": {
-                                "suggestSortText": "2",
-                                "defaultSnippets": [
-                                    {
-                                        "body": "$1"
-                                    }
-                                ],
-                                "anyOf": [
-                                    {
-                                        "type": "array",
-                                        "items": {
-                                            "type": "string"
-                                        }
-                                    },
-                                    {
-                                        "type": "string"
-                                    }
-                                ]
-                            },
                             "when": {
                                 "suggestSortText": "3",
                                 "type": "object",
@@ -632,7 +611,7 @@
                                 "description": "Execute custom command on snippet accept, doesn't work with resolveImports",
                                 "defaultSnippets": [
                                     {
-                                        "executeCommand": "$1"
+                                        "body": "$1"
                                     }
                                 ],
                                 "anyOf": [
@@ -657,14 +636,37 @@
                                     }
                                 ]
                             }
-                        },
-                        "required": [
-                            "body"
-                        ]
+                        }
                     },
                     {
                         "type": "object",
                         "properties": {
+                            "body": {
+                                "description": "If `false` sequence will not be removed, useful for just executing post actions such as commands",
+                                "suggestSortText": "2",
+                                "defaultSnippets": [
+                                    {
+                                        "body": "$1"
+                                    }
+                                ],
+                                "anyOf": [
+                                    {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    {
+                                        "enum": [
+                                            false
+                                        ],
+                                        "type": "boolean"
+                                    },
+                                    {
+                                        "type": "string"
+                                    }
+                                ]
+                            },
                             "sequence": {
                                 "description": "Snippet will be accepted only after typing THE EXACT sequence of characters on the keyboard. Using arrows or mouse for navigating will reset the sequence (see settings)",
                                 "suggestSortText": "!",
@@ -681,6 +683,7 @@
                             }
                         },
                         "required": [
+                            "body",
                             "sequence"
                         ]
                     }

@@ -33,13 +33,6 @@ type TestProp =
 
 export type GeneralSnippet = {
     /**
-     * @suggestSortText "2"
-     * @defaultSnippets [{
-     *   "body": "$1"
-     * }]
-     */
-    body: string | string[]
-    /**
      * @suggestSortText "3"
      */
     when?: {
@@ -100,7 +93,7 @@ export type GeneralSnippet = {
     /**
      * Execute custom command on snippet accept, doesn't work with resolveImports
      * @defaultSnippets [{
-     *   "executeCommand": "$1"
+     *   "body": "$1"
      * }]
      */
     executeCommand?: CommandDefinition /* | CommandDefinition[] */
@@ -139,6 +132,13 @@ export type Configuration = {
      */
     customSnippets: Array<
         GeneralSnippet & {
+            /**
+             * @suggestSortText "2"
+             * @defaultSnippets [{
+             *   "body": "$1"
+             * }]
+             */
+            body: string | string[]
             /**
              * @suggestSortText !
              */
@@ -182,6 +182,14 @@ export type Configuration = {
      */
     typingSnippets: Array<
         GeneralSnippet & {
+            /**
+             * If `false` sequence will not be removed, useful for just executing post actions such as commands
+             * @suggestSortText "2"
+             * @defaultSnippets [{
+             *   "body": "$1"
+             * }]
+             */
+            body: string | string[] | false
             /**
              * Snippet will be accepted only after typing THE EXACT sequence of characters on the keyboard. Using arrows or mouse for navigating will reset the sequence (see settings)
              * @suggestSortText !

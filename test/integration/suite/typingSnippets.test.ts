@@ -8,6 +8,7 @@ import { clearEditorText } from './utils'
 describe('Typing snippets', () => {
     const resultingBody = 'EXAMPLE'
     const triggerSequence = 'cb '
+    const triggerSequenceWithoutBody = 'cbb'
 
     let editor: vscode.TextEditor
     let document: vscode.TextDocument
@@ -38,6 +39,14 @@ describe('Typing snippets', () => {
                         // locations: ['lineStart'],
                     },
                 },
+                {
+                    sequence: triggerSequenceWithoutBody,
+                    body: false,
+                    when: {
+                        languages: ['markdown'],
+                    },
+                    executeCommand: '_dummyCommand1',
+                },
             ]
             await vscode.workspace.getConfiguration('betterSnippets').update(configKey, configValue, vscode.ConfigurationTarget.Global)
             done()
@@ -53,6 +62,19 @@ describe('Typing snippets', () => {
         await clearEditorText(editor)
         await typeSequenceWithDelay(triggerSequence)
         expect(document.getText()).to.equal(resultingBody)
+    })
+
+    it('After false body', async () => {
+        let called = false
+        vscode.commands.registerCommand('_dummyCommand1', () => {
+            called = true
+        })
+        await clearEditorText(editor)
+        await typeSequenceWithDelay(triggerSequenceWithoutBody)
+        expect(document.getText()).to.equal(triggerSequenceWithoutBody)
+        expect(called).to.equal(true)
+        await typeSequenceWithDelay(triggerSequence)
+        expect(document.getText()).to.equal(triggerSequenceWithoutBody + resultingBody)
     })
 
     it('Typing from second line two times', async () => {
