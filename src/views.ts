@@ -10,10 +10,10 @@ import { Configuration, GeneralSnippet } from './configurationType'
 const fsScheme = `${getExtensionContributionsPrefix()}virtualSnippets`
 
 const views = {
-    globalSnippets: true,
-    globalTypingSnippets: true,
-    workspaceSnippets: true,
-    workspaceTypingSnippets: true,
+    'betterSnippets.globalSnippets': true,
+    'betterSnippets.globalTypingSnippets': true,
+    'betterSnippets.workspaceSnippets': true,
+    'betterSnippets.workspaceTypingSnippets': true,
 }
 type ViewType = keyof typeof views
 
@@ -55,8 +55,8 @@ class TreeDataProvider extends BaseTreeDataProvider {
     getChildrenInner(element: TreeItemWithTreeItems | undefined) {
         if (element) return element.items
 
-        const isTyping = oneOf(this.view, 'globalTypingSnippets', 'workspaceTypingSnippets')
-        const isLocal = oneOf(this.view, 'workspaceSnippets', 'workspaceTypingSnippets')
+        const isTyping = oneOf(this.view, 'betterSnippets.globalSnippets', 'betterSnippets.workspaceTypingSnippets')
+        const isLocal = oneOf(this.view, 'betterSnippets.workspaceSnippets', 'betterSnippets.workspaceTypingSnippets')
         const configKey: keyof Settings = isTyping ? 'typingSnippets' : 'customSnippets'
 
         type TreeProps = {

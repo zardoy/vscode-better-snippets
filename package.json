@@ -47,6 +47,11 @@
                 "command": "groupBy#language",
                 "title": "Group by Language",
                 "enablement": "better-snippets.grouping != language"
+            },
+            {
+                "command": "groupBy#extendsGroup",
+                "title": "Group by Extends Group",
+                "enablement": "better-snippets.grouping != extendsGroup"
             }
         ],
         "menus": {
@@ -59,30 +64,42 @@
                     "command": "applySpecialSnippet",
                     "when": "false"
                 }
+            ],
+            "view/title": [
+                {
+                    "command": "groupBy#none",
+                    "when": "view =~ /betterSnippets.globalSnippets|betterSnippets.globalTypingSnippets|betterSnippets.workspaceSnippets|betterSnippets.workspaceTypingSnippets/",
+                    "group": "1_header@1"
+                },
+                {
+                    "command": "groupBy#language",
+                    "when": "view =~ /betterSnippets.globalSnippets|betterSnippets.globalTypingSnippets|betterSnippets.workspaceSnippets|betterSnippets.workspaceTypingSnippets/",
+                    "group": "1_header@2"
+                }
             ]
         },
         "views": {
             "betterSnippets": [
                 {
-                    "id": "globalSnippets",
+                    "id": "betterSnippets.globalSnippets",
                     "name": "Global Snippets"
                 },
                 {
-                    "id": "globalTypingSnippets",
+                    "id": "betterSnippets.globalTypingSnippets",
                     "name": "Global Typing Snippets"
                 },
                 {
-                    "id": "workspaceSnippets",
+                    "id": "betterSnippets.workspaceSnippets",
                     "name": "Workspace Snippets",
                     "visibility": "collapsed"
                 },
                 {
-                    "id": "workspaceTypingSnippets",
+                    "id": "betterSnippets.workspaceTypingSnippets",
                     "name": "Workspace Typing Snippets",
                     "visibility": "collapsed"
                 },
                 {
-                    "id": "packs",
+                    "id": "betterSnippets.packs",
                     "name": "Packs",
                     "visibility": "collapsed"
                 }
@@ -97,12 +114,6 @@
                 }
             ]
         },
-        "submenus": [
-            {
-                "id": "betterSnippets.groupBy",
-                "label": "test"
-            }
-        ],
         "betterSnippetsEngineExtension": true
     },
     "activationEvents": [
