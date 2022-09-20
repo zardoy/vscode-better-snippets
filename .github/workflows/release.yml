@@ -10,6 +10,8 @@ jobs:
     timeout-minutes: 30
     # needs: test
     steps:
+      - run: npm -v
+      - run: node -v
       - uses: actions/checkout@v2
       - name: Cache pnpm modules
         uses: actions/cache@v2
@@ -25,7 +27,7 @@ jobs:
             args: [--frozen-lockfile, --strict-peer-dependencies]
       - run: pnpm lint
       - run: pnpm unit-test
-      # its fine, until we use version in bundle somewhere
+      # its fine until we don't use version in bundle somewhere
       - run: pnpm build
       - uses: GabrielBB/xvfb-action@v1.6
         with:

@@ -59,25 +59,6 @@
                     "command": "applySpecialSnippet",
                     "when": "false"
                 }
-            ],
-            "view/item/context": [
-                {
-                    "command": "revealSnippetInSettingsJson",
-                    "group": "inline",
-                    "when": "view =~ /^(globalSnippets|globalTypingSnippets|workspaceSnippets|workspaceTypingSnippets)$/"
-                }
-            ],
-            "view/title": [
-                {
-                    "command": "groupBy#none",
-                    "group": "1",
-                    "when": "view =~ /^(globalSnippets|globalTypingSnippets|workspaceSnippets|workspaceTypingSnippets)$/"
-                },
-                {
-                    "command": "groupBy#language",
-                    "group": "1",
-                    "when": "view =~ /^(globalSnippets|globalTypingSnippets|workspaceSnippets|workspaceTypingSnippets)$/"
-                }
             ]
         },
         "views": {
@@ -113,7 +94,7 @@
                     "id": "betterSnippets",
                     "title": "Better Snippets",
                     "icon": "$(file-code)"
-                }
+                },
             ]
         },
         "submenus": [
@@ -122,12 +103,7 @@
                 "label": "test"
             }
         ],
-        "typescriptServerPlugins": [
-            {
-                "name": "better-snippets-typescript-plugin",
-                "enableForWorkspaceTypeScriptVersions": true
-            }
-        ]
+        "betterSnippetsEngineExtension": true
     },
     "activationEvents": [
         "*"
@@ -144,7 +120,7 @@
         "build": "vscode-framework build && node buildTsPlugin.mjs",
         "watch-plugin": "tsc -p typescript-plugin -w",
         "integration-test": "tsc -p tsconfig.test.json && node testsOut/runTests.js",
-        "integration-test:watch": "tsc-watch -p tsconfig.test.json --onSuccess \"node testsOut/runTests.js\"",
+        "integration-test:watch": "chokidar \"test/integration/**\" -c \"pnpm integration-test\" --initial",
         "unit-test": "vitest --globals",
         "test": "vitest --globals --run && pnpm integration-test",
         "lint": "eslint src/**/*.ts",
@@ -154,7 +130,10 @@
         "overrides": {
             "esbuild": "^0.14.10",
             "typescript-json-schema": "^0.53.0"
-        }
+        },
+        "neverBuiltDependencies": [
+            "playwright"
+        ]
     },
     "devDependencies": {
         "@milahu/patch-package-with-pnpm-support": "^6.4.8",
@@ -165,8 +144,8 @@
         "@types/mocha": "^9.1.0",
         "@types/node": "^16.11.25",
         "@types/path-browserify": "^1.0.0",
-        "@types/vscode": "^1.64.0",
-        "@vscode/test-electron": "^2.1.2",
+        "@types/vscode": "1.64.0",
+        "@vscode/test-electron": "^2.1.5",
         "@zardoy/tsconfig": "^1.4.0",
         "cross-env": "^7.0.3",
         "eslint": "^8.9.0",
@@ -180,10 +159,10 @@
         "vscode-manifest": "^0.0.8"
     },
     "dependencies": {
-        "@zardoy/utils": "^0.0.4",
-        "@zardoy/vscode-utils": "^0.0.16",
-        "better-snippets-typescript-plugin": "workspace:*",
+        "@zardoy/utils": "^0.0.7",
+        "@zardoy/vscode-utils": "^0.0.28",
         "chai": "^4.3.6",
+        "chokidar-cli": "^3.0.0",
         "delay": "^5.0.0",
         "esbuild": "^0.14.10",
         "escape-string-regexp": "^5.0.0",
@@ -196,7 +175,6 @@
         "rambda": "^6.9.0",
         "string-dedent": "^2.0.0",
         "ts-essentials": "^9.1.2",
-        "tsc-watch": "^4.6.0",
         "type-fest": "^2.11.2",
         "typed-jsonfile": "^0.2.1",
         "vscode-framework": "^0.0.18",
@@ -209,6 +187,12 @@
         "tabWidth": 4,
         "trailingComma": "all",
         "arrowParens": "avoid",
-        "printWidth": 150
+        "printWidth": 160,
+        "endOfLine": "auto"
+    },
+    "release": {
+        "preset": {
+            "runTest": false
+        }
     }
 }

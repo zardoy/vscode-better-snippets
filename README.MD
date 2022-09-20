@@ -6,7 +6,7 @@ It's a TypeScript-oriented extension, however it can also be used with other lan
 
 The main setting is `betterSnippets.customSnippets`: **[example usage](./test/snippets.jsonc)**.
 
-Snippets in VSCode are always contextless, they will be suggested in comments, string, everywhere. You can only restrict them showing only in specific language IDs, however this extension let you can control:
+Snippets in VSCode are always contextless, they will be suggested in comments, string, everywhere. You can only restrict them showing only in specific languages, however this extension let you can control:
 
 - Snippet Icon (with `iconType`, `fileIcon` or `folderIcon`)
 - Snippet Sorting (with `sortText`, you can boost suggestion to top or bottom)
@@ -17,8 +17,6 @@ Snippets in VSCode are always contextless, they will be suggested in comments, s
 This can give extreme control for your snippets.
 
 You can use this extension instead of builtin snippets.
-
-<!-- So, basically I just turned off snippet suggestion by setting `editor.suggest.showSnippets` to `false` and migrated all my snippets to this extension. -->
 
 Just because snippets are now aware of context, you can configure them to **always** show on top and/or show them only when exact snippet prefix is typed.
 
@@ -49,9 +47,17 @@ Configuration:
 
 Note that:
 
-- some features from snippets such as `resolveImports` or `when` clause are supported
-- any cursor movement (using arrows or mouse) will reset the typing sequence
-- they don't work with multiple selections (when there are multiple cursor in editor)
+- almost all features from snippets such as `resolveImports` or `when` clause are supported!
+- any cursor movement (using arrows or mouse) will reset the typing sequence, `\n` can't be part of sequence
+- they work with multiple selections (in multicursor mode, can be disabled)
+
+## Snippet Features Demo
+
+> Below are demos. See config for these demos above in *example usage*
+
+### Auto Imports
+
+![vscode javascript auto imports](https://user-images.githubusercontent.com/46503702/188254222-64fbf138-de7c-49a0-8237-cf62bf678c57.gif)
 
 ## TypeScript-only features
 

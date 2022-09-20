@@ -1,6 +1,5 @@
-import { normalizeLanguages as normalizeLanguagesOriginal, areLangsEquals } from '@zardoy/vscode-utils/build/langs'
+import { normalizeLanguages as normalizeLanguagesOriginal, areLangsEquals, defaultLanguageSupersets } from '@zardoy/vscode-utils/build/langs'
 import { vi } from 'vitest'
-import { defaultLanguageSupersets } from '../../src/configurationType'
 
 vi.mock('vscode', () => ({}))
 

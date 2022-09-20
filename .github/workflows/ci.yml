@@ -12,6 +12,7 @@ jobs:
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v2
+      - run: npx prettier --check src/**
       - name: Cache pnpm modules
         uses: actions/cache@v2
         with:

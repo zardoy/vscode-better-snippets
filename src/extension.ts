@@ -8,16 +8,17 @@ import { SnippetParser } from 'vscode-snippet-parser'
 import { mergeDeepRight, partition } from 'rambda'
 import { DeepRequired } from 'ts-essentials'
 import { extensionCtx, getExtensionCommandId, getExtensionSetting, getExtensionSettingId, registerActiveDevelopmentCommand } from 'vscode-framework'
-import { omitObj, oneOf, pickObj } from '@zardoy/utils'
+import { ensureHasProp, omitObj, oneOf, pickObj } from '@zardoy/utils'
 import escapeStringRegexp from 'escape-string-regexp'
 import { getActiveRegularEditor } from '@zardoy/vscode-utils'
 import { Configuration } from './configurationType'
-import { normalizeFilePathRegex } from './util'
+import { completionAddTextEdit, normalizeFilePathRegex } from './util'
 import { builtinSnippets } from './builtinSnippets'
 import { registerExperimentalSnippets } from './experimentalSnippets'
 import { CompletionInsertArg, registerCompletionInsert } from './completionInsert'
 import { registerSpecialCommand } from './specialCommand'
 import { registerCreateSnippetFromSelection } from './createSnippetFromSelection'
+import settingsHelper from './settingsHelper'
 import { registerViews } from './views'
 import { registerRevealSnippetInSettingsJson } from './revealSnippetInSettingsJson'
 
@@ -61,7 +62,7 @@ export const activate = () => {
         /** end position */
         position: vscode.Position,
         displayLanguage = document.languageId,
-    ): Array<Omit<T, 'body'> & { body: string }> => {
+    ): Array<T & { body: T extends CustomSnippet ? string : string | false }> => {
         const log = (...args) => console.log(`[${debugType}]`, ...args)
         const debug = (...args) => console.debug(`[${debugType}]`, ...args)
         log(displayLanguage, 'for', snippets.length, 'snippets')
@@ -163,7 +164,10 @@ export const activate = () => {
                 regexFails(snippetDefaults.when.pathRegex, docPath, 'snippetDefaults.when.pathRegex') ||
                 regexFails(normalizeFilePathRegex(regexes.pathRegex, fileType), docPath, 'snippet.pathRegex') ||
                 regexFails(regexes.lineHasRegex, lineText, 'snippet.lineHasRegex') ||
-                regexFails(regexes.lineRegex, lineText.slice(0, position.character), 'snippet.lineRegex')
+                regexFails(regexes.lineRegex, lineText.slice(0, position.character), 'snippet.lineRegex') ||
+                ('sequence' in snippet &&
+                    'lineBeforeRegex' in regexes &&
+                    regexFails(regexes.lineBeforeRegex, lineText.slice(0, position.character - snippet.sequence.length), 'snippet.lineRegexBefore'))
             )
                 continue
             for (const location of locations)
@@ -175,10 +179,11 @@ export const activate = () => {
                 ) {
                     log(`Snippet ${name} included. Reason: ${location}`)
                     let newBody = Array.isArray(body) ? body.join('\n') : body
-                    for (const [groupName, groupValue] of Object.entries(regexGroups))
-                        newBody = newBody.replace(new RegExp(`(?<!\\\\)${escapeStringRegexp(`$${groupName}`)}`, 'g'), groupValue)
+                    if (newBody !== false)
+                        for (const [groupName, groupValue] of Object.entries(regexGroups))
+                            newBody = newBody.replace(new RegExp(`(?<!\\\\)${escapeStringRegexp(`$${groupName}`)}`, 'g'), groupValue)
 
-                    includedSnippets.push({ ...snippet, body: newBody })
+                    includedSnippets.push({ ...snippet, body: newBody as string })
                 }
         }
 
@@ -203,77 +208,107 @@ export const activate = () => {
         ]
 
         const registerSnippets = (snippetsToLoad: Configuration['customSnippets']) => {
-            const snippetsByLanguage: { [language: string]: CustomSnippet[] } = {}
+            const snippetsByLanguage: { [language: string]: { snippets: CustomSnippet[]; snippetsByTriggerChar: Record<string, CustomSnippet[]> } } = {}
             for (const snippetToLoad of snippetsToLoad) {
                 const customSnippet = mergeSnippetWithDefaults(snippetToLoad)
                 for (const language of customSnippet.when.languages) {
-                    if (!snippetsByLanguage[language]) snippetsByLanguage[language] = []
-                    snippetsByLanguage[language]!.push(mergeSnippetWithDefaults(customSnippet))
+                    if (!snippetsByLanguage[language]) snippetsByLanguage[language] = { snippets: [], snippetsByTriggerChar: {} }
+                    const snippet = mergeSnippetWithDefaults(customSnippet)
+                    for (const triggerChar of snippet.when.triggerCharacters ?? [''])
+                        if (triggerChar === '') snippetsByLanguage[language]!.snippets.push(snippet)
+                        else ensureHasProp(snippetsByLanguage[language]!.snippetsByTriggerChar, triggerChar, []).push(snippet)
                 }
             }
 
             const completionProviderDisposables = [] as vscode.Disposable[]
-            for (const [language, snippets] of Object.entries(snippetsByLanguage)) {
+            for (const [language, { snippets, snippetsByTriggerChar }] of Object.entries(snippetsByLanguage)) {
                 let triggerFromInner = false
-                const disposable = vscode.languages.registerCompletionItemProvider(normalizeLanguages(language, langsSupersets), {
-                    provideCompletionItems(document, position, _token, context) {
-                        // if (context.triggerKind !== vscode.CompletionTriggerKind.Invoke) return
-                        if (triggerFromInner) {
-                            triggerFromInner = false
-                            return []
-                        }
+                const disposable = vscode.languages.registerCompletionItemProvider(
+                    normalizeLanguages(language, langsSupersets),
+                    {
+                        provideCompletionItems(document, position, _token, { triggerCharacter }) {
+                            // if (context.triggerKind !== vscode.CompletionTriggerKind.Invoke) return
+                            if (triggerFromInner) {
+                                triggerFromInner = false
+                                return []
+                            }
 
-                        const includedSnippets = getCurrentSnippets('completion', snippets, document, position, language)
-                        return includedSnippets.map(
-                            ({ body, name, sortText, executeCommand, resolveImports, fileIcon, folderIcon, description, iconType, group, type }) => {
-                                if (group) description = group
-                                if (type) iconType = type as any
-                                //
-                                const completion = new vscode.CompletionItem(
-                                    { label: name, description },
-                                    vscode.CompletionItemKind[iconType as string | number],
-                                )
-                                completion.sortText = sortText
-                                const snippetString = new vscode.SnippetString(body)
-                                completion.insertText = snippetString
-                                const snippetPreview = new vscode.MarkdownString().appendCodeblock(new SnippetParser().text(body), document.languageId)
-                                if (fileIcon) {
-                                    completion.kind = vscode.CompletionItemKind.File
-                                    completion.detail = fileIcon
-                                }
+                            const snippetsToCheck = triggerCharacter ? snippetsByTriggerChar[triggerCharacter] : snippets
+                            if (!snippetsToCheck) return
 
-                                if (folderIcon) {
-                                    completion.kind = vscode.CompletionItemKind.Folder
-                                    completion.detail = folderIcon
-                                }
-
-                                completion.documentation = snippetPreview
-                                if (resolveImports) {
-                                    const arg: CompletionInsertArg = {
-                                        action: 'resolve-imports',
-                                        importsConfig: resolveImports,
-                                        insertPos: position,
-                                        snippetLines: body.split('\n').length,
-                                    }
-                                    completion.command = {
-                                        command: getExtensionCommandId('completionInsert'),
-                                        title: '',
-                                        arguments: [arg],
-                                    }
-                                }
-
-                                if (executeCommand)
-                                    completion.command = {
-                                        ...(typeof executeCommand === 'string' ? { command: executeCommand } : executeCommand),
-                                        title: '',
+                            const includedSnippets = getCurrentSnippets('completion', snippetsToCheck, document, position, language)
+                            return includedSnippets.map(
+                                ({
+                                    body,
+                                    name,
+                                    sortText,
+                                    executeCommand,
+                                    resolveImports,
+                                    fileIcon,
+                                    folderIcon,
+                                    description,
+                                    iconType,
+                                    group,
+                                    type,
+                                    replaceTriggerCharacter,
+                                }) => {
+                                    if (group) description = group
+                                    if (type) iconType = type as any
+                                    //
+                                    const completion = new vscode.CompletionItem(
+                                        { label: name, description },
+                                        vscode.CompletionItemKind[iconType as string | number],
+                                    )
+                                    completion.sortText = sortText
+                                    const snippetString = new vscode.SnippetString(body)
+                                    completion.insertText = snippetString
+                                    const snippetPreview = new vscode.MarkdownString().appendCodeblock(new SnippetParser().text(body), document.languageId)
+                                    if (fileIcon) {
+                                        completion.kind = vscode.CompletionItemKind.File
+                                        completion.detail = fileIcon
                                     }
 
-                                if (!body || !completion.documentation) completion.documentation = undefined
-                                return completion
-                            },
-                        )
+                                    if (folderIcon) {
+                                        completion.kind = vscode.CompletionItemKind.Folder
+                                        completion.detail = folderIcon
+                                    }
+
+                                    completion.documentation = snippetPreview
+                                    if (resolveImports) {
+                                        const arg: CompletionInsertArg = {
+                                            action: 'resolve-imports',
+                                            importsConfig: resolveImports,
+                                            insertPos: position,
+                                            snippetLines: body.split('\n').length,
+                                        }
+                                        completion.command = {
+                                            command: getExtensionCommandId('completionInsert'),
+                                            title: '',
+                                            arguments: [arg],
+                                        }
+                                    }
+
+                                    if (executeCommand)
+                                        completion.command = {
+                                            ...(typeof executeCommand === 'string' ? { command: executeCommand } : executeCommand),
+                                            title: '',
+                                        }
+
+                                    if (!body || !completion.documentation) completion.documentation = undefined
+
+                                    if (triggerCharacter && replaceTriggerCharacter)
+                                        completionAddTextEdit(completion, {
+                                            newText: '',
+                                            range: new vscode.Range(position.translate(0, -1), position),
+                                        })
+
+                                    return completion
+                                },
+                            )
+                        },
                     },
-                })
+                    ...Object.keys(snippetsByTriggerChar),
+                )
                 completionProviderDisposables.push(disposable)
             }
 
@@ -289,10 +324,20 @@ export const activate = () => {
             const typingSnippets = typingSnippetsToLoad.map(snippet => mergeSnippetWithDefaults(snippet))
             let lastTypedSeq = ''
             let lastTypePosition = null as null | vscode.Position
-            const resetSelection = () => {
+
+            // for easier debuging during development
+            const statusBarSeq = process.env.NODE_ENV === 'development' ? vscode.window.createStatusBarItem() : undefined
+            statusBarSeq?.show()
+            if (statusBarSeq) disposables.push(statusBarSeq)
+            const updateStatusBarSeq = () => {
+                if (statusBarSeq) statusBarSeq.text = `[${lastTypedSeq}]`
+            }
+
+            updateStatusBarSeq()
+            const resetSequence = () => {
                 lastTypedSeq = ''
                 lastTypePosition = null
-                console.debug('[typing] Selection reset')
+                updateStatusBarSeq()
             }
 
             // TODO review implementation as its still blurry. Describe it graphically
@@ -302,25 +347,43 @@ export const activate = () => {
                 // TODO losing errors here for some reason
                 vscode.workspace.onDidChangeTextDocument(({ contentChanges, document, reason }) => {
                     ;(async () => {
+                        // ignore if nothing is changed
+                        if (contentChanges.length === 0) return
                         const editor = vscode.window.activeTextEditor
-                        if (document.uri !== editor?.document.uri) return
-                        if (internalDocumentChange || vscode.workspace.fs.isWritableFileSystem(document.uri.scheme) !== true) return
+                        if (document.uri !== editor?.document.uri || ['output'].includes(editor.document.uri.scheme)) return
+                        if (internalDocumentChange || vscode.workspace.fs.isWritableFileSystem(document.uri.scheme) === false) return
 
                         if (oneOf(reason, vscode.TextDocumentChangeReason.Undo, vscode.TextDocumentChangeReason.Redo)) {
-                            resetSelection()
+                            resetSequence()
                             return
                         }
 
+                        // since we don't work with selections (only cursor positions) we compare them by start
+                        // ensure we ALWAYS work with first position only in case of multicursor
+                        contentChanges = [...contentChanges].sort((a, b) => a.range.start.compareTo(b.range.start))
+                        const char = contentChanges[0]?.text
                         // also reseting on content pasting
-                        // TODO use typeof equals
-                        if (contentChanges.length !== 1 || contentChanges[0]!.text.length !== 1) {
-                            resetSelection()
+                        if (char?.length !== 1) {
+                            resetSequence()
                             return
                         }
 
-                        lastTypedSeq += contentChanges[0]!.text
+                        if (!getExtensionSetting('typingSnippetsEnableMulticursor') && contentChanges.length > 1) {
+                            resetSequence()
+                            return
+                        }
 
-                        const originalPos = contentChanges[0]!.range.end
+                        // ensure true multicursor typing
+                        if (contentChanges.some(({ text }) => text !== char)) {
+                            resetSequence()
+                            return
+                        }
+
+                        const originalPos = contentChanges[0]!.range.start
+
+                        lastTypedSeq += char
+                        updateStatusBarSeq()
+
                         lastTypePosition = originalPos
                         // we're always ahead of 1 character
                         const endPosition = originalPos.translate(0, 1)
@@ -337,23 +400,48 @@ export const activate = () => {
                         const snippet = appliableTypingSnippets[0]
                         if (!snippet) return
                         console.log('Applying typing snippet', snippet.sequence)
-                        const startPosition = endPosition.translate(0, -snippet.sequence.length)
                         const { body, executeCommand, resolveImports } = snippet
-                        await new Promise<void>(resolve => {
-                            internalDocumentChange = true
-                            const { dispose } = vscode.workspace.onDidChangeTextDocument(({ document }) => {
-                                if (document.uri !== editor?.document.uri) return
-                                internalDocumentChange = false
-                                dispose()
-                                resolve()
-                            })
-                            void editor.edit(builder => builder.delete(new vscode.Selection(startPosition, endPosition)), {
-                                undoStopBefore: getExtensionSetting('typingSnippetsUndoStops'),
-                                undoStopAfter: false,
-                            })
-                        })
+                        if (body !== false)
+                            // #region remove sequence content
+                            await new Promise<void>(resolve => {
+                                internalDocumentChange = true
+                                const { dispose } = vscode.workspace.onDidChangeTextDocument(({ document }) => {
+                                    if (document.uri !== editor?.document.uri) return
+                                    internalDocumentChange = false
+                                    dispose()
+                                    resolve()
+                                })
+                                void editor.edit(
+                                    builder => {
+                                        let previousLineNum = -1
+                                        let sameLinePos = 0
+                                        for (const { range } of contentChanges) {
+                                            // we can safely do this, as contentChanges are sorted
+                                            if (previousLineNum === range.start.line) {
+                                                sameLinePos++
+                                            } else {
+                                                previousLineNum = range.start.line
+                                                sameLinePos = 0
+                                            }
 
-                        await editor.insertSnippet(new vscode.SnippetString(body))
+                                            // start = end, which indicates where a character was typed,
+                                            // so we're always ahead of 1+N character, where N is zero-based number of position on the same line
+                                            // because of just typed letter + just typed letter in previous positions
+                                            const endPosition = range.start.translate(0, 1 + sameLinePos)
+                                            // eslint-disable-next-line unicorn/consistent-destructuring
+                                            const startPosition = endPosition.translate(0, -snippet.sequence.length)
+                                            builder.delete(new vscode.Range(startPosition, endPosition))
+                                        }
+                                    },
+                                    {
+                                        undoStopBefore: getExtensionSetting('typingSnippetsUndoStops'),
+                                        undoStopAfter: false,
+                                    },
+                                )
+                            })
+                        // #endregion
+
+                        if (body !== false) await editor.insertSnippet(new vscode.SnippetString(body))
                         if (executeCommand) {
                             // TODO extract fn
                             const command = typeof executeCommand === 'string' ? { command: executeCommand, arguments: [] } : executeCommand
@@ -361,11 +449,12 @@ export const activate = () => {
                         }
 
                         if (resolveImports) {
+                            const startPosition = endPosition.translate(0, -snippet.sequence.length)
                             const arg: CompletionInsertArg = {
                                 action: 'resolve-imports',
                                 importsConfig: resolveImports,
                                 insertPos: startPosition,
-                                snippetLines: body.split('\n').length,
+                                snippetLines: body === false ? 1 : body.split('\n').length,
                             }
                             await vscode.commands.executeCommand(getExtensionCommandId('completionInsert'), arg)
                         }
@@ -374,13 +463,24 @@ export const activate = () => {
                 vscode.window.onDidChangeTextEditorSelection(({ textEditor, kind, selections }) => {
                     const { document } = textEditor
                     if (document.uri !== vscode.window.activeTextEditor?.document.uri) return
-                    if (oneOf(kind, vscode.TextEditorSelectionChangeKind.Mouse) || selections.length > 1 || !selections[0]!.start.isEqual(selections[0]!.end)) {
-                        resetSelection()
+                    // reset on mouse click
+                    if (oneOf(kind, vscode.TextEditorSelectionChangeKind.Mouse)) {
+                        resetSequence()
                         return
                     }
 
-                    if (!lastTypePosition || !lastTypePosition.isEqual(selections[0]!.end)) return
-                    resetSelection()
+                    // we do the same in onDidChangeTextDocument
+                    selections = [...selections].sort((a, b) => a.start.compareTo(b.start))
+                    const newPos = selections[0]!.start
+                    // reset on selection start
+                    if (!selections[0]!.start.isEqual(newPos)) {
+                        resetSequence()
+                        return
+                    }
+
+                    // curosr moved from last TYPING position or
+                    // curosr moved to the start of line: reset sequence!
+                    if (lastTypePosition && (newPos.character === 0 || !lastTypePosition.isEqual(newPos.translate(0, -1)))) resetSequence()
                 }),
             )
         }
@@ -408,36 +508,9 @@ export const activate = () => {
     registerCompletionInsert()
     registerSpecialCommand()
     registerCreateSnippetFromSelection()
+    settingsHelper()
     registerViews()
     registerRevealSnippetInSettingsJson()
-
-    registerActiveDevelopmentCommand(async () => {
-        const editor = getActiveRegularEditor()!
-        const result = await vscode.commands.executeCommand('typescript.tsserverRequest', 'completionInfo', {
-            _: '%%%',
-            file: editor.document.uri.path,
-            line: 0,
-            offset: 0,
-        })
-        console.log(result)
-    })
-
-    void activateTsPlugin()
-}
-
-const activateTsPlugin = async () => {
-    const tsExtension = vscode.extensions.getExtension('vscode.typescript-language-features')
-    if (!tsExtension) return
-
-    await tsExtension.activate()
-
-    // Get the API from the TS extension
-    if (!tsExtension.exports || !tsExtension.exports.getAPI) return
-
-    const api = tsExtension.exports.getAPI(0)
-    if (!api) return
-
-    api.configurePlugin('better-snippets-typescript-plugin', {})
 }
 
 const unmergedSnippetDefaults: DeepRequired<Configuration['customSnippetDefaults']> = {

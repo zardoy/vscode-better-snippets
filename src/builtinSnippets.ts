@@ -45,10 +45,12 @@ export const builtinSnippets: Configuration['customSnippets'] = (
             when: {
                 locations: ['lineStart'],
                 languages: ['react'],
-                otherLines: [{
-                    indent: -1,
-                    testRegex: "function|=>|React.FC"
-                }]
+                otherLines: [
+                    {
+                        indent: -1,
+                        testRegex: 'function|=>|React.FC',
+                    },
+                ],
             },
         },
         // md

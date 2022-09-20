@@ -1,5 +1,5 @@
 // GENERATED. DON'T EDIT MANUALLY
-// md5hash: 6bd9ef0e9cb15b04e7c3494b19a490ee
+// md5hash: 7d732347733c9ebc36a37d9b2b7de42c
 {
     "type": "object",
     "properties": {
@@ -30,25 +30,6 @@
                     {
                         "type": "object",
                         "properties": {
-                            "body": {
-                                "suggestSortText": "2",
-                                "defaultSnippets": [
-                                    {
-                                        "body": "$1"
-                                    }
-                                ],
-                                "anyOf": [
-                                    {
-                                        "type": "array",
-                                        "items": {
-                                            "type": "string"
-                                        }
-                                    },
-                                    {
-                                        "type": "string"
-                                    }
-                                ]
-                            },
                             "when": {
                                 "suggestSortText": "3",
                                 "type": "object",
@@ -284,6 +265,11 @@
                             },
                             "executeCommand": {
                                 "description": "Execute custom command on snippet accept, doesn't work with resolveImports",
+                                "defaultSnippets": [
+                                    {
+                                        "body": "$1"
+                                    }
+                                ],
                                 "anyOf": [
                                     {
                                         "type": "object",
@@ -306,14 +292,30 @@
                                     }
                                 ]
                             }
-                        },
-                        "required": [
-                            "body"
-                        ]
+                        }
                     },
                     {
                         "type": "object",
                         "properties": {
+                            "body": {
+                                "suggestSortText": "2",
+                                "defaultSnippets": [
+                                    {
+                                        "body": "$1"
+                                    }
+                                ],
+                                "anyOf": [
+                                    {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    {
+                                        "type": "string"
+                                    }
+                                ]
+                            },
                             "name": {
                                 "suggestSortText": "!",
                                 "type": "string"
@@ -321,6 +323,18 @@
                             "description": {
                                 "description": "Should be short. Always displayed in completion widget on the same raw as label.",
                                 "type": "string"
+                            },
+                            "when": {
+                                "type": "object",
+                                "properties": {
+                                    "triggerCharacters": {
+                                        "description": "The snippet will be visible only after typing specific character on the keyboard\nAdd '' (empty string) so it'll be visible after regular triggering or typing",
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
                             },
                             "group": {
                                 "type": "string"
@@ -375,11 +389,17 @@
                                     }
                                 ]
                             },
+                            "replaceTriggerCharacter": {
+                                "description": "Only if `when.triggerCharacters` is used",
+                                "default": false,
+                                "type": "boolean"
+                            },
                             "type": {
                                 "type": "string"
                             }
                         },
                         "required": [
+                            "body",
                             "name"
                         ]
                     }
@@ -394,25 +414,6 @@
                     {
                         "type": "object",
                         "properties": {
-                            "body": {
-                                "suggestSortText": "2",
-                                "defaultSnippets": [
-                                    {
-                                        "body": "$1"
-                                    }
-                                ],
-                                "anyOf": [
-                                    {
-                                        "type": "array",
-                                        "items": {
-                                            "type": "string"
-                                        }
-                                    },
-                                    {
-                                        "type": "string"
-                                    }
-                                ]
-                            },
                             "when": {
                                 "suggestSortText": "3",
                                 "type": "object",
@@ -648,6 +649,11 @@
                             },
                             "executeCommand": {
                                 "description": "Execute custom command on snippet accept, doesn't work with resolveImports",
+                                "defaultSnippets": [
+                                    {
+                                        "body": "$1"
+                                    }
+                                ],
                                 "anyOf": [
                                     {
                                         "type": "object",
@@ -670,21 +676,54 @@
                                     }
                                 ]
                             }
-                        },
-                        "required": [
-                            "body"
-                        ]
+                        }
                     },
                     {
                         "type": "object",
                         "properties": {
+                            "body": {
+                                "description": "If `false` sequence will not be removed, useful for just executing post actions such as commands",
+                                "suggestSortText": "2",
+                                "defaultSnippets": [
+                                    {
+                                        "body": "$1"
+                                    }
+                                ],
+                                "anyOf": [
+                                    {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    {
+                                        "enum": [
+                                            false
+                                        ],
+                                        "type": "boolean"
+                                    },
+                                    {
+                                        "type": "string"
+                                    }
+                                ]
+                            },
                             "sequence": {
                                 "description": "Snippet will be accepted only after typing THE EXACT sequence of characters on the keyboard. Using arrows or mouse for navigating will reset the sequence (see settings)",
                                 "suggestSortText": "!",
                                 "type": "string"
+                            },
+                            "when": {
+                                "type": "object",
+                                "properties": {
+                                    "lineBeforeRegex": {
+                                        "description": "Recommnded instead of `lineRegex`, tests against what is before current snippet in the line\nExample:\n| - cursor, [...] - check position\nFor regular snippet `test` end position is before current word:\n`[before] test|`, `[before] beforetest|`,\nTyping snippet: cb\n`[before]cb|`, `[before ]cb|`,",
+                                        "type": "string"
+                                    }
+                                }
                             }
                         },
                         "required": [
+                            "body",
                             "sequence"
                         ]
                     }
@@ -692,6 +731,11 @@
             }
         },
         "typingSnippetsUndoStops": {
+            "default": true,
+            "type": "boolean"
+        },
+        "typingSnippetsEnableMulticursor": {
+            "description": "Note that, currently regex are executed against first position only for now!",
             "default": true,
             "type": "boolean"
         },
@@ -1243,6 +1287,7 @@
         "snippetCreator.showSnippetAfterCreation",
         "typescriptLocations",
         "typingSnippets",
+        "typingSnippetsEnableMulticursor",
         "typingSnippetsUndoStops",
         "useParamMode"
     ]

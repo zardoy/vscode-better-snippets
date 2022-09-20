@@ -34,13 +34,6 @@ type TestProp =
 
 export type GeneralSnippet = {
     /**
-     * @suggestSortText "2"
-     * @defaultSnippets [{
-     *   "body": "$1"
-     * }]
-     */
-    body: string | string[]
-    /**
      * @suggestSortText "3"
      */
     when?: {
@@ -98,7 +91,12 @@ export type GeneralSnippet = {
             // export?: string // default or specifier if package is specified
         }
     }
-    /** Execute custom command on snippet accept, doesn't work with resolveImports */
+    /**
+     * Execute custom command on snippet accept, doesn't work with resolveImports
+     * @defaultSnippets [{
+     *   "body": "$1"
+     * }]
+     */
     executeCommand?: CommandDefinition /* | CommandDefinition[] */
 }
 
@@ -136,11 +134,26 @@ export type Configuration = {
     customSnippets: Array<
         GeneralSnippet & {
             /**
+             * @suggestSortText "2"
+             * @defaultSnippets [{
+             *   "body": "$1"
+             * }]
+             */
+            body: string | string[]
+            /**
              * @suggestSortText !
              */
             name: string
             /** Should be short. Always displayed in completion widget on the same raw as label. */
             description?: string
+            when?: {
+                /**
+                 * The snippet will be visible only after typing specific character on the keyboard
+                 * Add '' (empty string) so it'll be visible after regular triggering or typing
+                 * @length 1
+                 */
+                triggerCharacters?: string[]
+            }
             /** @deprecated */
             group?: string
             // formatting?: {
@@ -156,6 +169,11 @@ export type Configuration = {
             folderIcon?: string
             sortText?: string | null
             iconType?: SnippetType
+            /**
+             * Only if `when.triggerCharacters` is used
+             * @default false
+             */
+            replaceTriggerCharacter?: boolean
             /** @deprecated */
             type?: string
         }
@@ -166,14 +184,41 @@ export type Configuration = {
     typingSnippets: Array<
         GeneralSnippet & {
             /**
+             * If `false` sequence will not be removed, useful for just executing post actions such as commands
+             * @suggestSortText "2"
+             * @defaultSnippets [{
+             *   "body": "$1"
+             * }]
+             */
+            body: string | string[] | false
+            /**
              * Snippet will be accepted only after typing THE EXACT sequence of characters on the keyboard. Using arrows or mouse for navigating will reset the sequence (see settings)
              * @suggestSortText !
              */
             sequence: string
+            when?: {
+                // TODO support in regular snippets and move to GeneralSnippet
+                // TODO rewrite snippet example
+                /**
+                 * Recommnded instead of `lineRegex`, tests against what is before current snippet in the line
+                 * Example:
+                 * | - cursor, [...] - check position
+                 * For regular snippet `test` end position is before current word:
+                 * `[before] test|`, `[before] beforetest|`,
+                 * Typing snippet: cb
+                 * `[before]cb|`, `[before ]cb|`,
+                 */
+                lineBeforeRegex?: string
+            }
         }
     >
     /** @default true */
     typingSnippetsUndoStops: boolean
+    /**
+     * Note that, currently regex are executed against first position only for now!
+     * @default true
+     *  */
+    typingSnippetsEnableMulticursor: boolean
     // /** @default true Ask to which language add snippet, when adding native snippet, otherwise use current */
     // 'nativeSnippetCreator.askLanguageId': boolean
     // /** @default false */
