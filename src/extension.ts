@@ -1,4 +1,4 @@
-/* eslint-disable no-labels */
+/* eslint-disable complexity */
 /* eslint-disable max-depth */
 import * as vscode from 'vscode'
 import { normalizeRegex } from '@zardoy/vscode-utils/build/settings'
@@ -54,7 +54,6 @@ export const activate = () => {
             snippet,
         )
 
-    // eslint-disable-next-line complexity
     const getCurrentSnippets = <T extends CustomSnippet | CustomTypingSnippet>(
         debugType: 'completion' | 'typing',
         snippets: T[],
@@ -62,7 +61,7 @@ export const activate = () => {
         /** end position */
         position: vscode.Position,
         displayLanguage = document.languageId,
-    ): Array<T & { body: T extends CustomSnippet ? string : string | false }> => {
+    ): Array<Omit<T, 'body'> & { body: T extends CustomSnippet ? string : string | false }> => {
         const log = (...args) => console.log(`[${debugType}]`, ...args)
         const debug = (...args) => console.debug(`[${debugType}]`, ...args)
         log(displayLanguage, 'for', snippets.length, 'snippets')
@@ -401,6 +400,9 @@ export const activate = () => {
                         if (!snippet) return
                         console.log('Applying typing snippet', snippet.sequence)
                         const { body, executeCommand, resolveImports } = snippet
+                        // TODO continue exploration
+                        // const isSnippet = body !== false && /(?<!\\)\$/.exec(body)
+                        const isSnippet = true
                         if (body !== false)
                             // #region remove sequence content
                             await new Promise<void>(resolve => {
@@ -411,6 +413,7 @@ export const activate = () => {
                                     dispose()
                                     resolve()
                                 })
+                                const insertingBody = isSnippet ? undefined : body.replace(/\\\$/g, '$$')
                                 void editor.edit(
                                     builder => {
                                         let previousLineNum = -1
@@ -430,7 +433,9 @@ export const activate = () => {
                                             const endPosition = range.start.translate(0, 1 + sameLinePos)
                                             // eslint-disable-next-line unicorn/consistent-destructuring
                                             const startPosition = endPosition.translate(0, -snippet.sequence.length)
-                                            builder.delete(new vscode.Range(startPosition, endPosition))
+                                            const fixedRange = new vscode.Range(startPosition, endPosition)
+                                            builder.delete(fixedRange)
+                                            if (insertingBody) builder.insert(fixedRange.start, insertingBody)
                                         }
                                     },
                                     {
@@ -441,7 +446,7 @@ export const activate = () => {
                             })
                         // #endregion
 
-                        if (body !== false) await editor.insertSnippet(new vscode.SnippetString(body))
+                        if (body !== false && isSnippet) await editor.insertSnippet(new vscode.SnippetString(body))
                         if (executeCommand) {
                             // TODO extract fn
                             const command = typeof executeCommand === 'string' ? { command: executeCommand, arguments: [] } : executeCommand
