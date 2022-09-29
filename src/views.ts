@@ -7,7 +7,7 @@ import { RevealSnippetOptions } from './revealSnippetInSettingsJson'
 import { CustomSnippet, getSnippetsDefaults } from './extension'
 import { Configuration, GeneralSnippet } from './configurationType'
 
-const fsScheme = `${getExtensionContributionsPrefix()}virtualSnippets`
+const SCHEME = `${getExtensionContributionsPrefix()}virtualSnippets`
 
 const views = {
     'betterSnippets.globalSnippets': true,
@@ -18,7 +18,7 @@ const views = {
 type ViewType = keyof typeof views
 
 abstract class BaseTreeDataProvider implements vscode.TreeDataProvider<vscode.TreeItem> {
-    grouping: 'none' | 'byLang' = 'byLang'
+    grouping: 'none' | 'language' = 'language'
     hidden = true
 
     private readonly _onDidChangeTreeData: vscode.EventEmitter<vscode.TreeItem | undefined | void> = new vscode.EventEmitter<
@@ -67,7 +67,7 @@ class TreeDataProvider extends BaseTreeDataProvider {
         const getTreeItem = ({ label, description, originalIndex }: TreeProps) => {
             const treeItem = new vscode.TreeItem(label)
             treeItem.tooltip = 'Edit snippet'
-            // treeItem.resourceUri = vscode.Uri.from({ scheme: fsScheme, path: `${configKey}/${isLocal}/${originalIndex}` })
+            treeItem.resourceUri = vscode.Uri.from({ scheme: SCHEME, path: `${configKey}/${isLocal}/${originalIndex}` })
             treeItem.description = description
             //@ts-expect-error for button command
             treeItem.betterSnippets = {
@@ -84,8 +84,8 @@ class TreeDataProvider extends BaseTreeDataProvider {
                 workspaceValue = [],
                 workspaceFolderValue = [],
             } = vscode.workspace.getConfiguration(process.env.IDS_PREFIX, null).inspect<any[]>(configKey)!
-            const value = isLocal ? [...workspaceValue, ...workspaceFolderValue] : globalValue
-            return value.map((snippet, index) => ({
+            const settingValue = isLocal ? [...workspaceValue, ...workspaceFolderValue] : globalValue
+            return settingValue.map((snippet, index) => ({
                 ...snippet,
                 label: snippet.sequence ?? snippet.name,
                 originalIndex: index,
@@ -128,31 +128,29 @@ class TreeDataProvider extends BaseTreeDataProvider {
 
 export const registerViews = () => {
     // TODO! index updates!
-    // vscode.workspace.registerFileSystemProvider(fsScheme, {
-    //     createDirectory() {},
-    //     delete() {},
-    //     onDidChangeFile() {
-    //         return { dispose() {} }
-    //     },
-    //     readDirectory() {
-    //         return []
-    //     },
-    //     readFile(uri) {
-    //         const [configKey, isLocal, originalIndex] = uri.path.split('/')
-    //         return new TextEncoder().encode(getExtensionSetting(configKey! as any)[originalIndex!])
-    //     },
-    //     rename() {},
-    //     stat() {
-    //         return { ctime: 0, mtime: 0, size: 0, type: 0 }
-    //     },
-    //     watch() {
-    //         // TODO sync with the settings.json
-    //         return { dispose() {} }
-    //     },
-    //     writeFile(uri, content) {
-    //         console.log('write!', uri.toString())
-    //     },
-    // })
+    vscode.workspace.registerFileSystemProvider(SCHEME, {
+        createDirectory() {},
+        delete() {},
+        onDidChangeFile() {
+            return { dispose() {} }
+        },
+        readDirectory() {
+            return []
+        },
+        readFile(uri) {
+            const [configKey, isLocal, originalIndex] = uri.path.split('/')
+            return new TextEncoder().encode(getExtensionSetting(configKey! as any)[originalIndex!])
+        },
+        rename() {},
+        stat() {
+            return { ctime: 0, mtime: 0, size: 0, type: 0 }
+        },
+        watch() {
+            // TODO sync with the settings.json
+            return { dispose() {} }
+        },
+        writeFile(uri, content) {},
+    })
 
     const treeProviders: TreeDataProvider[] = []
 
@@ -178,17 +176,18 @@ export const registerViews = () => {
     }
 
     const groupByHandler: CommandHandler = ({ command }) => {
+        const newGrouping = command.split('#')[1]!
         for (const treeView of treeProviders) {
-            // eslint-disable-next-line sonarjs/no-duplicate-string
-            treeView.grouping = command === 'groupBy#language' ? 'byLang' : 'none'
+            treeView.grouping = newGrouping as any
             treeView.refresh()
         }
 
-        updateGroupingContext(command === 'groupBy#language' ? 'language' : 'none')
+        updateGroupingContext(newGrouping)
     }
 
     registerExtensionCommand('groupBy#none', groupByHandler)
     registerExtensionCommand('groupBy#language', groupByHandler)
+    // registerExtensionCommand('groupBy#extendsGroup', groupByHandler)
 
     updateGroupingContext('language')
 }
