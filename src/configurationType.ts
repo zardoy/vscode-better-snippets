@@ -1,5 +1,5 @@
 import * as vscode from 'vscode'
-import { SyntaxKind } from 'typescript/lib/tsserverlibrary'
+// import { SyntaxKind } from 'typescript/lib/tsserverlibrary'
 
 export type SnippetLocation = 'fileStart' | 'comment' | 'lineStart' | 'topLineStart' | 'code'
 
@@ -258,15 +258,17 @@ export type Configuration = {
      * Define/change family of languages. You can use family's name instead of language id in when.
      */
     // TODO default is set in prepare.ts
-    // * Note that family name can overlap with language id, contributed by other extension. If this is case rename the family or set it to null (in case if family is builtin)
+    /** Note that family name can overlap with language id, contributed by other extension. If this is case rename the family or set it to null (in case if family is builtin) */
     languageSupersets: { [family: string]: string[] }
-    typescriptLocations: {
-        [location: string]: {
-            mode: 'exclude' | 'include'
-            /** In which enable/disable tokens (final) */
-            kinds: keyof typeof SyntaxKind
-        }
-    }
+    /** Which editing method to use when clicked on the snippet from view */
+    'snippetsView.editor': 'settingsJson' | 'custom'
+    // typescriptLocations: {
+    //     [location: string]: {
+    //         mode: 'exclude' | 'include'
+    //         /** In which enable/disable tokens (final) */
+    //         kinds: keyof typeof SyntaxKind
+    //     }
+    // }
     /**
      * Experimental way to disable builtin snippets. Will be removed in future in favor of something else.
      * @uniqueItems true
