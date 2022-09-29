@@ -1,5 +1,5 @@
 // GENERATED. DON'T EDIT MANUALLY
-// md5hash: 14a86ddfaa3ee036b00bbd9d59fcb3d7
+// md5hash: eb03c76683a4ddeb7fc8ac5e9c15aedd
 {
     "type": "object",
     "properties": {
@@ -872,11 +872,24 @@
                 ],
                 "type": "string"
             }
+        },
+        "debugScopes": {
+            "uniqueItems": "",
+            "type": "array",
+            "items": {
+                "enum": [
+                    "resolveImports",
+                    "snippets",
+                    "snippetsRegexs"
+                ],
+                "type": "string"
+            }
         }
     },
     "required": [
         "customSnippetDefaults",
         "customSnippets",
+        "debugScopes",
         "diagnosticTimeout",
         "enableBuiltinSnippets",
         "enableExperimentalSnippets",

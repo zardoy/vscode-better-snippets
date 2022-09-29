@@ -274,4 +274,8 @@ export type Configuration = {
      * @uniqueItems true
      *  */
     'experimental.disableBuiltinSnippets': Array<'er' | 'et' | 'em' | 'ef' | 'ed' | 'useParam' | 'ts' | 'tsx' | 'codeblock' | 'dropdown'>
+    /**
+     * @uniqueItems
+     */
+    debugScopes: Array<'resolveImports' | 'snippetsRegexs' | 'snippets'>
 }
