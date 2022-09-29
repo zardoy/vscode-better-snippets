@@ -1,3 +1,4 @@
+/* eslint-disable max-depth */
 /* eslint-disable unicorn/consistent-destructuring */
 /* eslint-disable no-await-in-loop */
 import * as vscode from 'vscode'
@@ -17,6 +18,10 @@ export interface CompletionInsertArg {
 export const registerCompletionInsert = () => {
     registerExtensionCommand('completionInsert', async (_, execArg: CompletionInsertArg) => {
         const { action, importsConfig, insertPos, snippetLines, useExistingDiagnosticsPooling } = execArg
+        const {
+            document,
+            selection: { active: position },
+        } = vscode.window.activeTextEditor!
         if (action === 'resolve-imports') {
             const editor = vscode.window.activeTextEditor!
             const { document } = editor
@@ -24,11 +29,20 @@ export const registerCompletionInsert = () => {
             let observed = false
             const missingIdentifiers = new Set<string>()
             const resolveIdentifiers = new Set<string>()
+            interface DiagnosticInterface {
+                code: number
+                message: string
+                range: vscode.Range
+            }
             const observeDiagnosticsChanges = async ({ uris }) => {
                 observed = true
                 if (!uris.includes(activeEditorUri)) return
-                console.log('document diagnostic changed')
+                console.debug('document diagnostic changed')
                 const diagnostics = vscode.languages.getDiagnostics(activeEditorUri)
+                await handleDiagnostics(diagnostics as DiagnosticInterface[])
+            }
+
+            const handleDiagnostics = async (diagnostics: DiagnosticInterface[]) => {
                 for (const problem of diagnostics) {
                     const { range } = problem
                     if (!new vscode.Range(insertPos, insertPos.translate(snippetLines)).intersection(range) || !oneOf(problem.code, 2552, 2304)) continue
@@ -68,28 +82,55 @@ export const registerCompletionInsert = () => {
                             },
                         )
                     else console.warn(`[resolve ${missingIdentifier}] No edit in`, codeAction)
+                    break
                 }
             }
 
-            if (useExistingDiagnosticsPooling !== undefined) {
-                void observeDiagnosticsChanges({ uris: [document.uri] })
-                if (useExistingDiagnosticsPooling !== 0)
-                    // pooling TS codeactions
-                    for (const i of range(0, Math.floor(getExtensionSetting('diagnosticTimeout') / useExistingDiagnosticsPooling))) {
-                        await delay(useExistingDiagnosticsPooling)
-                        void observeDiagnosticsChanges({ uris: [document.uri] })
+            try {
+                const { uri } = document
+                let requestFile = uri.fsPath
+                if (uri.scheme !== 'file') requestFile = `^/${uri.scheme}/${uri.authority || 'ts-nul-authority'}/${uri.path.replace(/^\//, '')}`
+                const result = (await vscode.commands.executeCommand('typescript.tsserverRequest', 'semanticDiagnosticsSync', {
+                    _: '%%%',
+                    file: requestFile,
+                    line: position.line + 1,
+                    offset: position.character + 1,
+                })) as any
+                if (!result?.body) throw new Error('no body in response')
+                const tsNormalizePos = ({ line, offset }: { line; offset }) => new vscode.Position(line - 1, offset - 1)
+                const diagnostics: DiagnosticInterface[] = result.body.map(
+                    ({ start, end, text, code }): DiagnosticInterface => ({
+                        code,
+                        message: text,
+                        range: new vscode.Range(tsNormalizePos(start), tsNormalizePos(end)),
+                    }),
+                )
+                await handleDiagnostics(diagnostics)
+            } catch {
+                if (useExistingDiagnosticsPooling !== undefined) {
+                    void observeDiagnosticsChanges({ uris: [document.uri] })
+                    if (useExistingDiagnosticsPooling !== 0)
+                        // pooling TS codeactions
+                        for (const i of range(0, Math.floor(getExtensionSetting('diagnosticTimeout') / useExistingDiagnosticsPooling))) {
+                            await delay(useExistingDiagnosticsPooling)
+                            void observeDiagnosticsChanges({ uris: [document.uri] })
+                        }
+                }
+
+                const disposable = vscode.languages.onDidChangeDiagnostics(observeDiagnosticsChanges)
+                setTimeout(async () => {
+                    disposable.dispose()
+                    if (!observed) {
+                        console.log('diagnostic timeout')
+                        return
                     }
+
+                    await warnPackageIsNotInstalled()
+                }, getExtensionSetting('diagnosticTimeout'))
             }
 
-            const langsSupersets = getExtensionSetting('languageSupersets')
-            const disposable = vscode.languages.onDidChangeDiagnostics(observeDiagnosticsChanges)
-            setTimeout(async () => {
-                disposable.dispose()
-                if (!observed) {
-                    console.log('diagnostic timeout')
-                    return
-                }
-
+            const warnPackageIsNotInstalled = async () => {
+                const langsSupersets = getExtensionSetting('languageSupersets')
                 // Below: warn about failed to import missing identifiers from resolveImports
                 /** parsed */
                 const missing = [...missingIdentifiers.values()].map(indentifier => {
@@ -134,8 +175,7 @@ export const registerCompletionInsert = () => {
                 })
                 // self run this command to finally import missing identifiers
                 await vscode.commands.executeCommand(getExtensionCommandId('completionInsert'), { ...execArg, useExistingDiagnosticsPooling: 300 })
-                // TODO maybe extend timeout on pooling? Why TS service in vscode is so slow hf
-            }, getExtensionSetting('diagnosticTimeout'))
+            }
         }
     })
 }
