@@ -490,7 +490,7 @@ export const activate = () => {
             )
         }
 
-        disposables.push(registerExperimentalSnippets())
+        registerExperimentalSnippets(disposables)
     }
 
     registerSnippets()
