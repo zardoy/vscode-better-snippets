@@ -7,7 +7,9 @@
                 "--disable-extensions"
             ],
             "name": "Launch Extension",
-            "outFiles": ["${workspaceFolder}/out/**/*.js"],
+            "outFiles": [
+                "${workspaceFolder}/out/**/*.js"
+            ],
             "request": "launch",
             "type": "extensionHost"
         }

@@ -20,8 +20,11 @@ patchPackageJson({
 })
 
 const config = defineConfig({
+    esbuild: {
+        keepNames: true,
+    },
     development: {
-        // disableExtensions: false,
+        disableExtensions: false,
     },
     // target: 'web',
     // webOpen: 'web',

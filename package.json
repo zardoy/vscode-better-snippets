@@ -41,7 +41,7 @@
             {
                 "command": "groupBy#none",
                 "title": "Disable Grouping",
-                "enablement": "better-snippets.grouping != disabled"
+                "enablement": "better-snippets.grouping != none"
             },
             {
                 "command": "groupBy#language",
@@ -128,8 +128,8 @@
     "scripts": {
         "start": "vscode-framework start",
         "start-web": "vscode-framework start --web",
-        "build": "vscode-framework build && node buildTsPlugin.mjs",
-        "watch-plugin": "tsc -p typescript-plugin -w",
+        "build": "vscode-framework build && node buildTsPlugin.mjs prod",
+        "watch-plugin": "node buildTsPlugin.mjs",
         "integration-test": "tsc -p tsconfig.test.json && node testsOut/runTests.js",
         "integration-test:watch": "chokidar \"test/integration/**\" -c \"pnpm integration-test\" --initial",
         "unit-test": "vitest --globals",

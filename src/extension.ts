@@ -431,7 +431,7 @@ export const activate = () => {
                                             // so we're always ahead of 1+N character, where N is zero-based number of position on the same line
                                             // because of just typed letter + just typed letter in previous positions
                                             const endPosition = range.start.translate(0, 1 + sameLinePos)
-                                            // eslint-disable-next-line unicorn/consistent-destructuring
+
                                             const startPosition = endPosition.translate(0, -snippet.sequence.length)
                                             const fixedRange = new vscode.Range(startPosition, endPosition)
                                             builder.delete(fixedRange)
