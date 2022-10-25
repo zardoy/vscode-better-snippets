@@ -11,10 +11,10 @@ import {
 } from 'vscode-framework'
 import { sort } from 'rambda'
 import { normalizeLanguages } from '@zardoy/vscode-utils/build/langs'
-import { RevealSnippetOptions } from './revealSnippetInSettingsJson'
+import { watchExtensionSettings } from '@zardoy/vscode-utils/build/settings'
+import { CommonSnippet, getSnippetsSettingValue, RevealSnippetOptions } from './settingsJsonSnippetCommands'
 import { getSnippetsDefaults } from './extension'
-import { Configuration, GeneralSnippet } from './configurationType'
-import { getAllLangsExtensions } from './langsUtils'
+import { GeneralSnippet } from './configurationType'
 
 const SCHEME = `${getExtensionContributionsPrefix()}virtualSnippets`
 
@@ -54,28 +54,21 @@ abstract class BaseTreeDataProvider implements vscode.TreeDataProvider<vscode.Tr
     abstract getChildrenInner(element: vscode.TreeItem | undefined)
 }
 
-type CommonSnippet = Settings['customSnippets'][number] | Settings['typingSnippets'][number]
-const getSnippetsSettingValue = (configKey: keyof Configuration, isLocal: boolean) => {
-    const {
-        globalValue = [],
-        workspaceValue = [],
-        workspaceFolderValue = [],
-    } = vscode.workspace.getConfiguration(process.env.IDS_PREFIX, null).inspect<any[]>(configKey)!
-    const settingValue: CommonSnippet[] = isLocal ? [...workspaceValue, ...workspaceFolderValue] : globalValue
-    return settingValue
-}
-
 type TreeItemWithTreeItems = vscode.TreeItem & { items: vscode.TreeItem[] }
 
 class TreeDataProvider extends BaseTreeDataProvider {
     constructor(private readonly view: ViewType) {
+        watchExtensionSettings(['customSnippets', 'customSnippetDefaults', 'typingSnippets', 'languageSupersets'], () => {
+            this.refresh()
+        })
+
         super()
     }
 
     getChildrenInner(element: TreeItemWithTreeItems | undefined) {
         if (element) return element.items
 
-        const revealType = getExtensionSetting('snippetsView.editor')
+        const revealType = /* getExtensionSetting('snippetsView.editor') ?? */ 'custom'
 
         const isTyping = oneOf(this.view, 'betterSnippets.globalTypingSnippets', 'betterSnippets.workspaceTypingSnippets')
         const isLocal = oneOf(this.view, 'betterSnippets.workspaceSnippets', 'betterSnippets.workspaceTypingSnippets')
@@ -91,6 +84,7 @@ class TreeDataProvider extends BaseTreeDataProvider {
         const getTreeItem = ({ label, description, originalIndex, hasBody, fileName }: TreeItemProps) => {
             const treeItem = new vscode.TreeItem(label)
             treeItem.tooltip = 'Edit snippet'
+            treeItem.contextValue = 'snippet'
             treeItem.description = description
             treeItem.iconPath = new vscode.ThemeIcon('symbol-snippet')
             // eslint-disable-next-line curly
@@ -100,7 +94,7 @@ class TreeDataProvider extends BaseTreeDataProvider {
                         ? {
                               command: 'vscode.open',
                               title: '',
-                              arguments: [vscode.Uri.from({ scheme: SCHEME, path: `/${originalIndex}/${isLocal}/${configKey}/${fileName}` })],
+                              arguments: [vscode.Uri.from({ scheme: SCHEME, path: `/${originalIndex}-${label}/${isLocal}/${configKey}/${fileName}` })],
                           }
                         : {
                               command: getExtensionCommandId('revealSnippetInSettingsJson'),
@@ -115,12 +109,12 @@ class TreeDataProvider extends BaseTreeDataProvider {
                           }
             }
 
-            // for button command
-            // treeItem.betterSnippets = {
-            //     snippetIndex: originalIndex,
-            //     isTyping,
-            //     level: isLocal ? 'workspace' : 'global',
-            // } as RevealSnippetOptions
+            // @ts-expect-error for menus commands
+            treeItem.betterSnippets = {
+                snippetIndex: originalIndex,
+                isTyping,
+                level: isLocal ? 'workspace' : 'global',
+            } as RevealSnippetOptions
 
             return treeItem
         }
@@ -129,7 +123,9 @@ class TreeDataProvider extends BaseTreeDataProvider {
             const handleBody = (body: CommonSnippet['body']) => {
                 if (body === undefined) return '<MISSING BODY>'
                 if (body === false) return '<ACTION ONLY>'
-                return (Array.isArray(body) ? body.join('\n') : body).replaceAll('\n', '↵').replaceAll('\t', '\\t')
+                return (Array.isArray(body) ? body.join('\n') : body) /* .replaceAll('\n', '↵ ') */
+                    .replaceAll('\n', ' ')
+                    .replaceAll('\t', '\\t')
             }
 
             const settingValue = getSnippetsSettingValue(configKey, isLocal)
@@ -181,13 +177,13 @@ class TreeDataProvider extends BaseTreeDataProvider {
 }
 
 const parseProviderUriSnippet = (uri: vscode.Uri) => {
-    const [originalIndex, isLocal, configKey] = uri.path.split('/').slice(1)
-    if (configKey === undefined || isLocal === undefined || originalIndex === undefined) throw new Error('Incorrect URI format for this scheme')
-    return { configKey, isLocal, originalIndex }
+    const [snippetIndexAndName, isLocal, configKey] = uri.path.split('/').slice(1)
+    if (configKey === undefined || isLocal === undefined || snippetIndexAndName === undefined) throw new Error('Incorrect URI format for this scheme')
+    const [snippetIndex, snippetName] = snippetIndexAndName.split('-')
+    return { configKey, isLocal: isLocal === 'true', snippetIndex: +snippetIndex!, snippetName: snippetName! }
 }
 
 export const registerViews = () => {
-    // TODO! index updates!
     vscode.workspace.registerFileSystemProvider(SCHEME, {
         createDirectory() {},
         delete() {},
@@ -198,9 +194,9 @@ export const registerViews = () => {
             return []
         },
         readFile(uri) {
-            const { configKey, isLocal, originalIndex } = parseProviderUriSnippet(uri)
-            const body = getSnippetsSettingValue(configKey as any, isLocal === 'true')[+originalIndex]?.body
-            if (!body) throw new Error(`Snippet ${configKey} with index ${originalIndex} doesn't have valid body`)
+            const { configKey, isLocal, snippetIndex } = parseProviderUriSnippet(uri)
+            const body = getSnippetsSettingValue(configKey as any, isLocal)[snippetIndex]?.body
+            if (!body) throw new Error(`Snippet ${configKey} with index ${snippetIndex} doesn't have valid body`)
             return new TextEncoder().encode(Array.isArray(body) ? body.join('\n') : body)
         },
         rename() {},
@@ -211,7 +207,29 @@ export const registerViews = () => {
             // TODO sync with the settings.json
             return { dispose() {} }
         },
-        writeFile(uri, content) {},
+        async writeFile(uri, content) {
+            const { configKey, isLocal, snippetIndex, snippetName } = parseProviderUriSnippet(uri)
+
+            const currentSnippets = getSnippetsSettingValue(configKey as any, isLocal)
+            const currentSnippet = currentSnippets[snippetIndex]!
+            const bodyIsArr = Array.isArray(currentSnippet.body)
+            const stringContent = new TextDecoder().decode(content).trimEnd() // trimming end as vscode might have files.insertNewLine enabled
+            const currentSnippetName = 'sequence' in currentSnippet ? currentSnippet.sequence : currentSnippet.name
+            if (currentSnippetName !== snippetName)
+                throw new Error('Editing snippet index has changed or the snippet was removed. Copy contents to the actual snippet')
+            await vscode.workspace.getConfiguration(process.env.IDS_PREFIX, null).update(
+                configKey,
+                currentSnippets.map((s, i) =>
+                    i === snippetIndex
+                        ? {
+                              ...s,
+                              body: bodyIsArr ? stringContent.split('\n') : stringContent,
+                          }
+                        : s,
+                ),
+                isLocal ? vscode.ConfigurationTarget.Workspace : vscode.ConfigurationTarget.Global,
+            )
+        },
     })
 
     // #region set language for highlighting
@@ -219,8 +237,9 @@ export const registerViews = () => {
         if (!textEditor) return
         const { uri } = textEditor.document
         if (uri.scheme !== SCHEME) return
-        const { configKey, isLocal, originalIndex } = parseProviderUriSnippet(uri)
-        const snippet = getSnippetsSettingValue(configKey as any, isLocal === 'true')[+originalIndex]
+
+        const { configKey, isLocal, snippetIndex } = parseProviderUriSnippet(uri)
+        const snippet = getSnippetsSettingValue(configKey as any, isLocal)[snippetIndex]
         if (!snippet) return
         const primaryLanguage = (snippet?.when?.languages ?? getSnippetsDefaults().when.languages)[0]
         if (!primaryLanguage) return

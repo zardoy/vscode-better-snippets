@@ -260,8 +260,11 @@ export type Configuration = {
     // TODO default is set in prepare.ts
     /** Note that family name can overlap with language id, contributed by other extension. If this is case rename the family or set it to null (in case if family is builtin) */
     languageSupersets: { [family: string]: string[] }
-    /** Which editing method to use when clicked on the snippet from view */
-    'snippetsView.editor': 'settingsJson' | 'custom'
+    /**
+     * Which editing method to use when clicked on the snippet from view
+     * @default custom
+     */
+    // 'snippetsView.editor': 'settingsJson' | 'custom'
     // typescriptLocations: {
     //     [location: string]: {
     //         mode: 'exclude' | 'include'

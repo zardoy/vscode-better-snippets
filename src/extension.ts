@@ -20,7 +20,7 @@ import { registerSpecialCommand } from './specialCommand'
 import { registerCreateSnippetFromSelection } from './createSnippetFromSelection'
 import settingsHelper from './settingsHelper'
 import { registerViews } from './views'
-import { registerRevealSnippetInSettingsJson } from './revealSnippetInSettingsJson'
+import { registerSnippetSettingsJsonCommands } from './settingsJsonSnippetCommands'
 
 type CustomSnippetUnresolved = Configuration['customSnippets'][number]
 type TypingSnippetUnresolved = Configuration['typingSnippets'][number]
@@ -515,7 +515,7 @@ export const activate = () => {
     registerCreateSnippetFromSelection()
     settingsHelper()
     registerViews()
-    registerRevealSnippetInSettingsJson()
+    registerSnippetSettingsJsonCommands()
 }
 
 const unmergedSnippetDefaults: DeepRequired<Configuration['customSnippetDefaults']> = {

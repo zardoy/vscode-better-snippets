@@ -1,5 +1,5 @@
 // GENERATED. DON'T EDIT MANUALLY
-// md5hash: eb03c76683a4ddeb7fc8ac5e9c15aedd
+// md5hash: 2351c5214d38669f11c968193b79c0f3
 {
     "type": "object",
     "properties": {
@@ -845,14 +845,6 @@
                 }
             }
         },
-        "snippetsView.editor": {
-            "description": "Which editing method to use when clicked on the snippet from view",
-            "enum": [
-                "custom",
-                "settingsJson"
-            ],
-            "type": "string"
-        },
         "experimental.disableBuiltinSnippets": {
             "description": "Experimental way to disable builtin snippets. Will be removed in future in favor of something else.",
             "uniqueItems": true,
@@ -896,7 +888,6 @@
         "experimental.disableBuiltinSnippets",
         "languageSupersets",
         "snippetCreator.showSnippetAfterCreation",
-        "snippetsView.editor",
         "typingSnippets",
         "typingSnippetsEnableMulticursor",
         "typingSnippetsUndoStops",

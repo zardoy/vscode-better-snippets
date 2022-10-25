@@ -26,8 +26,8 @@
                 "title": "CompletionInsert"
             },
             {
-                "command": "applySpecialSnippet",
-                "title": "ApplySpecialSnippet"
+                "command": "removeSnippet",
+                "title": "removeSnippet"
             },
             {
                 "command": "createSnippetFromSelection",
@@ -36,6 +36,7 @@
             {
                 "command": "revealSnippetInSettingsJson",
                 "title": "Reveal Snippet in Settings Json",
+                "enablement": "true",
                 "icon": "$(gear)"
             },
             {
@@ -61,7 +62,7 @@
                     "when": "false"
                 },
                 {
-                    "command": "applySpecialSnippet",
+                    "command": "removeSnippet",
                     "when": "false"
                 }
             ],
@@ -75,6 +76,17 @@
                     "command": "groupBy#language",
                     "when": "view =~ /betterSnippets.globalSnippets|betterSnippets.globalTypingSnippets|betterSnippets.workspaceSnippets|betterSnippets.workspaceTypingSnippets/",
                     "group": "1_header@2"
+                }
+            ],
+            "view/item/context": [
+                {
+                    "command": "removeSnippet",
+                    "when": "viewItem == snippet && view =~ /betterSnippets.globalSnippets|betterSnippets.globalTypingSnippets|betterSnippets.workspaceSnippets|betterSnippets.workspaceTypingSnippets/"
+                },
+                {
+                    "command": "revealSnippetInSettingsJson",
+                    "when": "viewItem == snippet && view =~ /betterSnippets.globalSnippets|betterSnippets.globalTypingSnippets|betterSnippets.workspaceSnippets|betterSnippets.workspaceTypingSnippets/",
+                    "group": "inline"
                 }
             ]
         },
@@ -170,8 +182,8 @@
         "vscode-manifest": "^0.0.8"
     },
     "dependencies": {
-        "@zardoy/utils": "^0.0.7",
-        "@zardoy/vscode-utils": "^0.0.28",
+        "@zardoy/utils": "^0.0.9",
+        "@zardoy/vscode-utils": "^0.0.41",
         "chai": "^4.3.6",
         "chokidar-cli": "^3.0.0",
         "delay": "^5.0.0",

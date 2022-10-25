@@ -13,7 +13,7 @@ import { parseTree, findNodeAtLocation } from 'jsonc-parser'
 import { normalizeLanguages, areLangsEquals } from '@zardoy/vscode-utils/build/langs'
 import { Configuration } from './configurationType'
 import { getSnippetsDefaults } from './extension'
-import { RevealSnippetOptions } from './revealSnippetInSettingsJson'
+import { RevealSnippetOptions } from './settingsJsonSnippetCommands'
 
 export const registerCreateSnippetFromSelection = () => {
     // createNativeSnippetFromSelection
