@@ -7,10 +7,9 @@ import { ConditionalPick } from 'type-fest'
 import { SnippetParser } from 'vscode-snippet-parser'
 import { mergeDeepRight, partition } from 'rambda'
 import { DeepRequired } from 'ts-essentials'
-import { extensionCtx, getExtensionCommandId, getExtensionSetting, getExtensionSettingId, registerActiveDevelopmentCommand } from 'vscode-framework'
+import { extensionCtx, getExtensionCommandId, getExtensionSetting, getExtensionSettingId } from 'vscode-framework'
 import { ensureHasProp, omitObj, oneOf, pickObj } from '@zardoy/utils'
 import escapeStringRegexp from 'escape-string-regexp'
-import { getActiveRegularEditor } from '@zardoy/vscode-utils'
 import { Configuration } from './configurationType'
 import { completionAddTextEdit, normalizeFilePathRegex } from './util'
 import { builtinSnippets } from './builtinSnippets'
@@ -21,6 +20,8 @@ import { registerCreateSnippetFromSelection } from './createSnippetFromSelection
 import settingsHelper from './settingsHelper'
 import { registerViews } from './views'
 import { registerSnippetSettingsJsonCommands } from './settingsJsonSnippetCommands'
+import { PreparedSnippetData, prepareSnippetData } from './prepareSnippetData'
+import { filterSnippetByLocationPhase1, filterWithSecondPhaseIfNeeded, snippetsConfig } from './snippets'
 
 type CustomSnippetUnresolved = Configuration['customSnippets'][number]
 type TypingSnippetUnresolved = Configuration['typingSnippets'][number]
@@ -167,29 +168,30 @@ export const activate = () => {
                 ('sequence' in snippet &&
                     'lineBeforeRegex' in regexes &&
                     regexFails(regexes.lineBeforeRegex, lineText.slice(0, position.character - snippet.sequence.length), 'snippet.lineRegexBefore'))
-            )
+            ) {
                 continue
-            for (const location of locations)
-                if (
-                    (location === 'fileStart' && position.line === 0 && name.startsWith(lineText)) ||
-                    (location === 'topLineStart' && name.startsWith(lineText)) ||
-                    (location === 'lineStart' && name.startsWith(lineText.trim())) ||
-                    location === 'code'
-                ) {
-                    log(`Snippet ${name} included. Reason: ${location}`)
-                    let newBody = Array.isArray(body) ? body.join('\n') : body
-                    if (newBody !== false)
-                        for (const [groupName, groupValue] of Object.entries(regexGroups))
-                            newBody = newBody.replace(new RegExp(`(?<!\\\\)${escapeStringRegexp(`$${groupName}`)}`, 'g'), groupValue)
+            }
 
-                    includedSnippets.push({ ...snippet, body: newBody as string })
+            const snippetMatchLocation = filterSnippetByLocationPhase1(snippet, document, position, log)
+            if (!snippetMatchLocation) continue
+
+            let newBody = Array.isArray(body) ? body.join('\n') : body
+            if (newBody !== false) {
+                for (const [groupName, groupValue] of Object.entries(regexGroups)) {
+                    newBody = newBody.replace(new RegExp(`(?<!\\\\)${escapeStringRegexp(`$${groupName}`)}`, 'g'), groupValue)
                 }
+            }
+
+            includedSnippets.push({ ...snippet, body: newBody as string })
         }
 
         return includedSnippets
     }
 
     const registerSnippets = () => {
+        snippetsConfig.strictPositionLocations = getExtensionSetting('strictPositionLocations')
+        snippetsConfig.enableTsPlugin = getExtensionSetting('enableTsPlugin')
+
         const langsSupersets = getExtensionSetting('languageSupersets')
         const getMergedConfig = <T extends keyof ConditionalPick<Configuration, any[]>>(configKey: T): Configuration[T] => {
             const {
@@ -225,7 +227,7 @@ export const activate = () => {
                 const disposable = vscode.languages.registerCompletionItemProvider(
                     normalizeLanguages(language, langsSupersets),
                     {
-                        provideCompletionItems(document, position, _token, { triggerCharacter }) {
+                        async provideCompletionItems(document, position, _token, { triggerCharacter }) {
                             // if (context.triggerKind !== vscode.CompletionTriggerKind.Invoke) return
                             if (triggerFromInner) {
                                 triggerFromInner = false
@@ -235,7 +237,9 @@ export const activate = () => {
                             const snippetsToCheck = triggerCharacter ? snippetsByTriggerChar[triggerCharacter] : snippets
                             if (!snippetsToCheck) return
 
-                            const includedSnippets = getCurrentSnippets('completion', snippetsToCheck, document, position, language)
+                            const firstPhaseSnippets = getCurrentSnippets('completion', snippetsToCheck, document, position, language)
+
+                            const includedSnippets = await filterWithSecondPhaseIfNeeded(firstPhaseSnippets, document, position)
                             return includedSnippets.map(
                                 ({
                                     body,
@@ -386,7 +390,7 @@ export const activate = () => {
                         lastTypePosition = originalPos
                         // we're always ahead of 1 character
                         const endPosition = originalPos.translate(0, 1)
-                        const appliableTypingSnippets = getCurrentSnippets(
+                        let appliableTypingSnippets = getCurrentSnippets(
                             'typing',
                             typingSnippets.filter(
                                 ({ sequence, when }) =>
@@ -395,6 +399,7 @@ export const activate = () => {
                             document,
                             endPosition,
                         )
+                        appliableTypingSnippets = await filterWithSecondPhaseIfNeeded(appliableTypingSnippets, document, endPosition)
                         if (appliableTypingSnippets.length > 2) console.warn(`Multiple appliable typing snippets found: ${appliableTypingSnippets.join(', ')}`)
                         const snippet = appliableTypingSnippets[0]
                         if (!snippet) return
@@ -502,7 +507,9 @@ export const activate = () => {
             affectsConfiguration(getExtensionSettingId('enableBuiltinSnippets')) ||
             affectsConfiguration(getExtensionSettingId('enableExperimentalSnippets')) ||
             affectsConfiguration(getExtensionSettingId('experimental.disableBuiltinSnippets')) ||
-            affectsConfiguration(getExtensionSettingId('languageSupersets'))
+            affectsConfiguration(getExtensionSettingId('languageSupersets')) ||
+            affectsConfiguration(getExtensionSettingId('strictPositionLocations')) ||
+            affectsConfiguration(getExtensionSettingId('enableTsPlugin'))
         ) {
             console.log('Snippets configuration updated')
             vscode.Disposable.from(...disposables).dispose()

@@ -126,6 +126,12 @@
                 }
             ]
         },
+        "typescriptServerPlugins": [
+            {
+                "name": "better-snippets-typescript-plugin",
+                "enableForWorkspaceTypeScriptVersions": true
+            }
+        ],
         "betterSnippetsEngineExtension": true
     },
     "activationEvents": [

@@ -1,6 +1,7 @@
 //@ts-check
 const { defineConfig } = require('@zardoy/vscode-utils/build/defineConfig.cjs')
 const { patchPackageJson } = require('@zardoy/vscode-utils/build/patchPackageJson.cjs')
+const { snippetLocation } = require('./src/configurationType')
 
 patchPackageJson({
     async patchSettings(configuration) {
@@ -16,6 +17,14 @@ patchPackageJson({
         // TODO move it from here
         configuration['languageSupersets'].default = defaultLanguageSupersets
         return configuration
+    },
+    rawPatchManifest(manifest) {
+        return JSON.parse(
+            JSON.stringify(manifest).replaceAll(
+                '"replace-locations-marker"',
+                `{"pattern": "^${snippetLocation.join('|')}|${snippetLocation.map(x => `!${x}`).join('|')}$"}`,
+            ),
+        )
     },
 })
 

@@ -5,6 +5,7 @@
         "@typescript-eslint/space-before-function-paren": "off",
         "@typescript-eslint/no-explicit-any": "off",
         "unicorn/consistent-destructuring": "off",
-        "@typescript-eslint/naming-convention": "off"
+        "@typescript-eslint/naming-convention": "off",
+        "curly": "off"
     }
 }

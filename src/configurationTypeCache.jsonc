@@ -1,5 +1,5 @@
 // GENERATED. DON'T EDIT MANUALLY
-// md5hash: 2351c5214d38669f11c968193b79c0f3
+// md5hash: 678f3180cb550894a795a247149dfb11
 {
     "type": "object",
     "properties": {
@@ -20,6 +20,16 @@
         "enableExperimentalSnippets": {
             "description": "Whether to enable builtin postfix snippets. They may be moved to another extension in future releases",
             "default": false,
+            "type": "boolean"
+        },
+        "strictPositionLocations": {
+            "description": "Don't display snippets with locations `fileStart`, `lineStart` and `topLineStart` locations if line after cursor has existing content that doesn't match the name of the snippet",
+            "default": false,
+            "type": "boolean"
+        },
+        "enableTsPlugin": {
+            "description": "Required for the following locations: `code` (which is default), `comment`, `string`",
+            "default": true,
             "type": "boolean"
         },
         "customSnippets": {
@@ -51,17 +61,8 @@
                                     },
                                     "locations": {
                                         "description": "Specify to restrict showing suggest in specific location",
-                                        "type": "array",
-                                        "items": {
-                                            "enum": [
-                                                "code",
-                                                "comment",
-                                                "fileStart",
-                                                "lineStart",
-                                                "topLineStart"
-                                            ],
-                                            "type": "string"
-                                        }
+                                        "items": "replace-locations-marker",
+                                        "type": "array"
                                     },
                                     "pathRegex": {
                                         "type": "string"
@@ -435,17 +436,8 @@
                                     },
                                     "locations": {
                                         "description": "Specify to restrict showing suggest in specific location",
-                                        "type": "array",
-                                        "items": {
-                                            "enum": [
-                                                "code",
-                                                "comment",
-                                                "fileStart",
-                                                "lineStart",
-                                                "topLineStart"
-                                            ],
-                                            "type": "string"
-                                        }
+                                        "items": "replace-locations-marker",
+                                        "type": "array"
                                     },
                                     "pathRegex": {
                                         "type": "string"
@@ -810,17 +802,9 @@
                             }
                         },
                         "locations": {
-                            "type": "array",
-                            "items": {
-                                "enum": [
-                                    "code",
-                                    "comment",
-                                    "fileStart",
-                                    "lineStart",
-                                    "topLineStart"
-                                ],
-                                "type": "string"
-                            }
+                            "description": "Specify to restrict showing suggest in specific location",
+                            "items": "replace-locations-marker",
+                            "type": "array"
                         },
                         "pathRegex": {
                             "description": "Restrict suggesting all snippets (instead of overriding, regexs will be merged)",
@@ -885,9 +869,11 @@
         "diagnosticTimeout",
         "enableBuiltinSnippets",
         "enableExperimentalSnippets",
+        "enableTsPlugin",
         "experimental.disableBuiltinSnippets",
         "languageSupersets",
         "snippetCreator.showSnippetAfterCreation",
+        "strictPositionLocations",
         "typingSnippets",
         "typingSnippetsEnableMulticursor",
         "typingSnippetsUndoStops",

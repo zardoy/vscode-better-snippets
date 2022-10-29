@@ -1,9 +1,9 @@
-/* eslint-disable curly */
 import * as vscode from 'vscode'
 import { findNodeAtLocation, getLocation, getNodeValue, Location, parseTree } from 'jsonc-parser'
 import { getExtensionSetting, getExtensionSettingId } from 'vscode-framework'
 import { getJsonCompletingInfo, jsonPathEquals, jsonValuesToCompletions } from '@zardoy/vscode-utils/build/jsonCompletions'
 import { oneOf } from '@zardoy/utils'
+import { snippetLocation } from './configurationType'
 
 export default () => {
     const selector = { language: 'jsonc', pattern: '**/settings.json' }
@@ -44,6 +44,14 @@ export default () => {
                                 ),
                                 ...(await getLanguageCompletions(insideStringRange)),
                             ].flat(1)
+                        }
+
+                        if (jsonPathEquals(localPath, ['when', 'locations'], true)) {
+                            const value = findNodeAtLocation(root, path)?.value
+                            return jsonValuesToCompletions(
+                                snippetLocation.map(loc => (value?.startsWith('!') ? `!${loc}` : loc)),
+                                insideStringRange,
+                            )
                         }
 
                         // TODO it suggests in arg!

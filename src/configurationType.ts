@@ -1,7 +1,8 @@
 import * as vscode from 'vscode'
 // import { SyntaxKind } from 'typescript/lib/tsserverlibrary'
 
-export type SnippetLocation = 'fileStart' | 'comment' | 'lineStart' | 'topLineStart' | 'code'
+export const snippetLocation = ['fileStart', 'comment', 'lineStart', 'topLineStart', 'code'] as const
+export type SnippetLocation = typeof snippetLocation[number]
 
 type CommandDefinition =
     | string
@@ -48,8 +49,9 @@ export type GeneralSnippet = {
         // Unimplemented: inComments. topLineStart means line start without indendation, useful for top-level declaration snippets, like `export const`
         /**
          * Specify to restrict showing suggest in specific location
+         * @items "replace-locations-marker"
          */
-        locations?: SnippetLocation[]
+        locations?: any[]
         pathRegex?: string
         /** Shortcuts for complex path regexs. If specified, `pathRegex` is ignored */
         fileType?: 'package.json' | 'tsconfig.json'
@@ -106,12 +108,6 @@ export type Configuration = {
      * @default true
      *  */
     enableBuiltinSnippets: boolean
-    // builtinSnippetsConfiguratin?: {
-    //     postifxes?: {
-    //         /** @default true */
-    //         normalizeEqeq: boolean
-    //     }
-    // }
     /**
      * Choose the output for useSnippet type:
      * ```ts
@@ -128,6 +124,16 @@ export type Configuration = {
      * Whether to enable builtin postfix snippets. They may be moved to another extension in future releases
      * @default false */
     enableExperimentalSnippets: boolean
+    /**
+     * Don't display snippets with locations `fileStart`, `lineStart` and `topLineStart` locations if line after cursor has existing content that doesn't match the name of the snippet
+     * @default false
+     */
+    strictPositionLocations: boolean
+    /**
+     * Required for the following locations: `code` (which is default), `comment`, `string`
+     * @default true
+     */
+    enableTsPlugin: boolean
     /**
      * @suggestSortText betterSnippets.1
      */
@@ -242,7 +248,11 @@ export type Configuration = {
         group?: string
         when?: {
             languages?: string[]
-            locations?: SnippetLocation[]
+            /**
+             * Specify to restrict showing suggest in specific location
+             * @items "replace-locations-marker"
+             */
+            locations?: any[]
             // TODO
             /** Restrict suggesting all snippets (instead of overriding, regexs will be merged) */
             pathRegex?: string
