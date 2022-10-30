@@ -150,7 +150,7 @@ export type Configuration = {
              * @suggestSortText !
              */
             name: string
-            /** Should be short. Always displayed in completion widget on the same raw as label. */
+            /** Should be short. Always displayed in completion widget on the right on the same line as label. */
             description?: string
             when?: {
                 /**
@@ -242,7 +242,7 @@ export type Configuration = {
         iconType?: SnippetType
         /** @deprecated */
         type?: string
-        /** Should be short. Always displayed in completion widget on the same raw as label. Default is 'Better Snippet' */
+        /** Should be short. Always displayed in completion widget on the right on the same line as label. Default is 'Better Snippet' */
         description?: string
         /** @deprecated */
         group?: string

@@ -22,6 +22,7 @@ import { registerViews } from './views'
 import { registerSnippetSettingsJsonCommands } from './settingsJsonSnippetCommands'
 import { PreparedSnippetData, prepareSnippetData } from './prepareSnippetData'
 import { filterSnippetByLocationPhase1, filterWithSecondPhaseIfNeeded, snippetsConfig } from './snippets'
+import { registerSnippetsMigrateCommands } from './migrateSnippets'
 
 type CustomSnippetUnresolved = Configuration['customSnippets'][number]
 type TypingSnippetUnresolved = Configuration['typingSnippets'][number]
@@ -523,6 +524,7 @@ export const activate = () => {
     settingsHelper()
     registerViews()
     registerSnippetSettingsJsonCommands()
+    registerSnippetsMigrateCommands()
 }
 
 const unmergedSnippetDefaults: DeepRequired<Configuration['customSnippetDefaults']> = {

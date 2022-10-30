@@ -1,5 +1,5 @@
 // GENERATED. DON'T EDIT MANUALLY
-// md5hash: 678f3180cb550894a795a247149dfb11
+// md5hash: 1d611548cf4132a8d85ba797b5a708e3
 {
     "type": "object",
     "properties": {
@@ -322,7 +322,7 @@
                                 "type": "string"
                             },
                             "description": {
-                                "description": "Should be short. Always displayed in completion widget on the same raw as label.",
+                                "description": "Should be short. Always displayed in completion widget on the right on the same line as label.",
                                 "type": "string"
                             },
                             "when": {
@@ -786,7 +786,7 @@
                     "type": "string"
                 },
                 "description": {
-                    "description": "Should be short. Always displayed in completion widget on the same raw as label. Default is 'Better Snippet'",
+                    "description": "Should be short. Always displayed in completion widget on the right on the same line as label. Default is 'Better Snippet'",
                     "type": "string"
                 },
                 "group": {

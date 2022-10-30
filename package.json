@@ -53,6 +53,14 @@
                 "command": "groupBy#extendsGroup",
                 "title": "Group by Extends Group",
                 "enablement": "better-snippets.grouping != extendsGroup"
+            },
+            {
+                "command": "migrateNativeSnippetsToExtension",
+                "title": "Migrate Native Snippets to Extension"
+            },
+            {
+                "command": "migrateExtensionSnippetsToNative",
+                "title": "Migrate Extension Snippets to Native"
             }
         ],
         "menus": {
@@ -178,7 +186,7 @@
         "@zardoy/tsconfig": "^1.4.0",
         "cross-env": "^7.0.3",
         "eslint": "^8.9.0",
-        "eslint-config-zardoy": "^0.2.13",
+        "eslint-config-zardoy": "^0.2.14",
         "fs-extra": "^10.0.1",
         "glob": "^7.2.0",
         "mocha": "^9.2.0",
@@ -189,7 +197,7 @@
     },
     "dependencies": {
         "@zardoy/utils": "^0.0.9",
-        "@zardoy/vscode-utils": "^0.0.41",
+        "@zardoy/vscode-utils": "^0.0.42",
         "chai": "^4.3.6",
         "chokidar-cli": "^3.0.0",
         "delay": "^5.0.0",
