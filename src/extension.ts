@@ -273,14 +273,9 @@ export const activate = () => {
                                     folderIcon,
                                     description,
                                     iconType,
-                                    group,
-                                    type,
                                     replaceTriggerCharacter,
                                     metadata,
                                 }) => {
-                                    if (group) description = group
-                                    if (type) iconType = type as any
-                                    //
                                     const completion = new vscode.CompletionItem(
                                         { label: name, description },
                                         vscode.CompletionItemKind[iconType as string | number],
@@ -569,9 +564,7 @@ export const activate = () => {
 const unmergedSnippetDefaults: DeepRequired<Configuration['customSnippetDefaults']> = {
     sortText: undefined!,
     iconType: 'Snippet',
-    type: undefined!,
     description: 'Better Snippet',
-    group: undefined!,
     when: {
         languages: ['js'],
         locations: ['code'],

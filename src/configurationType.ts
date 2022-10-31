@@ -167,8 +167,6 @@ export type Configuration = {
                  */
                 triggerCharacters?: string[]
             }
-            /** @deprecated */
-            group?: string
             // formatting?: {
             //     /**
             //      * Always insert double quote. Prettier rules. Otherwise always insert single. Default: auto
@@ -187,8 +185,6 @@ export type Configuration = {
              * @default false
              */
             replaceTriggerCharacter?: boolean
-            /** @deprecated */
-            type?: string
         }
     >
     /**
@@ -247,12 +243,8 @@ export type Configuration = {
     customSnippetDefaults: {
         sortText?: string
         iconType?: SnippetType
-        /** @deprecated */
-        type?: string
         /** Should be short. Always displayed in completion widget on the right on the same line as label. Default is 'Better Snippet' */
         description?: string
-        /** @deprecated */
-        group?: string
         when?: {
             languages?: string[]
             /**
