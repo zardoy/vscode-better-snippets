@@ -4,6 +4,7 @@ import { getExtensionSetting, getExtensionSettingId } from 'vscode-framework'
 import { getJsonCompletingInfo, jsonPathEquals, jsonValuesToCompletions } from '@zardoy/vscode-utils/build/jsonCompletions'
 import { oneOf } from '@zardoy/utils'
 import { snippetLocation } from './configurationType'
+import { getContributedLangInfo } from './langsUtils'
 
 const getSharedParsingInfo = (document: vscode.TextDocument, position: vscode.Position) => {
     const location = getLocation(document.getText(), document.offsetAt(position))
@@ -137,6 +138,44 @@ export default () => {
             }
 
             return undefined
+        },
+    })
+
+    vscode.languages.registerHoverProvider(selector, {
+        provideHover(document, position, token) {
+            const sharedParsingInfo = getSharedParsingInfo(document, position)
+            if (!sharedParsingInfo) return
+            const { isAnySnippet, localPath, insideStringRange, nodeValue } = sharedParsingInfo
+            if (!insideStringRange) return
+            let providerResult: vscode.Hover | undefined
+            try {
+                if (isAnySnippet && jsonPathEquals(localPath, ['when', 'languages'], true) && nodeValue) {
+                    const contributedLangInfo = getContributedLangInfo(nodeValue)
+                    if (!contributedLangInfo) {
+                        providerResult = { contents: ['Unknown language. Probably extension, contributing this language is disabled or not installed'] }
+                        return
+                    }
+
+                    const lines = [] as Array<vscode.MarkdownString | string>
+                    const { sourceExtension, extensions, aliases } = contributedLangInfo
+                    if (sourceExtension) {
+                        const { id, title } = sourceExtension
+                        const markdown = new vscode.MarkdownString(
+                            `Source extension: [${title}](command:extension.open?${JSON.stringify(id)})${id.startsWith('vscode.') ? ' (builtin)' : ''}`,
+                        )
+                        markdown.isTrusted = true
+                        lines.push(markdown)
+                    }
+
+                    if (aliases.length > 0) lines.push(`Aliases: ${aliases.join(', ')}`)
+                    if (extensions.length > 0) lines.push(`File extensions: ${extensions.join(', ')}`)
+                    providerResult = { contents: lines }
+                    return
+                }
+            } finally {
+                // eslint-disable-next-line no-unsafe-finally
+                return providerResult && { range: insideStringRange, ...providerResult }
+            }
         },
     })
 }
