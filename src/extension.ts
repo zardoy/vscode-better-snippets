@@ -11,7 +11,7 @@ import { extensionCtx, getExtensionCommandId, getExtensionSetting, getExtensionS
 import { ensureHasProp, omitObj, oneOf, pickObj } from '@zardoy/utils'
 import escapeStringRegexp from 'escape-string-regexp'
 import { Configuration } from './configurationType'
-import { completionAddTextEdit, normalizeFilePathRegex } from './util'
+import { completionAddTextEdit, normalizeFilePathRegex, objectUndefinedIfEmpty } from './util'
 import { builtinSnippets } from './builtinSnippets'
 import { registerExperimentalSnippets } from './experimentalSnippets'
 import { CompletionInsertArg, registerCompletionInsert } from './completionInsert'
@@ -20,7 +20,6 @@ import { registerCreateSnippetFromSelection } from './createSnippetFromSelection
 import settingsHelper from './settingsHelper'
 import { registerViews } from './views'
 import { registerSnippetSettingsJsonCommands } from './settingsJsonSnippetCommands'
-import { PreparedSnippetData, prepareSnippetData } from './prepareSnippetData'
 import { filterSnippetByLocationPhase1, filterWithSecondPhaseIfNeeded, snippetsConfig } from './snippets'
 import { registerSnippetsMigrateCommands } from './migrateSnippets'
 
@@ -56,6 +55,12 @@ export const activate = () => {
             snippet,
         )
 
+    type SnippetResolvedMetadata = {
+        /** stays positive */
+        removeContentNegativeOffset: number
+        removeContentAfterCurrentContent: boolean
+    }
+
     const getCurrentSnippets = <T extends CustomSnippet | CustomTypingSnippet>(
         debugType: 'completion' | 'typing',
         snippets: T[],
@@ -63,22 +68,16 @@ export const activate = () => {
         /** end position */
         position: vscode.Position,
         displayLanguage = document.languageId,
-    ): Array<Omit<T, 'body'> & { body: T extends CustomSnippet ? string : string | false }> => {
+    ): Array<Omit<T, 'body'> & { body: T extends CustomSnippet ? string : string | false; metadata?: SnippetResolvedMetadata }> => {
         const log = (...args) => console.log(`[${debugType}]`, ...args)
         const debug = (...args) => console.debug(`[${debugType}]`, ...args)
         log(displayLanguage, 'for', snippets.length, 'snippets')
         const getSnippetDebugName = (snippet: typeof snippets[number]) => ('name' in snippet ? snippet.name : snippet.sequence)
         debug('Active snippets:', snippets.map(getSnippetDebugName))
-        // const source = ts.createSourceFile('test.ts', document.getText(), ts.ScriptTarget.ES5, true)
-        // const pos = source.getPositionOfLineAndCharacter(position.line, position.character)
-        // const node = findNodeAtPosition(source, pos)
-        // const nodeKind = node.kind
-        // const commentKind = [ts.SyntaxKind.JSDocComment, ts.SyntaxKind.MultiLineCommentTrivia, ts.SyntaxKind.SingleLineCommentTrivia]
-        // log(ts.isStringLiteralLike(node), ts.isJsxText(node), commentKind.includes(nodeKind), ts.SyntaxKind[nodeKind])
 
         const line = document.lineAt(position.line)
         const lineText = line.text
-        const includedSnippets: Array<T & { body: string }> = []
+        const includedSnippets: Array<T & { body: string; metadata?: SnippetResolvedMetadata }> = []
 
         snippet: for (const snippet of snippets) {
             const { body, when } = snippet
@@ -88,13 +87,31 @@ export const activate = () => {
             const docPath = document.uri.path
 
             const regexGroups: Record<string, string> = {}
-            const regexFails = (regex: string | RegExp | undefined, testingString: string, regexName: string) => {
+            const metadata: SnippetResolvedMetadata = {} as any // todo
+            const regexFails = (regex: string | RegExp | undefined, testingString: string, regexName: string): boolean => {
                 if (!regex) return false
                 const match = testingString.match(regex instanceof RegExp ? regex : normalizeRegex(regex))
                 Object.assign(regexGroups, match?.groups)
                 const doesntMatch = !match
-                if (doesntMatch) log(`Snippet ${name} skipped due to regex: ${regexName} (${regex as string} against ${testingString})`)
-                return doesntMatch
+                if (doesntMatch) {
+                    log(`Snippet ${name} skipped due to regex: ${regexName} (${regex as string} against ${testingString})`)
+                    return true
+                }
+
+                if (
+                    snippet.replaceBeforeRegex &&
+                    // match[1] &&
+                    // eslint-disable-next-line sonarjs/no-duplicate-string
+                    (regexName === 'snippet.lineRegexBefore' || regexName === 'snippet.lineRegex') &&
+                    match.index! + match[0]!.length === testingString.length
+                ) {
+                    Object.assign(metadata, {
+                        removeContentNegativeOffset: match[0]!.length,
+                        removeContentAfterCurrentContent: regexName === 'snippet.lineRegexBefore',
+                    })
+                }
+
+                return false
             }
 
             if (when.otherLines) {
@@ -183,7 +200,11 @@ export const activate = () => {
                 }
             }
 
-            includedSnippets.push({ ...snippet, body: newBody as string })
+            includedSnippets.push({
+                ...snippet,
+                body: newBody as string,
+                metadata: objectUndefinedIfEmpty(metadata),
+            })
         }
 
         return includedSnippets
@@ -255,6 +276,7 @@ export const activate = () => {
                                     group,
                                     type,
                                     replaceTriggerCharacter,
+                                    metadata,
                                 }) => {
                                     if (group) description = group
                                     if (type) iconType = type as any
@@ -300,7 +322,20 @@ export const activate = () => {
 
                                     if (!body || !completion.documentation) completion.documentation = undefined
 
-                                    if (triggerCharacter && replaceTriggerCharacter)
+                                    if (metadata) {
+                                        let { removeContentNegativeOffset, removeContentAfterCurrentContent } = metadata
+
+                                        const completionRange = document.getWordRangeAtPosition(position)
+                                        const startRemovePos = completionRange?.start ?? position
+                                        if (!removeContentAfterCurrentContent) {
+                                            removeContentNegativeOffset -= position.character - startRemovePos.character
+                                        }
+
+                                        completionAddTextEdit(completion, {
+                                            range: new vscode.Range(startRemovePos.translate(0, -removeContentNegativeOffset), startRemovePos),
+                                            newText: '',
+                                        })
+                                    } else if (triggerCharacter && replaceTriggerCharacter)
                                         completionAddTextEdit(completion, {
                                             newText: '',
                                             range: new vscode.Range(position.translate(0, -1), position),
@@ -425,7 +460,7 @@ export const activate = () => {
                                         let previousLineNum = -1
                                         let sameLinePos = 0
                                         for (const { range } of contentChanges) {
-                                            // we can safely do this, as contentChanges are sorted
+                                            // we can safely do this, as contentChanges is sorted
                                             if (previousLineNum === range.start.line) {
                                                 sameLinePos++
                                             } else {
@@ -438,7 +473,11 @@ export const activate = () => {
                                             // because of just typed letter + just typed letter in previous positions
                                             const endPosition = range.start.translate(0, 1 + sameLinePos)
 
-                                            const startPosition = endPosition.translate(0, -snippet.sequence.length)
+                                            const negativeStartOffset =
+                                                snippet.metadata?.removeContentAfterCurrentContent === false
+                                                    ? snippet.metadata.removeContentNegativeOffset
+                                                    : snippet.sequence.length + (snippet.metadata?.removeContentNegativeOffset ?? 0)
+                                            const startPosition = endPosition.translate(0, -negativeStartOffset)
                                             const fixedRange = new vscode.Range(startPosition, endPosition)
                                             builder.delete(fixedRange)
                                             if (insertingBody) builder.insert(fixedRange.start, insertingBody)

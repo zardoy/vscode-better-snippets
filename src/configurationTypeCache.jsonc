@@ -1,5 +1,5 @@
 // GENERATED. DON'T EDIT MANUALLY
-// md5hash: 1d611548cf4132a8d85ba797b5a708e3
+// md5hash: f7c7dc54a1e3a45394106c862c8530de
 {
     "type": "object",
     "properties": {
@@ -251,6 +251,10 @@
                                         }
                                     }
                                 }
+                            },
+                            "replaceBeforeRegex": {
+                                "description": "Wether to replace the matched content from `lineBeforeRegex` or `lineRegex` regex check. The first one takes precedence.\nWorks only when end of content is matched (e.g. it will always work if regex ends with `$`)",
+                                "type": "boolean"
                             },
                             "resolveImports": {
                                 "description": "For JS langs only. How to resolve suggested imports if any",
@@ -626,6 +630,10 @@
                                         }
                                     }
                                 }
+                            },
+                            "replaceBeforeRegex": {
+                                "description": "Wether to replace the matched content from `lineBeforeRegex` or `lineRegex` regex check. The first one takes precedence.\nWorks only when end of content is matched (e.g. it will always work if regex ends with `$`)",
+                                "type": "boolean"
                             },
                             "resolveImports": {
                                 "description": "For JS langs only. How to resolve suggested imports if any",

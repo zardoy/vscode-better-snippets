@@ -85,6 +85,13 @@ export type GeneralSnippet = {
          */
         // npmDependencies?: string[]
     }
+    // ... of **first capture group** from ...
+    /**
+     * Wether to replace the matched content from `lineBeforeRegex` or `lineRegex` regex check. The first one takes precedence.
+     * Works only when end of content is matched (e.g. it will always work if regex ends with `$`)
+     * @sortText z9
+     */
+    replaceBeforeRegex?: boolean
     /** For JS langs only. How to resolve suggested imports if any */
     resolveImports?: {
         // specifier can be subst only for now

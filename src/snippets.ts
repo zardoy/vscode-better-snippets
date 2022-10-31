@@ -1,8 +1,8 @@
 import * as vscode from 'vscode'
-import { intersection, partition } from 'rambda'
-import { Configuration, snippetLocation, SnippetLocation } from './configurationType'
+import { partition } from 'rambda'
+import { Configuration, SnippetLocation } from './configurationType'
 import { CustomSnippet, CustomTypingSnippet } from './extension'
-import { PreparedSnippetData, prepareSnippetData } from './prepareSnippetData'
+import { prepareSnippetData } from './prepareSnippetData'
 import { possiblyRelatedTsLocations } from './typescriptPluginIntegration'
 
 // most of the logic live in extension.ts for now
@@ -53,13 +53,13 @@ export const filterSnippetByLocationPhase1 = <T extends CustomSnippet | CustomTy
     if (name.startsWith(lineText.trim())) validLocations.push('lineStart')
 
     const isPrevPosDot = (pos: vscode.Position) => pos.character > 0 && document.getText(new vscode.Range(pos.translate(0, -1), pos)) === '.'
-    if (position.character !== 0 && !isPrevPosDot(position)) {
+    if (position.character === 0) {
+        validLocations.push('code')
+    } else if (!isPrevPosDot(position)) {
         const wordRangeAtPosition = document.getWordRangeAtPosition(position)
         if (!wordRangeAtPosition || !isPrevPosDot(wordRangeAtPosition.start)) {
             validLocations.push('code')
         }
-    } else {
-        validLocations.push('code')
     }
 
     return filterSnippetByLocationShared(snippet.when.locations, validLocations, phase1Locations)

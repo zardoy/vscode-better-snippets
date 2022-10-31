@@ -1,0 +1,14 @@
+{
+    // it can also be a typing snippet with sequence instead
+    "name": "destruct3",
+    "body": "const { $LAST } = $EXPR",
+    "when": {
+        "lineRegex": "(?<EXPR>(\\.?\\w)+)\\.(?<LAST>\\w+)\\.\\w*$",
+        "triggerCharacters": [
+            ".",
+            ""
+        ],
+        "locations": []
+    },
+    "replaceBeforeRegex": true
+}

@@ -21,9 +21,14 @@ export const completionAddTextEdit = (completion: vscode.CompletionItem, textEdi
     return textEdits
 }
 
-export const Debug =
-    (scope: 'resolveImports' | 'snippetsRegexs' | 'snippets') =>
-    (...msg) => {
+export const Debug = (scope: 'resolveImports' | 'snippetsRegexs' | 'snippets') => {
+    return (...msg) => {
         const debugScopes = getExtensionSetting('debugScopes')
         if (debugScopes.includes(scope)) console.log(`[${scope}]`, ...msg)
     }
+}
+
+export const objectUndefinedIfEmpty = <T extends Record<string, any>>(obj: T) => {
+    if (Object.keys(obj).length === 0) return undefined
+    return obj
+}
