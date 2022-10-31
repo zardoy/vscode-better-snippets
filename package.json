@@ -193,7 +193,7 @@
     },
     "dependencies": {
         "@zardoy/utils": "^0.0.9",
-        "@zardoy/vscode-utils": "^0.0.42",
+        "@zardoy/vscode-utils": "^0.0.43",
         "chai": "^4.3.6",
         "chokidar-cli": "^3.0.0",
         "delay": "^5.0.0",

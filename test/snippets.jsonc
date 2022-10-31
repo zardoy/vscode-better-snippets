@@ -23,6 +23,9 @@
                         "testRegex": "function|=>|React.FC"
                     }
                 ]
+                // Optionally display these snippets only when react is in dependencies of package.json
+                // Might be useful if you also use react for things like ink
+                // "npmDependencies": ["react"]
             },
             // Make snippet import useState from react package for us! Though with some latency :(
             "resolveImports": {

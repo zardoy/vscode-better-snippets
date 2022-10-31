@@ -33,6 +33,8 @@ type TestProp =
           matchWith?: 'startsWith' | 'includes' | 'endsWith'
       }
 
+type NpmDependency = string | { type: 'dev' | 'prod'; dep: string }
+
 export type GeneralSnippet = {
     /**
      * @suggestSortText "3"
@@ -81,9 +83,9 @@ export type GeneralSnippet = {
                 )
         >
         /**
-         * Enable snippet only when following NPM dependencies are installed locally. TODO: implement
+         * Enable snippet only when following NPM dependencies are in package.json.
          */
-        // npmDependencies?: string[]
+        npmDependencies?: NpmDependency[]
     }
     // ... of **first capture group** from ...
     /**

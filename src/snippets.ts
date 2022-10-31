@@ -4,6 +4,7 @@ import { Configuration, SnippetLocation } from './configurationType'
 import { CustomSnippet, CustomTypingSnippet } from './extension'
 import { prepareSnippetData } from './prepareSnippetData'
 import { possiblyRelatedTsLocations } from './typescriptPluginIntegration'
+import { npmFilterSnippets } from './npmDependencies'
 
 // most of the logic live in extension.ts for now
 
@@ -70,6 +71,7 @@ export const filterWithSecondPhaseIfNeeded = async <T extends CustomSnippet | Cu
     document: vscode.TextDocument,
     position: vscode.Position,
 ): Promise<T[]> => {
+    snippets = await npmFilterSnippets(document, snippets)
     if (snippets.every(snippet => snippet.when.locations.every(loc => !possiblyRelatedTsLocations.includes(loc.replace(/^!/, ''))))) return snippets
     const { validCurrentLocations } = await prepareSnippetData(document, position)
     return snippets.filter(snippet => filterSnippetByLocationShared(snippet.when.locations, validCurrentLocations, possiblyRelatedTsLocations))

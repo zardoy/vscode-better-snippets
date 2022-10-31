@@ -20,7 +20,7 @@ specifiers:
   '@vscode/test-electron': ^2.1.5
   '@zardoy/tsconfig': ^1.4.0
   '@zardoy/utils': ^0.0.9
-  '@zardoy/vscode-utils': ^0.0.42
+  '@zardoy/vscode-utils': ^0.0.43
   chai: ^4.3.6
   chokidar-cli: ^3.0.0
   cross-env: ^7.0.3
@@ -52,7 +52,7 @@ specifiers:
 
 dependencies:
   '@zardoy/utils': 0.0.9
-  '@zardoy/vscode-utils': 0.0.42_3wjxqtud57hursbaqheex54bh4
+  '@zardoy/vscode-utils': 0.0.43_3wjxqtud57hursbaqheex54bh4
   chai: 4.3.6
   chokidar-cli: 3.0.0
   delay: 5.0.0
@@ -849,8 +849,8 @@ packages:
       type-fest: 2.19.0
     dev: false
 
-  /@zardoy/vscode-utils/0.0.42_3wjxqtud57hursbaqheex54bh4:
-    resolution: {integrity: sha512-VZyKqUr3KRJcEocpIUI6RXkNJzYqr9GmmPhjvM9njSCqWfZ6l/snQQpZFOUXvOZNMYoIMfNOlKej5yrs0xboRA==}
+  /@zardoy/vscode-utils/0.0.43_3wjxqtud57hursbaqheex54bh4:
+    resolution: {integrity: sha512-yXwMvXkBqllKY/7TdKR8tnWorots4DIBayGzfgR+/aC7c+KcJBDDtv1HifLwHVqurMHnIv/rOiuuFsN9EquFdg==}
     engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
     hasBin: true
     peerDependencies:
@@ -879,6 +879,7 @@ packages:
       jsonc-parser: 3.0.0
       lodash.throttle: 4.1.1
       modify-json-file: 1.2.2
+      path-browserify: 1.0.1
       rambda: 7.3.0
       type-fest: 2.19.0
       typed-jsonfile: 0.2.1
@@ -2712,7 +2713,7 @@ packages:
     dev: true
 
   /get-stream/2.3.1:
-    resolution: {integrity: sha1-Xzj5PzRgCWZu4BUKBUFn+Rvdld4=}
+    resolution: {integrity: sha512-AUGhbbemXxrZJRD5cDvKtQxLuYaIbNtDTK8YqupCI393Q2KSTreEsLUN3ZxAWFGiKTzL6nKuzfcIvieflUX9qA==}
     engines: {node: '>=0.10.0'}
     dependencies:
       object-assign: 4.1.1
@@ -3151,7 +3152,7 @@ packages:
     dev: true
 
   /is-stream/1.1.0:
-    resolution: {integrity: sha1-EtSj3U5o4Lec6428hBc66A2RykQ=}
+    resolution: {integrity: sha512-uQPm8kcs47jx38atAcWTVxyltQYoPT68y9aWYdV6yWXSyW8mzSat0TL6CiWdZeCdF3KrAvpVtnHbTv4RN+rqdQ==}
     engines: {node: '>=0.10.0'}
     dev: false
 

@@ -1,5 +1,5 @@
 // GENERATED. DON'T EDIT MANUALLY
-// md5hash: f7c7dc54a1e3a45394106c862c8530de
+// md5hash: 41cf33ab1bb8373faa2b68a42e22b3cf
 {
     "type": "object",
     "properties": {
@@ -249,6 +249,36 @@
                                                 }
                                             ]
                                         }
+                                    },
+                                    "npmDependencies": {
+                                        "description": "Enable snippet only when following NPM dependencies are installed locally. TODO: implement",
+                                        "type": "array",
+                                        "items": {
+                                            "anyOf": [
+                                                {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "type": {
+                                                            "enum": [
+                                                                "dev",
+                                                                "prod"
+                                                            ],
+                                                            "type": "string"
+                                                        },
+                                                        "dep": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "dep",
+                                                        "type"
+                                                    ]
+                                                },
+                                                {
+                                                    "type": "string"
+                                                }
+                                            ]
+                                        }
                                     }
                                 }
                             },
@@ -341,9 +371,6 @@
                                     }
                                 }
                             },
-                            "group": {
-                                "type": "string"
-                            },
                             "fileIcon": {
                                 "description": "If specified, `iconType` is ignored. It makes sense to use with custom file icon theme",
                                 "type": "string"
@@ -398,9 +425,6 @@
                                 "description": "Only if `when.triggerCharacters` is used",
                                 "default": false,
                                 "type": "boolean"
-                            },
-                            "type": {
-                                "type": "string"
                             }
                         },
                         "required": [
@@ -628,6 +652,36 @@
                                                 }
                                             ]
                                         }
+                                    },
+                                    "npmDependencies": {
+                                        "description": "Enable snippet only when following NPM dependencies are installed locally. TODO: implement",
+                                        "type": "array",
+                                        "items": {
+                                            "anyOf": [
+                                                {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "type": {
+                                                            "enum": [
+                                                                "dev",
+                                                                "prod"
+                                                            ],
+                                                            "type": "string"
+                                                        },
+                                                        "dep": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "dep",
+                                                        "type"
+                                                    ]
+                                                },
+                                                {
+                                                    "type": "string"
+                                                }
+                                            ]
+                                        }
                                     }
                                 }
                             },
@@ -790,14 +844,8 @@
                         }
                     ]
                 },
-                "type": {
-                    "type": "string"
-                },
                 "description": {
                     "description": "Should be short. Always displayed in completion widget on the right on the same line as label. Default is 'Better Snippet'",
-                    "type": "string"
-                },
-                "group": {
                     "type": "string"
                 },
                 "when": {

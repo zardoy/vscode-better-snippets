@@ -22,6 +22,7 @@ import { registerViews } from './views'
 import { registerSnippetSettingsJsonCommands } from './settingsJsonSnippetCommands'
 import { filterSnippetByLocationPhase1, filterWithSecondPhaseIfNeeded, snippetsConfig } from './snippets'
 import { registerSnippetsMigrateCommands } from './migrateSnippets'
+import { changeNpmDepsWatcherState } from './npmDependencies'
 
 type CustomSnippetUnresolved = Configuration['customSnippets'][number]
 type TypingSnippetUnresolved = Configuration['typingSnippets'][number]
@@ -229,6 +230,8 @@ export const activate = () => {
             ...getMergedConfig('customSnippets'),
             ...(getExtensionSetting('enableBuiltinSnippets') ? builtinSnippets.filter(snippet => !disableBuiltinSnippets.includes(snippet.name as any)) : []),
         ]
+
+        void changeNpmDepsWatcherState(snippetsToLoadFromSettings)
 
         const registerSnippets = (snippetsToLoad: Configuration['customSnippets']) => {
             const snippetsByLanguage: { [language: string]: { snippets: CustomSnippet[]; snippetsByTriggerChar: Record<string, CustomSnippet[]> } } = {}
