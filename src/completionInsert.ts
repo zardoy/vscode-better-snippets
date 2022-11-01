@@ -1,12 +1,11 @@
-/* eslint-disable unicorn/consistent-destructuring */
 /* eslint-disable no-await-in-loop */
 import * as vscode from 'vscode'
 import { getExtensionCommandId, getExtensionSetting, registerExtensionCommand } from 'vscode-framework'
 import delay from 'delay'
 import { range } from 'rambda'
 import { oneOf } from '@zardoy/utils'
-import { CustomSnippet } from './extension'
 import { Debug } from './util'
+import { CustomSnippet } from './snippet'
 
 const debug = Debug('resolveImports')
 

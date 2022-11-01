@@ -3,8 +3,8 @@ import { partition } from 'rambda'
 import { vscodeReadFile } from '@zardoy/vscode-utils/build/fs'
 import { PackageJson } from 'type-fest'
 import { parse } from 'jsonc-parser'
-import { CustomSnippet, CustomTypingSnippet } from './extension'
 import { Configuration } from './configurationType'
+import { CustomSnippet, CustomTypingSnippet } from './snippet'
 
 let watcher: vscode.FileSystemWatcher | undefined
 

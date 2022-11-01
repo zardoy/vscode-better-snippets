@@ -1,12 +1,10 @@
 import * as vscode from 'vscode'
 import { partition } from 'rambda'
 import { Configuration, SnippetLocation } from './configurationType'
-import { CustomSnippet, CustomTypingSnippet } from './extension'
 import { prepareSnippetData } from './prepareSnippetData'
 import { possiblyRelatedTsLocations } from './typescriptPluginIntegration'
 import { npmFilterSnippets } from './npmDependencies'
-
-// most of the logic live in extension.ts for now
+import { CustomSnippet, CustomTypingSnippet } from './snippet'
 
 // mutates on init
 export const snippetsConfig: Pick<Configuration, 'strictPositionLocations' | 'enableTsPlugin'> = {} as any

@@ -1,24 +1,13 @@
 import * as vscode from 'vscode'
-import delay from 'delay'
 import stringDedent from 'string-dedent'
-import {
-    getExtensionCommandId,
-    getExtensionSetting,
-    getExtensionSettingId,
-    registerExtensionCommand,
-    showQuickPick,
-    VSCodeQuickPickItem,
-} from 'vscode-framework'
-import { parseTree, findNodeAtLocation } from 'jsonc-parser'
+import { getExtensionCommandId, getExtensionSetting, registerExtensionCommand, showQuickPick, VSCodeQuickPickItem } from 'vscode-framework'
 import { normalizeLanguages, areLangsEquals } from '@zardoy/vscode-utils/build/langs'
 import { Configuration } from './configurationType'
-import { getSnippetsDefaults } from './extension'
 import { RevealSnippetOptions } from './settingsJsonSnippetCommands'
+import { getSnippetsDefaults } from './snippet'
 
 export const registerCreateSnippetFromSelection = () => {
-    // createNativeSnippetFromSelection
     registerExtensionCommand('createSnippetFromSelection', async (_, snippetName?: string) => {
-        const isNativeCreator = false
         const activeEditor = vscode.window.activeTextEditor
         if (!activeEditor) return
         const { document } = activeEditor

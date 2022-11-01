@@ -13,8 +13,8 @@ import { sort } from 'rambda'
 import { normalizeLanguages } from '@zardoy/vscode-utils/build/langs'
 import { watchExtensionSettings } from '@zardoy/vscode-utils/build/settings'
 import { CommonSnippet, getSnippetsSettingValue, RevealSnippetOptions } from './settingsJsonSnippetCommands'
-import { getSnippetsDefaults } from './extension'
 import { GeneralSnippet } from './configurationType'
+import { getSnippetsDefaults } from './snippet'
 
 const SCHEME = `${getExtensionContributionsPrefix()}virtualSnippets`
 

@@ -3,16 +3,12 @@
 import * as vscode from 'vscode'
 import { normalizeRegex } from '@zardoy/vscode-utils/build/settings'
 import { normalizeLanguages } from '@zardoy/vscode-utils/build/langs'
-import { ConditionalPick } from 'type-fest'
 import { SnippetParser } from 'vscode-snippet-parser'
-import { mergeDeepRight, partition } from 'rambda'
-import { DeepRequired } from 'ts-essentials'
+import { partition } from 'rambda'
 import { extensionCtx, getExtensionCommandId, getExtensionSetting, getExtensionSettingId } from 'vscode-framework'
-import { ensureHasProp, omitObj, oneOf, pickObj } from '@zardoy/utils'
+import { ensureHasProp, oneOf } from '@zardoy/utils'
 import escapeStringRegexp from 'escape-string-regexp'
-import { Configuration } from './configurationType'
 import { completionAddTextEdit, getConfigValueFromAllScopes, normalizeFilePathRegex, objectUndefinedIfEmpty } from './util'
-import { builtinSnippets } from './builtinSnippets'
 import { registerExperimentalSnippets } from './experimentalSnippets'
 import { CompletionInsertArg, registerCompletionInsert } from './completionInsert'
 import { registerSpecialCommand } from './specialCommand'
@@ -20,41 +16,16 @@ import { registerCreateSnippetFromSelection } from './createSnippetFromSelection
 import settingsHelper from './settingsHelper'
 import { registerViews } from './views'
 import { registerSnippetSettingsJsonCommands } from './settingsJsonSnippetCommands'
-import { filterSnippetByLocationPhase1, filterWithSecondPhaseIfNeeded, snippetsConfig } from './snippets'
+import { filterSnippetByLocationPhase1, filterWithSecondPhaseIfNeeded, snippetsConfig } from './filterSnippets'
 import { registerSnippetsMigrateCommands } from './migrateSnippets'
 import { changeNpmDepsWatcherState } from './npmDependencies'
-
-type CustomSnippetUnresolved = Configuration['customSnippets'][number]
-type TypingSnippetUnresolved = Configuration['typingSnippets'][number]
-export type CustomSnippet = CustomSnippetUnresolved & typeof unmergedSnippetDefaults
-export type CustomTypingSnippet = TypingSnippetUnresolved & Pick<typeof unmergedSnippetDefaults, 'when'>
+import { CustomSnippet, CustomTypingSnippet, initSnippetDefaults, mergeSnippetWithDefaults, snippetDefaults } from './snippet'
+import { getAllLoadedSnippets } from './loadedSnippets'
 
 export const activate = () => {
     let disposables: vscode.Disposable[] = []
 
-    // #region snippetDefaults
-    let snippetDefaults: DeepRequired<Configuration['customSnippetDefaults']>
-    function updateSnippetDefaults() {
-        snippetDefaults = getSnippetsDefaults()
-    }
-
-    updateSnippetDefaults()
-    vscode.workspace.onDidChangeConfiguration(({ affectsConfiguration }) => {
-        if (affectsConfiguration(getExtensionSettingId('customSnippetDefaults'))) updateSnippetDefaults()
-    })
-    // #endregion
-
-    const mergeSnippetWithDefaults = <T extends CustomSnippetUnresolved | TypingSnippetUnresolved>(
-        snippet: T,
-    ): T extends CustomSnippetUnresolved ? CustomSnippet : CustomTypingSnippet =>
-        mergeDeepRight(
-            {
-                ...omitObj(snippetDefaults, 'sortText', 'when'),
-                ...('sortText' in snippet ? {} : pickObj(snippetDefaults, 'sortText')),
-                when: omitObj(snippetDefaults.when, 'pathRegex'),
-            } as CustomSnippet,
-            snippet,
-        )
+    initSnippetDefaults()
 
     type SnippetResolvedMetadata = {
         /** stays positive */
@@ -217,30 +188,22 @@ export const activate = () => {
 
         const langsSupersets = getExtensionSetting('languageSupersets')
 
-        const disableBuiltinSnippets = getConfigValueFromAllScopes('experimental.disableBuiltinSnippets')
-        const snippetsToLoadFromSettings = [
-            ...getConfigValueFromAllScopes('customSnippets'),
-            ...(getExtensionSetting('enableBuiltinSnippets') ? builtinSnippets.filter(snippet => !disableBuiltinSnippets.includes(snippet.name as any)) : []),
-        ]
+        const snippetsToLoadByLang = getAllLoadedSnippets()
 
-        void changeNpmDepsWatcherState(snippetsToLoadFromSettings)
+        void changeNpmDepsWatcherState(Object.values(snippetsToLoadByLang).flat(1))
 
-        const registerSnippets = (snippetsToLoad: Configuration['customSnippets']) => {
-            const snippetsByLanguage: { [language: string]: { snippets: CustomSnippet[]; snippetsByTriggerChar: Record<string, CustomSnippet[]> } } = {}
-            for (const snippetToLoad of snippetsToLoad) {
-                const customSnippet = mergeSnippetWithDefaults(snippetToLoad)
-                for (const language of customSnippet.when.languages) {
-                    if (!snippetsByLanguage[language]) snippetsByLanguage[language] = { snippets: [], snippetsByTriggerChar: {} }
-                    const snippet = mergeSnippetWithDefaults(customSnippet)
+        const registerSnippets = () => {
+            const completionProviderDisposables = [] as vscode.Disposable[]
+            for (const [language, allSnippets] of Object.entries(snippetsToLoadByLang)) {
+                const snippets: CustomSnippet[] = []
+                const snippetsByTriggerChar: Record<string, CustomSnippet[]> = {}
+                for (const snippet of allSnippets) {
                     for (const triggerChar of snippet.when.triggerCharacters ?? ['']) {
-                        if (triggerChar === '') snippetsByLanguage[language]!.snippets.push(snippet)
-                        else ensureHasProp(snippetsByLanguage[language]!.snippetsByTriggerChar, triggerChar, []).push(snippet)
+                        if (triggerChar === '') snippets.push(snippet)
+                        else ensureHasProp(snippetsByTriggerChar, triggerChar, []).push(snippet)
                     }
                 }
-            }
 
-            const completionProviderDisposables = [] as vscode.Disposable[]
-            for (const [language, { snippets, snippetsByTriggerChar }] of Object.entries(snippetsByLanguage)) {
                 let triggerFromInner = false
                 const disposable = vscode.languages.registerCompletionItemProvider(
                     normalizeLanguages(language, langsSupersets),
@@ -344,10 +307,9 @@ export const activate = () => {
 
             disposables.push(...completionProviderDisposables)
             extensionCtx.subscriptions.push(...disposables)
-            return completionProviderDisposables
         }
 
-        registerSnippets(snippetsToLoadFromSettings)
+        registerSnippets()
 
         const typingSnippetsToLoad = getConfigValueFromAllScopes('typingSnippets')
         if (typingSnippetsToLoad.length > 0) {
@@ -562,17 +524,3 @@ export const activate = () => {
     registerSnippetSettingsJsonCommands()
     registerSnippetsMigrateCommands()
 }
-
-const unmergedSnippetDefaults: DeepRequired<Configuration['customSnippetDefaults']> = {
-    sortText: undefined!,
-    iconType: 'Snippet',
-    description: 'Better Snippet',
-    when: {
-        languages: ['js'],
-        locations: ['code'],
-        pathRegex: undefined!,
-    },
-}
-
-export const getSnippetsDefaults = (): DeepRequired<Configuration['customSnippetDefaults']> =>
-    mergeDeepRight(unmergedSnippetDefaults, getExtensionSetting('customSnippetDefaults'))
