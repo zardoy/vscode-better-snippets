@@ -220,7 +220,7 @@ export const activate = () => {
 
                             const firstPhaseSnippets = getCurrentSnippets('completion', snippetsToCheck, document, position, language)
 
-                            const includedSnippets = await filterWithSecondPhaseIfNeeded(firstPhaseSnippets, document, position)
+                            const includedSnippets = await filterWithSecondPhaseIfNeeded(firstPhaseSnippets, document, position, langsSupersets)
                             return includedSnippets.map(
                                 ({
                                     body,
@@ -388,7 +388,7 @@ export const activate = () => {
                             document,
                             endPosition,
                         )
-                        appliableTypingSnippets = await filterWithSecondPhaseIfNeeded(appliableTypingSnippets, document, endPosition)
+                        appliableTypingSnippets = await filterWithSecondPhaseIfNeeded(appliableTypingSnippets, document, endPosition, langsSupersets)
                         if (appliableTypingSnippets.length > 2) console.warn(`Multiple appliable typing snippets found: ${appliableTypingSnippets.join(', ')}`)
                         const snippet = appliableTypingSnippets[0]
                         if (!snippet) return

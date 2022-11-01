@@ -1,7 +1,6 @@
 import * as vscode from 'vscode'
 import type { RequestResponseData } from '../typescript-plugin/src/requestData'
 import { SnippetLocation } from './configurationType'
-import { PreparedSnippetData } from './prepareSnippetData'
 import { snippetsConfig } from './filterSnippets'
 
 export const makeTypescriptPluginRequest = async ({ uri }: vscode.TextDocument, position: vscode.Position): Promise<RequestResponseData | undefined> => {
@@ -29,10 +28,7 @@ export const possiblyRelatedTsLocations: SnippetLocation[] = ['comment', 'code']
 // also typing snippets provider can be called at the same moment
 let previousRequestCache: { /*uri+ver+pos*/ key: string; data: RequestResponseData | undefined } | null = null
 
-export const getValidTsRelatedLocations = async (
-    textDocument: vscode.TextDocument,
-    position: vscode.Position,
-): Promise<PreparedSnippetData['validCurrentLocations']> => {
+export const getValidTsRelatedLocations = async (textDocument: vscode.TextDocument, position: vscode.Position): Promise<SnippetLocation[]> => {
     const cacheKey = `${textDocument.uri.toString()}:${textDocument.version}:${textDocument.offsetAt(position)}`
     const data =
         previousRequestCache?.key === cacheKey
@@ -44,7 +40,7 @@ export const getValidTsRelatedLocations = async (
     // we don't know why, so display them all
     if (!data) return possiblyRelatedTsLocations
     const { kind } = data
-    const returnLocations: PreparedSnippetData['validCurrentLocations'] = []
+    const returnLocations: SnippetLocation[] = []
     if (kind === 'comment') returnLocations.push(kind)
     if (kind !== 'string' && kind !== 'comment') returnLocations.push('code')
     return returnLocations
