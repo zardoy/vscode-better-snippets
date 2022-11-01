@@ -5,7 +5,7 @@ import delay from 'delay'
 import { Configuration } from '../../../src/configurationType'
 import { clearEditorText } from './utils'
 
-describe('Typing snippets', () => {
+describe.only('Typing snippets', () => {
     const resultingBody = 'EXAMPLE'
     const triggerSequence = 'cb '
     const triggerSequenceWithoutBody = 'cbb'
@@ -18,9 +18,24 @@ describe('Typing snippets', () => {
     }
 
     /** With delay, enough for comparing triggered result */
-    const typeSequenceWithDelay = async (seq: string) => {
+    const typeSequenceWithDelay = async (seq: string, tryToShortenDelay = true) => {
         await typeSequence(seq)
-        await delay(300)
+        if (tryToShortenDelay) {
+            await new Promise<void>(resolve => {
+                let isFirst = true
+                const { dispose } = vscode.workspace.onDidChangeTextDocument(() => {
+                    if (isFirst) {
+                        isFirst = false
+                        return
+                    }
+
+                    dispose()
+                    resolve()
+                })
+            })
+        } else {
+            await delay(300)
+        }
     }
 
     before(done => {
@@ -49,6 +64,7 @@ describe('Typing snippets', () => {
                 },
             ]
             await vscode.workspace.getConfiguration('betterSnippets').update(configKey, configValue, vscode.ConfigurationTarget.Global)
+            await delay(200)
             done()
         })
     })
@@ -70,7 +86,7 @@ describe('Typing snippets', () => {
             called = true
         })
         await clearEditorText(editor)
-        await typeSequenceWithDelay(triggerSequenceWithoutBody)
+        await typeSequenceWithDelay(triggerSequenceWithoutBody, false)
         expect(document.getText()).to.equal(triggerSequenceWithoutBody)
         expect(called).to.equal(true)
         await typeSequenceWithDelay(triggerSequence)
@@ -98,7 +114,7 @@ describe('Typing snippets', () => {
         await typeSequence('cb')
         await vscode.commands.executeCommand('cursorMove', { to: 'left' })
         await vscode.commands.executeCommand('cursorMove', { to: 'right' })
-        await typeSequenceWithDelay(' ')
+        await typeSequenceWithDelay(' ', false)
         expect(document.getText().split('\n')[0]).to.equal('cb ')
     })
 
