@@ -11,7 +11,7 @@ import { extensionCtx, getExtensionCommandId, getExtensionSetting, getExtensionS
 import { ensureHasProp, omitObj, oneOf, pickObj } from '@zardoy/utils'
 import escapeStringRegexp from 'escape-string-regexp'
 import { Configuration } from './configurationType'
-import { completionAddTextEdit, normalizeFilePathRegex, objectUndefinedIfEmpty } from './util'
+import { completionAddTextEdit, getConfigValueFromAllScopes, normalizeFilePathRegex, objectUndefinedIfEmpty } from './util'
 import { builtinSnippets } from './builtinSnippets'
 import { registerExperimentalSnippets } from './experimentalSnippets'
 import { CompletionInsertArg, registerCompletionInsert } from './completionInsert'
@@ -216,18 +216,10 @@ export const activate = () => {
         snippetsConfig.enableTsPlugin = getExtensionSetting('enableTsPlugin')
 
         const langsSupersets = getExtensionSetting('languageSupersets')
-        const getMergedConfig = <T extends keyof ConditionalPick<Configuration, any[]>>(configKey: T): Configuration[T] => {
-            const {
-                globalValue = [],
-                workspaceValue = [],
-                workspaceFolderValue = [],
-            } = vscode.workspace.getConfiguration(process.env.IDS_PREFIX, null).inspect<any[]>(configKey)!
-            return [...globalValue, ...workspaceValue, ...workspaceFolderValue] as any
-        }
 
-        const disableBuiltinSnippets = getMergedConfig('experimental.disableBuiltinSnippets')
+        const disableBuiltinSnippets = getConfigValueFromAllScopes('experimental.disableBuiltinSnippets')
         const snippetsToLoadFromSettings = [
-            ...getMergedConfig('customSnippets'),
+            ...getConfigValueFromAllScopes('customSnippets'),
             ...(getExtensionSetting('enableBuiltinSnippets') ? builtinSnippets.filter(snippet => !disableBuiltinSnippets.includes(snippet.name as any)) : []),
         ]
 
@@ -240,9 +232,10 @@ export const activate = () => {
                 for (const language of customSnippet.when.languages) {
                     if (!snippetsByLanguage[language]) snippetsByLanguage[language] = { snippets: [], snippetsByTriggerChar: {} }
                     const snippet = mergeSnippetWithDefaults(customSnippet)
-                    for (const triggerChar of snippet.when.triggerCharacters ?? [''])
+                    for (const triggerChar of snippet.when.triggerCharacters ?? ['']) {
                         if (triggerChar === '') snippetsByLanguage[language]!.snippets.push(snippet)
                         else ensureHasProp(snippetsByLanguage[language]!.snippetsByTriggerChar, triggerChar, []).push(snippet)
+                    }
                 }
             }
 
@@ -356,7 +349,7 @@ export const activate = () => {
 
         registerSnippets(snippetsToLoadFromSettings)
 
-        const typingSnippetsToLoad = getMergedConfig('typingSnippets')
+        const typingSnippetsToLoad = getConfigValueFromAllScopes('typingSnippets')
         if (typingSnippetsToLoad.length > 0) {
             const typingSnippets = typingSnippetsToLoad.map(snippet => mergeSnippetWithDefaults(snippet))
             let lastTypedSeq = ''
@@ -380,9 +373,9 @@ export const activate = () => {
             // TODO review implementation as its still blurry. Describe it graphically
             let internalDocumentChange = false
 
-            disposables.push(
-                // TODO losing errors here for some reason
-                vscode.workspace.onDidChangeTextDocument(({ contentChanges, document, reason }) => {
+            // TODO losing errors here for some reason
+            vscode.workspace.onDidChangeTextDocument(
+                ({ contentChanges, document, reason }) => {
                     ;(async () => {
                         // ignore if nothing is changed
                         if (contentChanges.length === 0) return
@@ -507,8 +500,12 @@ export const activate = () => {
                             await vscode.commands.executeCommand(getExtensionCommandId('completionInsert'), arg)
                         }
                     })().catch(console.error)
-                }),
-                vscode.window.onDidChangeTextEditorSelection(({ textEditor, kind, selections }) => {
+                },
+                undefined,
+                disposables,
+            )
+            vscode.window.onDidChangeTextEditorSelection(
+                ({ textEditor, kind, selections }) => {
                     const { document } = textEditor
                     if (document.uri !== vscode.window.activeTextEditor?.document.uri) return
                     // reset on mouse click
@@ -529,7 +526,9 @@ export const activate = () => {
                     // curosr moved from last TYPING position or
                     // curosr moved to the start of line: reset sequence!
                     if (lastTypePosition && (newPos.character === 0 || !lastTypePosition.isEqual(newPos.translate(0, -1)))) resetSequence()
-                }),
+                },
+                undefined,
+                disposables,
             )
         }
 
