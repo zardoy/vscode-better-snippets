@@ -1,5 +1,5 @@
 // GENERATED. DON'T EDIT MANUALLY
-// md5hash: 41cf33ab1bb8373faa2b68a42e22b3cf
+// md5hash: 6bd68c56fbd48c05f1795b782ef97307
 {
     "type": "object",
     "properties": {
@@ -251,7 +251,7 @@
                                         }
                                     },
                                     "npmDependencies": {
-                                        "description": "Enable snippet only when following NPM dependencies are installed locally. TODO: implement",
+                                        "description": "Enable snippet only when following NPM dependencies are in package.json.",
                                         "type": "array",
                                         "items": {
                                             "anyOf": [
@@ -654,7 +654,7 @@
                                         }
                                     },
                                     "npmDependencies": {
-                                        "description": "Enable snippet only when following NPM dependencies are installed locally. TODO: implement",
+                                        "description": "Enable snippet only when following NPM dependencies are in package.json.",
                                         "type": "array",
                                         "items": {
                                             "anyOf": [

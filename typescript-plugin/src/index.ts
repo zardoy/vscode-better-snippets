@@ -19,7 +19,8 @@ export = function ({ typescript: ts }: { typescript: typeof import('typescript/l
                 if (options?.triggerCharacter === ('betterSnippetsRequest' as any)) {
                     let kind: RequestResponseData['kind'] = 'else'
 
-                    if (info.languageService.getSpanOfEnclosingComment(fileName, position, false)) {
+                    const spanOfEnclosingComment = info.languageService.getSpanOfEnclosingComment(fileName, position, false)
+                    if (spanOfEnclosingComment && spanOfEnclosingComment.start + spanOfEnclosingComment.length !== position) {
                         kind = 'comment'
                     } else {
                         const sourceFile = info.languageService.getProgram()!.getSourceFile(fileName)!

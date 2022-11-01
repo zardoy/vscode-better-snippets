@@ -24,18 +24,21 @@ export const makeTypescriptPluginRequest = async ({ uri }: vscode.TextDocument, 
 
 export const possiblyRelatedTsLocations: SnippetLocation[] = ['comment', 'code']
 
-let previousRequestCache: { uriString: string; ver: number; data: RequestResponseData | undefined } | null = null
+// this cache is ovbviously for one-time usage (e.g. version and pos is changed between each keystroke), however:
+// each provider requests it individually e.g. if editing .tsx file it will be called twice for typescript and typescriptreact snippets
+// also typing snippets provider can be called at the same moment
+let previousRequestCache: { /*uri+ver+pos*/ key: string; data: RequestResponseData | undefined } | null = null
 
 export const getValidTsRelatedLocations = async (
     textDocument: vscode.TextDocument,
     position: vscode.Position,
 ): Promise<PreparedSnippetData['validCurrentLocations']> => {
+    const cacheKey = `${textDocument.uri.toString()}:${textDocument.version}:${textDocument.offsetAt(position)}`
     const data =
-        previousRequestCache?.uriString === textDocument.uri.toString() && previousRequestCache.ver === textDocument.version
+        previousRequestCache?.key === cacheKey
             ? previousRequestCache.data
             : (previousRequestCache = {
-                  uriString: textDocument.uri.toString(),
-                  ver: textDocument.version,
+                  key: cacheKey,
                   data: await makeTypescriptPluginRequest(textDocument, position),
               }).data
     // we don't know why, so display them all

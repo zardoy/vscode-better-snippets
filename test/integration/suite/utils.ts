@@ -1,4 +1,5 @@
 import * as vscode from 'vscode'
+import _ from 'lodash'
 
 export const clearEditorText = async (editor: vscode.TextEditor, resetContent = '') => {
     await new Promise<void>(resolve => {
@@ -28,7 +29,7 @@ export const getCompletionItems = async (pos?: vscode.Position) => {
 
 export const getFirstCompletionItem = async (pos: vscode.Position) =>
     getCompletionItems(pos).then(items => {
-        const item = items[0]
+        const item = _.sortBy(items, c => c.sortText ?? c.label)[0]
         return item && { ...item, label: normalizeCompletionItemLabel(item.label) }
     })
 

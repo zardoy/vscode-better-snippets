@@ -6,6 +6,7 @@ neverBuiltDependencies:
 overrides:
   esbuild: ^0.14.10
   typescript-json-schema: ^0.53.0
+  escape-string-regexp: ^4
 
 specifiers:
   '@milahu/patch-package-with-pnpm-support': ^6.4.8
@@ -13,32 +14,35 @@ specifiers:
   '@types/fs-extra': ^9.0.13
   '@types/glob': ^7.2.0
   '@types/jest': ^27.4.0
+  '@types/lodash': ^4.14.187
   '@types/mocha': ^9.1.0
   '@types/node': ^16.11.25
   '@types/path-browserify': ^1.0.0
   '@types/vscode': 1.64.0
   '@vscode/test-electron': ^2.1.5
   '@zardoy/tsconfig': ^1.4.0
-  '@zardoy/utils': ^0.0.9
+  '@zardoy/utils': ^0.0.10
   '@zardoy/vscode-utils': ^0.0.43
   chai: ^4.3.6
   chokidar-cli: ^3.0.0
   cross-env: ^7.0.3
   delay: ^5.0.0
   esbuild: ^0.14.10
-  escape-string-regexp: ^5.0.0
+  escape-string-regexp: ^4
   eslint: ^8.9.0
   eslint-config-zardoy: ^0.2.14
   fs-extra: ^10.0.1
   glob: ^7.2.0
   got: ^11.8.3
   jsonc-parser: ^3.0.0
+  lodash: ^4.17.21
   lodash.orderby: ^4.6.0
   mocha: ^9.2.0
   modify-json-file: ^1.2.2
   path-browserify: ^1.0.1
   prettier: ^2.5.1
   rambda: ^6.9.0
+  rimraf: ^3.0.2
   string-dedent: ^2.0.0
   ts-essentials: ^9.1.2
   tsm: ^2.2.1
@@ -51,13 +55,13 @@ specifiers:
   vscode-snippet-parser: ^0.0.5
 
 dependencies:
-  '@zardoy/utils': 0.0.9
+  '@zardoy/utils': 0.0.10
   '@zardoy/vscode-utils': 0.0.43_3wjxqtud57hursbaqheex54bh4
   chai: 4.3.6
   chokidar-cli: 3.0.0
   delay: 5.0.0
   esbuild: 0.14.23
-  escape-string-regexp: 5.0.0
+  escape-string-regexp: 4.0.0
   got: 11.8.3
   jsonc-parser: 3.0.0
   lodash.orderby: 4.6.0
@@ -78,6 +82,7 @@ devDependencies:
   '@types/fs-extra': 9.0.13
   '@types/glob': 7.2.0
   '@types/jest': 27.4.0
+  '@types/lodash': 4.14.187
   '@types/mocha': 9.1.0
   '@types/node': 16.11.25
   '@types/path-browserify': 1.0.0
@@ -89,7 +94,9 @@ devDependencies:
   eslint-config-zardoy: 0.2.14_fhzmdq77bspfhxkfuzq4fbrdsy
   fs-extra: 10.0.1
   glob: 7.2.0
+  lodash: 4.17.21
   mocha: 9.2.0
+  rimraf: 3.0.2
   tsm: 2.2.1
   typescript: 4.5.5
   vitest: 0.8.1
@@ -603,6 +610,10 @@ packages:
       '@types/node': 16.11.25
     dev: false
 
+  /@types/lodash/4.14.187:
+    resolution: {integrity: sha512-MrO/xLXCaUgZy3y96C/iOsaIqZSeupyTImKClHunL5GrmaiII2VwvWmLBu2hwa0Kp0sV19CsyjtrTc/Fx8rg/A==}
+    dev: true
+
   /@types/minimatch/3.0.5:
     resolution: {integrity: sha512-Klz949h02Gz2uZCMGwDUSDS1YBlTdDDgbWHi+81l29tQALUtvz4rAYi5uoVhE5Lagoq6DeqAUlbrHvW/mXDgdQ==}
     dev: true
@@ -831,17 +842,18 @@ packages:
       typescript: 4.5.5
     dev: true
 
-  /@zardoy/utils/0.0.4:
-    resolution: {integrity: sha512-XByd7HzxgwJi85o3oTSJDhk6b3H4w21NYHIqX3WtQ+tGBFPLldo8rdzr31oms6coeXvPVwRmoTGkJmAyHTJQRw==}
+  /@zardoy/utils/0.0.10:
+    resolution: {integrity: sha512-Tgk1RPmKl2HMHDOIoFwrRcPQWgSfoIhJZiatR18GVvvjxQ0zZNSR7ZIT6HLHBDXNsFA2aanyQv4GTPe1V8+iMQ==}
     engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
     dependencies:
+      escape-string-regexp: 4.0.0
       lodash.compact: 3.0.1
       rambda: 6.9.0
       type-fest: 2.19.0
     dev: false
 
-  /@zardoy/utils/0.0.9:
-    resolution: {integrity: sha512-c7UJ3UC3yXXAYvZe23AFTGI1Nqes/TXvKMVnEYk/ikKF7v8d5rvuwz6dw5cTlDgz3Vpub725MIWsIloVKAPSmQ==}
+  /@zardoy/utils/0.0.4:
+    resolution: {integrity: sha512-XByd7HzxgwJi85o3oTSJDhk6b3H4w21NYHIqX3WtQ+tGBFPLldo8rdzr31oms6coeXvPVwRmoTGkJmAyHTJQRw==}
     engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
     dependencies:
       lodash.compact: 3.0.1
@@ -1257,7 +1269,7 @@ packages:
     engines: {node: '>=4'}
     dependencies:
       ansi-styles: 3.2.1
-      escape-string-regexp: 1.0.5
+      escape-string-regexp: 4.0.0
       supports-color: 5.5.0
 
   /chalk/4.1.2:
@@ -1324,7 +1336,7 @@ packages:
     resolution: {integrity: sha512-GfisEZEJvzKrmGWkvfhgzcz/BllN1USeqD2V6tg14OAOgaCD2Z/PUEuxnAZ/nPvmaHRG7a8y77p1T/IRQ4D1Hw==}
     engines: {node: '>=4'}
     dependencies:
-      escape-string-regexp: 1.0.5
+      escape-string-regexp: 4.0.0
     dev: true
 
   /clean-stack/2.2.0:
@@ -2015,23 +2027,9 @@ packages:
     resolution: {integrity: sha1-Aljq5NPQwJdN4cFpGI7wBR0dGYg=}
     dev: false
 
-  /escape-string-regexp/1.0.5:
-    resolution: {integrity: sha1-G2HAViGQqN/2rjuyzwIAyhMLhtQ=}
-    engines: {node: '>=0.8.0'}
-
-  /escape-string-regexp/2.0.0:
-    resolution: {integrity: sha512-UpzcLCXolUWcNu5HtVMHYdXJjArjsF9C0aNnquZYY4uW/Vu0miy5YoWvbV345HauVvcAUnpRuhMMcqTcGOY2+w==}
-    engines: {node: '>=8'}
-    dev: false
-
   /escape-string-regexp/4.0.0:
     resolution: {integrity: sha512-TtpcNJ3XAzx3Gq8sWRzJaVajRs0uVxA2YAkdb1jm2YkPz4G6egUFAyA3n5vtEIZefPk5Wa4UXbKuS5fKkJWdgA==}
     engines: {node: '>=10'}
-
-  /escape-string-regexp/5.0.0:
-    resolution: {integrity: sha512-/veY75JbMK4j1yjvuUxuVsiS/hr/4iHs9FTT6cgTexxdE0Ly/glccBAkloH/DofkjRbZU3bnoj38mOmhkZ0lHw==}
-    engines: {node: '>=12'}
-    dev: false
 
   /escodegen/1.14.3:
     resolution: {integrity: sha512-qFcX0XJkdg+PB3xjZZG/wKSuT1PnQWx57+TVSjIMmILd2yC/6ByYElPwJnslDsuWuSAp4AwJGumarAAmJch5Kw==}
@@ -2193,7 +2191,7 @@ packages:
     peerDependencies:
       eslint: '>=4.19.1'
     dependencies:
-      escape-string-regexp: 1.0.5
+      escape-string-regexp: 4.0.0
       eslint: 8.9.0
       ignore: 5.2.0
     dev: true
@@ -3291,7 +3289,7 @@ packages:
   /jsonfile/4.0.0:
     resolution: {integrity: sha1-h3Gq4HmbZAdrdmQPygWPnBDjPss=}
     optionalDependencies:
-      graceful-fs: 4.2.9
+      graceful-fs: 4.2.10
     dev: true
 
   /jsonfile/6.1.0:
@@ -3299,7 +3297,7 @@ packages:
     dependencies:
       universalify: 2.0.0
     optionalDependencies:
-      graceful-fs: 4.2.9
+      graceful-fs: 4.2.10
 
   /keygrip/1.1.0:
     resolution: {integrity: sha512-iYSchDJ+liQ8iwbSI2QqsQOvqv58eJCEanyJPJi+Khyu8smkcKSFUCbPwzFcL7YVtZ6eONjqRX/38caJ7QjRAQ==}
@@ -4530,7 +4528,7 @@ packages:
     resolution: {integrity: sha512-xrQcmYhOsn/1kX+Vraq+7j4oE2j/6BFscZ0etmYg81xuM8Gq0022Pxb8+IqgOFUIaxHs0KaSb7T1+OegiNrNFA==}
     engines: {node: '>=10'}
     dependencies:
-      escape-string-regexp: 2.0.0
+      escape-string-regexp: 4.0.0
     dev: false
 
   /static-eval/2.1.0:

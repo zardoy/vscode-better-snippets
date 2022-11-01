@@ -87,7 +87,6 @@ class TreeDataProvider extends BaseTreeDataProvider {
             treeItem.contextValue = 'snippet'
             treeItem.description = description
             treeItem.iconPath = new vscode.ThemeIcon('symbol-snippet')
-            // eslint-disable-next-line curly
             if (hasBody) {
                 treeItem.command =
                     revealType === 'custom'

@@ -5,7 +5,7 @@ import delay from 'delay'
 import { Configuration } from '../../../src/configurationType'
 import { clearEditorText } from './utils'
 
-describe.only('Typing snippets', () => {
+describe('Typing snippets', () => {
     const resultingBody = 'EXAMPLE'
     const triggerSequence = 'cb '
     const triggerSequenceWithoutBody = 'cbb'
