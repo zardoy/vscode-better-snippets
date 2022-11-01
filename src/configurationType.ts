@@ -259,6 +259,7 @@ export type Configuration = {
             pathRegex?: string
         }
     }
+    extensionSnippets: { [extId: string]: false }
     /**
      * (advanced) After which milliseconds stop observing on diagnostics to resovle snippet's `resolveImports`
      * @default 1500

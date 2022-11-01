@@ -1,5 +1,5 @@
 // GENERATED. DON'T EDIT MANUALLY
-// md5hash: 6bd68c56fbd48c05f1795b782ef97307
+// md5hash: 057e1eb92107ba0c22afa3976c06e559
 {
     "type": "object",
     "properties": {
@@ -870,6 +870,15 @@
                 }
             }
         },
+        "extensionSnippets": {
+            "type": "object",
+            "additionalProperties": {
+                "type": "boolean",
+                "enum": [
+                    false
+                ]
+            }
+        },
         "diagnosticTimeout": {
             "description": "(advanced) After which milliseconds stop observing on diagnostics to resovle snippet's `resolveImports`",
             "default": 1500,
@@ -927,6 +936,7 @@
         "enableExperimentalSnippets",
         "enableTsPlugin",
         "experimental.disableBuiltinSnippets",
+        "extensionSnippets",
         "languageSupersets",
         "snippetCreator.showSnippetAfterCreation",
         "strictPositionLocations",

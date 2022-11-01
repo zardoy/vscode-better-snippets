@@ -19,9 +19,21 @@ import { registerSnippetSettingsJsonCommands } from './settingsJsonSnippetComman
 import { filterSnippetByLocationPhase1, filterWithSecondPhaseIfNeeded, snippetsConfig } from './filterSnippets'
 import { registerSnippetsMigrateCommands } from './migrateSnippets'
 import { changeNpmDepsWatcherState } from './npmDependencies'
-import { CustomSnippet, CustomTypingSnippet, initSnippetDefaults, mergeSnippetWithDefaults, snippetDefaults } from './snippet'
+import {
+    CustomSnippet,
+    CustomTypingSnippet,
+    getAllExtensionSnippets,
+    getExtensionApi,
+    initSnippetDefaults,
+    mergeSnippetWithDefaults,
+    snippetDefaults,
+    TypingSnippetUnresolved,
+} from './snippet'
 import { getAllLoadedSnippets } from './loadedSnippets'
 import registerForceInsertSnippet from './forceInsertSnippet'
+import { ExposedExtensionApi } from './extensionApi'
+
+export const registerSnippetsEvent = new vscode.EventEmitter<void>()
 
 export const activate = () => {
     let disposables: vscode.Disposable[] = []
@@ -183,15 +195,21 @@ export const activate = () => {
         return includedSnippets
     }
 
+    let snippetsRegistered = false
     const registerSnippets = () => {
+        snippetsRegistered = true
         snippetsConfig.strictPositionLocations = getExtensionSetting('strictPositionLocations')
         snippetsConfig.enableTsPlugin = getExtensionSetting('enableTsPlugin')
 
         const langsSupersets = getExtensionSetting('languageSupersets')
-
         const snippetsToLoadByLang = getAllLoadedSnippets()
+        const typingSnippets: CustomTypingSnippet[] = [
+            ...getConfigValueFromAllScopes('typingSnippets').map(snippet => mergeSnippetWithDefaults(snippet)),
+            ...getAllExtensionSnippets('typingSnippets'),
+        ]
+        const snippetsToLoadFlattened = [...Object.values(snippetsToLoadByLang).flat(1), ...typingSnippets]
 
-        void changeNpmDepsWatcherState(Object.values(snippetsToLoadByLang).flat(1))
+        void changeNpmDepsWatcherState(snippetsToLoadFlattened)
 
         const registerSnippets = () => {
             const completionProviderDisposables = [] as vscode.Disposable[]
@@ -312,9 +330,7 @@ export const activate = () => {
 
         registerSnippets()
 
-        const typingSnippetsToLoad = getConfigValueFromAllScopes('typingSnippets')
-        if (typingSnippetsToLoad.length > 0) {
-            const typingSnippets = typingSnippetsToLoad.map(snippet => mergeSnippetWithDefaults(snippet))
+        if (typingSnippets.length > 0) {
             let lastTypedSeq = ''
             let lastTypePosition = null as null | vscode.Position
 
@@ -498,6 +514,15 @@ export const activate = () => {
         registerExperimentalSnippets(disposables)
     }
 
+    registerSnippetsEvent.event(() => {
+        if (snippetsRegistered) {
+            vscode.Disposable.from(...disposables).dispose()
+            disposables = []
+            registerSnippets()
+        }
+        // otherwise just wait until registered later
+    })
+
     registerSnippets()
     vscode.workspace.onDidChangeConfiguration(({ affectsConfiguration }) => {
         if (
@@ -512,9 +537,7 @@ export const activate = () => {
             affectsConfiguration(getExtensionSettingId('enableTsPlugin'))
         ) {
             console.log('Snippets configuration updated')
-            vscode.Disposable.from(...disposables).dispose()
-            disposables = []
-            registerSnippets()
+            registerSnippetsEvent.fire()
         }
     })
     registerCompletionInsert()
@@ -525,4 +548,9 @@ export const activate = () => {
     registerSnippetSettingsJsonCommands()
     registerSnippetsMigrateCommands()
     registerForceInsertSnippet()
+
+    const exposedApi: ExposedExtensionApi = {
+        getAPI: getExtensionApi,
+    }
+    return exposedApi
 }

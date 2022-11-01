@@ -4,6 +4,8 @@ import { mergeDeepRight } from 'rambda'
 import { getExtensionSetting, getExtensionSettingId } from 'vscode-framework'
 import { omitObj, pickObj } from '@zardoy/utils'
 import { Configuration } from './configurationType'
+import { ExposedExtensionApi } from './extensionApi'
+import { registerSnippetsEvent } from './extension'
 
 // #region types
 export type CustomSnippet = CustomSnippetUnresolved & typeof unmergedSnippetDefaults
@@ -42,7 +44,7 @@ export const mergeSnippetWithDefaults = <T extends CustomSnippetUnresolved | Typ
 export const getSnippetsDefaults = (): DeepRequired<Configuration['customSnippetDefaults']> =>
     mergeDeepRight(unmergedSnippetDefaults, getExtensionSetting('customSnippetDefaults'))
 
-const unmergedSnippetDefaults: DeepRequired<Configuration['customSnippetDefaults']> = {
+export const unmergedSnippetDefaults: DeepRequired<Configuration['customSnippetDefaults']> = {
     sortText: undefined!,
     iconType: 'Snippet',
     description: 'Better Snippet',
@@ -51,4 +53,37 @@ const unmergedSnippetDefaults: DeepRequired<Configuration['customSnippetDefaults
         locations: ['code'],
         pathRegex: undefined!,
     },
+}
+
+// const contributedExtensionSnippets = new Map</*ext id*/ string, { customSnippets: CustomSnippetUnresolved[]; typingSnippets: TypingSnippetUnresolved[] }>()
+const activeExtensionSnippets = new Map</*ext id*/ string, { customSnippets: CustomSnippetUnresolved[]; typingSnippets: TypingSnippetUnresolved[] }>()
+
+type SnippetKey = 'customSnippets' | 'typingSnippets'
+export const getAllExtensionSnippets = <T extends SnippetKey>(key: T): T extends 'customSnippets' ? CustomSnippet[] : CustomTypingSnippet[] => {
+    const extensionSnippets = getExtensionSetting('extensionSnippets')
+    const collectedSnippets: Array<CustomTypingSnippet | CustomSnippet> = []
+    for (const [extId, snippets] of activeExtensionSnippets.entries()) {
+        if (extensionSnippets[extId] === false) continue
+        collectedSnippets.push(...snippets[key].map(snippet => mergeDeepRight<CustomSnippet>(unmergedSnippetDefaults, snippet)))
+    }
+
+    return collectedSnippets as any[]
+}
+
+export const getExtensionApi: ExposedExtensionApi['getAPI'] = extensionId => {
+    const contributeShared = <T>(key: SnippetKey) => {
+        return newSnippets => {
+            if (!activeExtensionSnippets.get(extensionId)?.[key].length && newSnippets.length === 0) return
+
+            const extensionSnippets = activeExtensionSnippets.get(extensionId) ?? { customSnippets: [], typingSnippets: [] }
+            extensionSnippets[key] = newSnippets
+            activeExtensionSnippets.set(extensionId, extensionSnippets)
+            registerSnippetsEvent.fire()
+        }
+    }
+
+    return {
+        contributeCustomSnippets: contributeShared('customSnippets'),
+        contributeTypingSnippets: contributeShared('typingSnippets'),
+    }
 }

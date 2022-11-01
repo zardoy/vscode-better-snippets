@@ -1,6 +1,6 @@
 import { getExtensionSetting } from 'vscode-framework'
 import { builtinSnippets } from './builtinSnippets'
-import { CustomSnippet, mergeSnippetWithDefaults } from './snippet'
+import { CustomSnippet, getAllExtensionSnippets, mergeSnippetWithDefaults } from './snippet'
 import { getConfigValueFromAllScopes } from './util'
 
 export const getAllLoadedSnippets = () => {
@@ -15,7 +15,13 @@ export const getAllLoadedSnippets = () => {
     for (const snippetToLoad of snippetsToLoad) {
         const customSnippet = mergeSnippetWithDefaults(snippetToLoad)
         for (const language of customSnippet.when.languages) {
-            ;(snippetsByLanguage[language] ??= []).push(mergeSnippetWithDefaults(customSnippet))
+            ;(snippetsByLanguage[language] ??= []).push(customSnippet)
+        }
+    }
+
+    for (const snippet of getAllExtensionSnippets('customSnippets')) {
+        for (const language of snippet.when.languages) {
+            ;(snippetsByLanguage[language] ??= []).push(snippet)
         }
     }
 
