@@ -7,6 +7,7 @@ It has only a few TypeScript-oriented features, all other features work with oth
 1. STUNNING number of restricting configurations
 2. Extreme
 3. [Typing snippets](#typing-snippets)
+4. View with convenient editor
 
 > Full web support!
 

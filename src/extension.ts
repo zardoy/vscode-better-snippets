@@ -21,6 +21,7 @@ import { registerSnippetsMigrateCommands } from './migrateSnippets'
 import { changeNpmDepsWatcherState } from './npmDependencies'
 import { CustomSnippet, CustomTypingSnippet, initSnippetDefaults, mergeSnippetWithDefaults, snippetDefaults } from './snippet'
 import { getAllLoadedSnippets } from './loadedSnippets'
+import registerForceInsertSnippet from './forceInsertSnippet'
 
 export const activate = () => {
     let disposables: vscode.Disposable[] = []
@@ -523,4 +524,5 @@ export const activate = () => {
     registerViews()
     registerSnippetSettingsJsonCommands()
     registerSnippetsMigrateCommands()
+    registerForceInsertSnippet()
 }

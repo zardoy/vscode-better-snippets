@@ -57,6 +57,10 @@
             {
                 "command": "migrateNativeSnippetsToExtension",
                 "title": "Migrate Native Snippets to Extension"
+            },
+            {
+                "command": "forceInsertCustomSnippet",
+                "title": "Force Insert Custom Snippet"
             }
         ],
         "menus": {
