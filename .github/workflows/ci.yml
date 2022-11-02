@@ -25,6 +25,7 @@ jobs:
           version: latest
           run_install: |
             args: [--frozen-lockfile, --strict-peer-dependencies]
+      - run: pnpm tsc -p tsconfig.test.json
       - run: pnpm build
       - run: pnpm lint
       - run: pnpm unit-test
