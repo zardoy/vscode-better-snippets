@@ -4,8 +4,8 @@
 
 It has only a few TypeScript-oriented features, all other features work with other languages as well.
 
-1. STUNNING number of restricting configurations
-2. Extreme
+1. Extremely configurable snippets with stunning number of restricting configurations
+2. [TS] Not suggesting in strings & comments out of the box
 3. [Typing snippets](#typing-snippets)
 4. View with convenient editor
 
