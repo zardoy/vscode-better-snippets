@@ -33,7 +33,7 @@ jobs:
       - uses: GabrielBB/xvfb-action@v1.6
         with:
           run: pnpm integration-test
-      - run: pnpx zardoy-release vscode-extension -- --pre-release --publish-prefix "[release]"
+      - run: pnpx zardoy-release vscode-extension --pre-release --publish-prefix "[release]"
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
           VSCE_PAT: ${{ secrets.VSCE_PAT }}
