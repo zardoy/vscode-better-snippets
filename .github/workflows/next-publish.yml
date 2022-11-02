@@ -1,7 +1,7 @@
-name: Release Extension
+name: Release Next
 on:
   push:
-    branches: [main]
+    branches: [next]
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -32,7 +32,7 @@ jobs:
       - uses: GabrielBB/xvfb-action@v1.6
         with:
           run: pnpm integration-test
-      - run: pnpx zardoy-release vscode-extension
+      - run: pnpx zardoy-release vscode-extension --pre-release --publish-prefix "[release]"
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
           VSCE_PAT: ${{ secrets.VSCE_PAT }}
