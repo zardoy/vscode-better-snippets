@@ -36,7 +36,6 @@ specifiers:
   got: ^11.8.3
   jsonc-parser: ^3.0.0
   lodash: ^4.17.21
-  lodash.orderby: ^4.6.0
   mocha: ^9.2.0
   modify-json-file: ^1.2.2
   path-browserify: ^1.0.1
@@ -64,7 +63,6 @@ dependencies:
   escape-string-regexp: 4.0.0
   got: 11.8.3
   jsonc-parser: 3.0.0
-  lodash.orderby: 4.6.0
   modify-json-file: 1.2.2
   path-browserify: 1.0.1
   prettier: 2.5.1
@@ -3465,10 +3463,6 @@ packages:
   /lodash.merge/4.6.2:
     resolution: {integrity: sha512-0KpjqXRVvrYyCsX1swR/XTK0va6VQkQM6MNo7PqW77ByjAhoARA8EfrP1N4+KlKj8YS0ZUCtRT/YUuhyYDujIQ==}
     dev: true
-
-  /lodash.orderby/4.6.0:
-    resolution: {integrity: sha512-T0rZxKmghOOf5YPnn8EY5iLYeWCpZq8G41FfqoVHH5QDTAFaghJRmAdLiadEDq+ztgM2q5PjA+Z1fOwGrLgmtg==}
-    dev: false
 
   /lodash.throttle/4.1.1:
     resolution: {integrity: sha512-wIkUCfVKpVsWo3JSZlc+8MB5it+2AN5W8J7YVMST30UrvcQNZ1Okbj+rbVniijTWE6FGYy4XJq/rHkas8qJMLQ==}
