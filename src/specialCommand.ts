@@ -5,7 +5,7 @@ import { getExtensionCommandId, getExtensionSetting, registerExtensionCommand } 
 import { CompletionInsertArg } from './completionInsert'
 
 export const registerSpecialCommand = () => {
-    registerExtensionCommand('applySpecialSnippet', async (_, specialCommand: string) => {
+    registerExtensionCommand('_applySpecialSnippet' as any, async (_, specialCommand: string) => {
         if (typeof specialCommand !== 'string') throw new Error('First arg (specialCommand) must be string')
         switch (specialCommand) {
             case 'useParam': {

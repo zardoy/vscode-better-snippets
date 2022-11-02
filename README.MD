@@ -1,36 +1,65 @@
 # VSCode Better Snippets
 
-## The Why
+## Key Features
 
-It's a TypeScript-oriented extension, however it can also be used with other languages as well.
+It has only a few TypeScript-oriented features, all other features work with other languages as well.
 
-The main setting is `betterSnippets.customSnippets`: **[example usage](./test/snippets.jsonc)**.
+1. STUNNING number of restricting configurations
+2. Extreme
+3. [Typing snippets](#typing-snippets)
+4. View with convenient editor
 
-Snippets in VSCode are always contextless, they will be suggested in comments, string, everywhere. You can only restrict them showing only in specific languages, however this extension let you can control:
+> Full web support!
 
-- Snippet Icon (with `iconType`, `fileIcon` or `folderIcon`)
-- Snippet Sorting (with `sortText`, you can boost suggestion to top or bottom)
-- Snippet Location (e.g. display snippet only in the start of the line or the file)
-- Display Snippets only in specific files by filtering the path by regex (for example set `when.fileRegex` to `App.tsx?`)
-- Display Snippet only if line matching the regex (for example set `when.lineRegex` to `\s*const`)
+Snippets in VSCode are always contextless, they will be suggested in comments, string, everywhere. You can only restrict them showing only in specific languages, however this extension lets you construct snippets just on another level.
 
-This can give extreme control for your snippets.
+I recommend to use this extension instead of builtin snippets. There is `Better Snippets: Migrate Native Snippets to Extension` command for migrating your native snippets to better snippets.
 
-You can use this extension instead of builtin snippets.
+### Configurable Parts
+
+The main setting for constructing your snippets is `betterSnippets.customSnippets`: **[example usage](./test/snippets.jsonc)**.
+
+#### Filtering
+
+- Snippet Location (e.g. display snippet only in the start of the line or the file). Note that setting location to empty array will make it to display everywhere.
+- Specific NPM dependencies are met (e.g. `react`)
+- Specific files: filtering the path by regex (for example set `when.fileRegex` to `App.tsx?`)
+- Display Snippet only if line the matching the regex (for example set `when.lineRegex` to `\s*const`)
+- Display Snippet only if some other line the matching the regex (for example line with indent up matches `function App() {`)
 
 Just because snippets are now aware of context, you can configure them to **always** show on top and/or show them only when exact snippet prefix is typed.
 
-Also, web is supported.
+#### Construct
+
+- Snippet Icon (with `iconType`, `fileIcon` or `folderIcon`)
+- Snippet Sorting (with `sortText`, you can boost suggestion to top or bottom)
+- Placeholders in body from regex props. See [postfix example](test/examples/postfixes.jsonc).
+
+This all can give extreme control for your snippets!
 
 ## Builtin Snippets
 
-This extension comes handy [top-line builtin snippets](src/builtinSnippets.ts) for JS and Markdown languages. They can be disabled.
+This extension comes with handy [top-line builtin snippets](src/builtinSnippets.ts) for JS and Markdown languages. They can be disabled.
+
+## Snippet Defaults
+
+This extension comes with some defaults for your snippets.
+
+They are set and configurable via `betterSnippets.customSnippetDefaults` setting.
+Some of defaults that important to understand:
+
+- **default location is `code`**. Banned locations:
+
+1. For all languages, location after dot e.g. in `something.mySnippet`.
+This was done as in most languages, after the dot you access the property and most probably don't want snippets.
+
+1. For JS/TS langs, also snippets withing comments / strings.
 
 ## Typing Snippets
 
 > aka hotstrings from [AutoHotkey](https://www.autohotkey.com/)
 
-You can also define so called typing snippets. Some sequence of letter will be replaced with snippet, for example:
+You can also define so called typing snippets. Some sequence of *typed letters* will be replaced with snippet, for example:
 
 `cb ` -> `($1) => $2`
 
@@ -47,9 +76,9 @@ Configuration:
 
 Note that:
 
-- almost all features from snippets such as `resolveImports` or `when` clause are supported!
+- almost all features from snippets such as `resolveImports` or `when` are supported!
 - any cursor movement (using arrows or mouse) will reset the typing sequence, `\n` can't be part of sequence
-- they work with multiple selections (in multicursor mode, can be disabled)
+- they work with multiple selections (in multicursor mode, can be disabled with setting)
 
 ## Snippet Features Demo
 
@@ -59,9 +88,10 @@ Note that:
 
 ![vscode javascript auto imports](https://user-images.githubusercontent.com/46503702/188254222-64fbf138-de7c-49a0-8237-cf62bf678c57.gif)
 
-## Experimental Snippets
+### Experimental TS Snippets
 
-Can be disabled.
+Disabled by default, can be enabled with `betterSnippets.enableExperimentalSnippets` setting.
+However will be removed (migrated from here) in future releases.
 
 Postfixes:
 
@@ -69,10 +99,14 @@ Postfixes:
 
 Special:
 
-- `useParams` for `react-router`
+- `useParams` for `react-router`: [demo](https://twitter.com/i/status/1482817282145492993)
+
+## More
+
+More docs coming soon, for now, you can look at [changelog](https://github.com/zardoy/vscode-better-snippets/releases) to see more about features
 
 ## Similar Extensions
 
 - [TS/JS postfix completion](https://marketplace.visualstudio.com/items?itemName=ipatalas.vscode-postfix-ts)
-- [Module Templates](https://marketplace.visualstudio.com/items?itemName=asbjornh.vscode-module-templates) for creating complex templates with one command
+- [Module Templates](https://marketplace.visualstudio.com/items?itemName=asbjornh.vscode-module-templates) for creating complex files templates with one command
 - Feel free to open PR to add another one!

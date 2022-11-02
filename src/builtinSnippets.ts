@@ -39,7 +39,7 @@ export const builtinSnippets: Configuration['customSnippets'] = (
             // experimentaly
             type: 'Event',
             executeCommand: {
-                command: getExtensionCommandId('applySpecialSnippet'),
+                command: getExtensionCommandId('_applySpecialSnippet' as any),
                 arguments: ['useParam'],
             },
             when: {

@@ -1,5 +1,5 @@
 // GENERATED. DON'T EDIT MANUALLY
-// md5hash: 7d732347733c9ebc36a37d9b2b7de42c
+// md5hash: 057e1eb92107ba0c22afa3976c06e559
 {
     "type": "object",
     "properties": {
@@ -20,6 +20,16 @@
         "enableExperimentalSnippets": {
             "description": "Whether to enable builtin postfix snippets. They may be moved to another extension in future releases",
             "default": false,
+            "type": "boolean"
+        },
+        "strictPositionLocations": {
+            "description": "Don't display snippets with locations `fileStart`, `lineStart` and `topLineStart` locations if line after cursor has existing content that doesn't match the name of the snippet",
+            "default": false,
+            "type": "boolean"
+        },
+        "enableTsPlugin": {
+            "description": "Required for the following locations: `code` (which is default), `comment`, `string`",
+            "default": true,
             "type": "boolean"
         },
         "customSnippets": {
@@ -51,17 +61,8 @@
                                     },
                                     "locations": {
                                         "description": "Specify to restrict showing suggest in specific location",
-                                        "type": "array",
-                                        "items": {
-                                            "enum": [
-                                                "code",
-                                                "comment",
-                                                "fileStart",
-                                                "lineStart",
-                                                "topLineStart"
-                                            ],
-                                            "type": "string"
-                                        }
+                                        "items": "replace-locations-marker",
+                                        "type": "array"
                                     },
                                     "pathRegex": {
                                         "type": "string"
@@ -134,7 +135,17 @@
                                                                     "description": "How many levels up of indendation to look? By default 0 - any. Example: `-1`\nCurrently it is possible to lookup only above (negative number)",
                                                                     "suggestSortText": "2",
                                                                     "default": 0,
-                                                                    "type": "number"
+                                                                    "anyOf": [
+                                                                        {
+                                                                            "enum": [
+                                                                                "up"
+                                                                            ],
+                                                                            "type": "string"
+                                                                        },
+                                                                        {
+                                                                            "type": "number"
+                                                                        }
+                                                                    ]
                                                                 }
                                                             },
                                                             "required": [
@@ -217,7 +228,17 @@
                                                                     "description": "How many levels up of indendation to look? By default 0 - any. Example: `-1`\nCurrently it is possible to lookup only above (negative number)",
                                                                     "suggestSortText": "2",
                                                                     "default": 0,
-                                                                    "type": "number"
+                                                                    "anyOf": [
+                                                                        {
+                                                                            "enum": [
+                                                                                "up"
+                                                                            ],
+                                                                            "type": "string"
+                                                                        },
+                                                                        {
+                                                                            "type": "number"
+                                                                        }
+                                                                    ]
                                                                 }
                                                             },
                                                             "required": [
@@ -228,8 +249,42 @@
                                                 }
                                             ]
                                         }
+                                    },
+                                    "npmDependencies": {
+                                        "description": "Enable snippet only when following NPM dependencies are in package.json.",
+                                        "type": "array",
+                                        "items": {
+                                            "anyOf": [
+                                                {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "type": {
+                                                            "enum": [
+                                                                "dev",
+                                                                "prod"
+                                                            ],
+                                                            "type": "string"
+                                                        },
+                                                        "dep": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "dep",
+                                                        "type"
+                                                    ]
+                                                },
+                                                {
+                                                    "type": "string"
+                                                }
+                                            ]
+                                        }
                                     }
                                 }
+                            },
+                            "replaceBeforeRegex": {
+                                "description": "Wether to replace the matched content from `lineBeforeRegex` or `lineRegex` regex check. The first one takes precedence.\nWorks only when end of content is matched (e.g. it will always work if regex ends with `$`)",
+                                "type": "boolean"
                             },
                             "resolveImports": {
                                 "description": "For JS langs only. How to resolve suggested imports if any",
@@ -301,7 +356,7 @@
                                 "type": "string"
                             },
                             "description": {
-                                "description": "Should be short. Always displayed in completion widget on the same raw as label.",
+                                "description": "Should be short. Always displayed in completion widget on the right on the same line as label.",
                                 "type": "string"
                             },
                             "when": {
@@ -315,9 +370,6 @@
                                         }
                                     }
                                 }
-                            },
-                            "group": {
-                                "type": "string"
                             },
                             "fileIcon": {
                                 "description": "If specified, `iconType` is ignored. It makes sense to use with custom file icon theme",
@@ -373,9 +425,6 @@
                                 "description": "Only if `when.triggerCharacters` is used",
                                 "default": false,
                                 "type": "boolean"
-                            },
-                            "type": {
-                                "type": "string"
                             }
                         },
                         "required": [
@@ -415,17 +464,8 @@
                                     },
                                     "locations": {
                                         "description": "Specify to restrict showing suggest in specific location",
-                                        "type": "array",
-                                        "items": {
-                                            "enum": [
-                                                "code",
-                                                "comment",
-                                                "fileStart",
-                                                "lineStart",
-                                                "topLineStart"
-                                            ],
-                                            "type": "string"
-                                        }
+                                        "items": "replace-locations-marker",
+                                        "type": "array"
                                     },
                                     "pathRegex": {
                                         "type": "string"
@@ -498,7 +538,17 @@
                                                                     "description": "How many levels up of indendation to look? By default 0 - any. Example: `-1`\nCurrently it is possible to lookup only above (negative number)",
                                                                     "suggestSortText": "2",
                                                                     "default": 0,
-                                                                    "type": "number"
+                                                                    "anyOf": [
+                                                                        {
+                                                                            "enum": [
+                                                                                "up"
+                                                                            ],
+                                                                            "type": "string"
+                                                                        },
+                                                                        {
+                                                                            "type": "number"
+                                                                        }
+                                                                    ]
                                                                 }
                                                             },
                                                             "required": [
@@ -581,7 +631,17 @@
                                                                     "description": "How many levels up of indendation to look? By default 0 - any. Example: `-1`\nCurrently it is possible to lookup only above (negative number)",
                                                                     "suggestSortText": "2",
                                                                     "default": 0,
-                                                                    "type": "number"
+                                                                    "anyOf": [
+                                                                        {
+                                                                            "enum": [
+                                                                                "up"
+                                                                            ],
+                                                                            "type": "string"
+                                                                        },
+                                                                        {
+                                                                            "type": "number"
+                                                                        }
+                                                                    ]
                                                                 }
                                                             },
                                                             "required": [
@@ -592,8 +652,42 @@
                                                 }
                                             ]
                                         }
+                                    },
+                                    "npmDependencies": {
+                                        "description": "Enable snippet only when following NPM dependencies are in package.json.",
+                                        "type": "array",
+                                        "items": {
+                                            "anyOf": [
+                                                {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "type": {
+                                                            "enum": [
+                                                                "dev",
+                                                                "prod"
+                                                            ],
+                                                            "type": "string"
+                                                        },
+                                                        "dep": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "dep",
+                                                        "type"
+                                                    ]
+                                                },
+                                                {
+                                                    "type": "string"
+                                                }
+                                            ]
+                                        }
                                     }
                                 }
+                            },
+                            "replaceBeforeRegex": {
+                                "description": "Wether to replace the matched content from `lineBeforeRegex` or `lineRegex` regex check. The first one takes precedence.\nWorks only when end of content is matched (e.g. it will always work if regex ends with `$`)",
+                                "type": "boolean"
                             },
                             "resolveImports": {
                                 "description": "For JS langs only. How to resolve suggested imports if any",
@@ -750,14 +844,8 @@
                         }
                     ]
                 },
-                "type": {
-                    "type": "string"
-                },
                 "description": {
-                    "description": "Should be short. Always displayed in completion widget on the same raw as label. Default is 'Better Snippet'",
-                    "type": "string"
-                },
-                "group": {
+                    "description": "Should be short. Always displayed in completion widget on the right on the same line as label. Default is 'Better Snippet'",
                     "type": "string"
                 },
                 "when": {
@@ -770,17 +858,9 @@
                             }
                         },
                         "locations": {
-                            "type": "array",
-                            "items": {
-                                "enum": [
-                                    "code",
-                                    "comment",
-                                    "fileStart",
-                                    "lineStart",
-                                    "topLineStart"
-                                ],
-                                "type": "string"
-                            }
+                            "description": "Specify to restrict showing suggest in specific location",
+                            "items": "replace-locations-marker",
+                            "type": "array"
                         },
                         "pathRegex": {
                             "description": "Restrict suggesting all snippets (instead of overriding, regexs will be merged)",
@@ -790,13 +870,22 @@
                 }
             }
         },
+        "extensionSnippets": {
+            "type": "object",
+            "additionalProperties": {
+                "type": "boolean",
+                "enum": [
+                    false
+                ]
+            }
+        },
         "diagnosticTimeout": {
             "description": "(advanced) After which milliseconds stop observing on diagnostics to resovle snippet's `resolveImports`",
             "default": 1500,
             "type": "number"
         },
         "languageSupersets": {
-            "description": "Define/change family of languages. You can use family's name instead of language id in when.",
+            "description": "Note that family name can overlap with language id, contributed by other extension. If this is case rename the family or set it to null (in case if family is builtin)",
             "type": "object",
             "additionalProperties": {
                 "type": "array",
@@ -824,17 +913,33 @@
                 ],
                 "type": "string"
             }
+        },
+        "debugScopes": {
+            "uniqueItems": "",
+            "type": "array",
+            "items": {
+                "enum": [
+                    "resolveImports",
+                    "snippets",
+                    "snippetsRegexs"
+                ],
+                "type": "string"
+            }
         }
     },
     "required": [
         "customSnippetDefaults",
         "customSnippets",
+        "debugScopes",
         "diagnosticTimeout",
         "enableBuiltinSnippets",
         "enableExperimentalSnippets",
+        "enableTsPlugin",
         "experimental.disableBuiltinSnippets",
+        "extensionSnippets",
         "languageSupersets",
         "snippetCreator.showSnippetAfterCreation",
+        "strictPositionLocations",
         "typingSnippets",
         "typingSnippetsEnableMulticursor",
         "typingSnippetsUndoStops",

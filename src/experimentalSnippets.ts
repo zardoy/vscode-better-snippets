@@ -1,18 +1,21 @@
 import * as vscode from 'vscode'
 import { getExtensionSetting } from 'vscode-framework'
 
-export const registerExperimentalSnippets = () => {
+export const registerExperimentalSnippets = (disposables: vscode.Disposable[]) => {
+    if (!getExtensionSetting('enableExperimentalSnippets')) return
     const POSTFIX_DESCRIPTION = 'Better Snippets Postfix'
     const langsSupersets = getExtensionSetting('languageSupersets')
-    return vscode.languages.registerCompletionItemProvider(
-        // is user mad?
+    const disposable = vscode.languages.registerCompletionItemProvider(
         langsSupersets.js ?? [],
         {
             provideCompletionItems(document, endPos, token, context) {
-                // LINE END SNIPPET!
+                // LINE END SNIPPETS!
                 const line = document.lineAt(endPos)
-                if (line.range.end.character !== endPos.character) return
                 const lineText = line.text
+                const lastDotIndex = lineText.lastIndexOf('.')
+                if (line.range.end.character !== endPos.character) return
+                if (lastDotIndex === -1) return
+
                 const completions: vscode.CompletionItem[] = []
                 // #region .if
                 // simple inline .if postfix. doesn't work with multiline, will be migrated to postfix extension
@@ -22,7 +25,7 @@ export const registerExperimentalSnippets = () => {
                     // completion.range = new vscode.Range(position.translate(0, -1), line.range.end)
                     completion.insertText = ') '
                     completion.sortText = '!100'
-                    const lastDotPos = new vscode.Position(endPos.line, lineText.lastIndexOf('.'))
+                    const lastDotPos = new vscode.Position(endPos.line, lastDotIndex)
                     completion.additionalTextEdits = [
                         {
                             range: new vscode.Range(lastDotPos, lastDotPos.translate(0, 1)),
@@ -52,9 +55,10 @@ export const registerExperimentalSnippets = () => {
                     // }
                     completions.push(completion)
                 }
-
                 // #endregion
-                if (/Index\.[^.]*$/.test(lineText)) {
+
+                // #region .notFound
+                if (/(Index|Idx)\.[a-zA-Z]*$/.test(lineText)) {
                     const startPos = new vscode.Position(endPos.line, line.firstNonWhitespaceCharacterIndex)
                     const completion = new vscode.CompletionItem({ label: 'notFound', description: POSTFIX_DESCRIPTION }, vscode.CompletionItemKind.Snippet)
                     // TODO insert snippet
@@ -69,10 +73,12 @@ export const registerExperimentalSnippets = () => {
                     ]
                     completions.push(completion)
                 }
+                // #endregion
 
                 return completions
             },
         },
         '.',
     )
+    disposables.push(disposable)
 }

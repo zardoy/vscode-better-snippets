@@ -1,16 +1,13 @@
 import * as vscode from 'vscode'
-import delay from 'delay'
 import stringDedent from 'string-dedent'
-import { getExtensionSetting, getExtensionSettingId, registerExtensionCommand, showQuickPick, VSCodeQuickPickItem } from 'vscode-framework'
-import { parseTree, findNodeAtLocation } from 'jsonc-parser'
+import { getExtensionCommandId, getExtensionSetting, registerExtensionCommand, showQuickPick, VSCodeQuickPickItem } from 'vscode-framework'
 import { normalizeLanguages, areLangsEquals } from '@zardoy/vscode-utils/build/langs'
 import { Configuration } from './configurationType'
-import { getSnippetsDefaults } from './extension'
+import { RevealSnippetOptions } from './settingsJsonSnippetCommands'
+import { getSnippetsDefaults } from './snippet'
 
 export const registerCreateSnippetFromSelection = () => {
-    // createNativeSnippetFromSelection
     registerExtensionCommand('createSnippetFromSelection', async (_, snippetName?: string) => {
-        const isNativeCreator = false
         const activeEditor = vscode.window.activeTextEditor
         if (!activeEditor) return
         const { document } = activeEditor
@@ -69,18 +66,9 @@ export const registerCreateSnippetFromSelection = () => {
             ],
             vscode.ConfigurationTarget.Global,
         )
-        if (getExtensionSetting('snippetCreator.showSnippetAfterCreation')) {
-            await vscode.commands.executeCommand('workbench.action.openSettingsJson')
-            const jsonSettingsEditor = vscode.window.activeTextEditor!
-            const jsonSettingsDocument = jsonSettingsEditor.document
-            // we've already awaited above, but not vscode
-            await delay(150)
-            const { offset, length } = findNodeAtLocation(parseTree(jsonSettingsDocument.getText())!, [
-                getExtensionSettingId('customSnippets'),
-                existingCustomSnippets.length,
-            ])!
-            jsonSettingsEditor.selection = new vscode.Selection(jsonSettingsDocument.positionAt(offset), jsonSettingsDocument.positionAt(offset + length))
-            jsonSettingsEditor.revealRange(jsonSettingsEditor.selection)
-        }
+        if (getExtensionSetting('snippetCreator.showSnippetAfterCreation'))
+            await vscode.commands.executeCommand(getExtensionCommandId('revealSnippetInSettingsJson'), {
+                snippetIndex: existingCustomSnippets.length,
+            } as RevealSnippetOptions)
     })
 }

@@ -15,7 +15,7 @@
     "keywords": [
         "snippets",
         "snippets alternative",
-        "insane snippets",
+        "type snippets",
         "live templates",
         "templates"
     ],
@@ -26,12 +26,41 @@
                 "title": "CompletionInsert"
             },
             {
-                "command": "applySpecialSnippet",
-                "title": "ApplySpecialSnippet"
+                "command": "removeSnippet",
+                "title": "removeSnippet"
             },
             {
                 "command": "createSnippetFromSelection",
                 "title": "Create Snippet From Selection"
+            },
+            {
+                "command": "revealSnippetInSettingsJson",
+                "title": "Reveal Snippet in Settings Json",
+                "enablement": "true",
+                "icon": "$(gear)"
+            },
+            {
+                "command": "groupBy#none",
+                "title": "Disable Grouping",
+                "enablement": "better-snippets.grouping != none"
+            },
+            {
+                "command": "groupBy#language",
+                "title": "Group by Language",
+                "enablement": "better-snippets.grouping != language"
+            },
+            {
+                "command": "groupBy#extendsGroup",
+                "title": "Group by Extends Group",
+                "enablement": "better-snippets.grouping != extendsGroup"
+            },
+            {
+                "command": "migrateNativeSnippetsToExtension",
+                "title": "Migrate Native Snippets to Extension"
+            },
+            {
+                "command": "forceInsertCustomSnippet",
+                "title": "Force Insert Custom Snippet"
             }
         ],
         "menus": {
@@ -41,11 +70,76 @@
                     "when": "false"
                 },
                 {
-                    "command": "applySpecialSnippet",
+                    "command": "removeSnippet",
                     "when": "false"
+                }
+            ],
+            "view/title": [
+                {
+                    "command": "groupBy#none",
+                    "when": "view =~ /betterSnippets.globalSnippets|betterSnippets.globalTypingSnippets|betterSnippets.workspaceSnippets|betterSnippets.workspaceTypingSnippets/",
+                    "group": "1_header@1"
+                },
+                {
+                    "command": "groupBy#language",
+                    "when": "view =~ /betterSnippets.globalSnippets|betterSnippets.globalTypingSnippets|betterSnippets.workspaceSnippets|betterSnippets.workspaceTypingSnippets/",
+                    "group": "1_header@2"
+                }
+            ],
+            "view/item/context": [
+                {
+                    "command": "removeSnippet",
+                    "when": "viewItem == snippet && view =~ /betterSnippets.globalSnippets|betterSnippets.globalTypingSnippets|betterSnippets.workspaceSnippets|betterSnippets.workspaceTypingSnippets/"
+                },
+                {
+                    "command": "revealSnippetInSettingsJson",
+                    "when": "viewItem == snippet && view =~ /betterSnippets.globalSnippets|betterSnippets.globalTypingSnippets|betterSnippets.workspaceSnippets|betterSnippets.workspaceTypingSnippets/",
+                    "group": "inline"
                 }
             ]
         },
+        "views": {
+            "betterSnippets": [
+                {
+                    "id": "betterSnippets.globalSnippets",
+                    "name": "Global Snippets"
+                },
+                {
+                    "id": "betterSnippets.globalTypingSnippets",
+                    "name": "Global Typing Snippets"
+                },
+                {
+                    "id": "betterSnippets.workspaceSnippets",
+                    "name": "Workspace Snippets",
+                    "visibility": "collapsed"
+                },
+                {
+                    "id": "betterSnippets.workspaceTypingSnippets",
+                    "name": "Workspace Typing Snippets",
+                    "visibility": "collapsed"
+                },
+                {
+                    "id": "betterSnippets.packs",
+                    "name": "Packs",
+                    "visibility": "collapsed"
+                }
+            ]
+        },
+        "viewsContainers": {
+            "activitybar": [
+                {
+                    "id": "betterSnippets",
+                    "title": "Better Snippets",
+                    "icon": "$(file-code)"
+                }
+            ]
+        },
+        "typescriptServerPlugins": [
+            {
+                "name": "better-snippets-typescript-plugin",
+                "enableForWorkspaceTypeScriptVersions": true
+            }
+        ],
         "betterSnippetsEngineExtension": true
     },
     "activationEvents": [
@@ -60,8 +154,9 @@
     "scripts": {
         "start": "vscode-framework start",
         "start-web": "vscode-framework start --web",
-        "build": "vscode-framework build",
-        "integration-test": "tsc -p tsconfig.test.json && node testsOut/runTests.js",
+        "build": "vscode-framework build && node buildTsPlugin.mjs prod",
+        "watch-plugin": "node buildTsPlugin.mjs",
+        "integration-test": "rimraf -rf ./testsOut/ && tsc -p tsconfig.test.json && node testsOut/runTests.js",
         "integration-test:watch": "chokidar \"test/integration/**\" -c \"pnpm integration-test\" --initial",
         "unit-test": "vitest --globals",
         "test": "vitest --globals --run && pnpm integration-test",
@@ -71,7 +166,8 @@
     "pnpm": {
         "overrides": {
             "esbuild": "^0.14.10",
-            "typescript-json-schema": "^0.53.0"
+            "typescript-json-schema": "^0.53.0",
+            "escape-string-regexp": "^4"
         },
         "neverBuiltDependencies": [
             "playwright"
@@ -83,6 +179,7 @@
         "@types/fs-extra": "^9.0.13",
         "@types/glob": "^7.2.0",
         "@types/jest": "^27.4.0",
+        "@types/lodash": "^4.14.187",
         "@types/mocha": "^9.1.0",
         "@types/node": "^16.11.25",
         "@types/path-browserify": "^1.0.0",
@@ -91,21 +188,24 @@
         "@zardoy/tsconfig": "^1.4.0",
         "cross-env": "^7.0.3",
         "eslint": "^8.9.0",
-        "eslint-config-zardoy": "^0.2.8",
+        "eslint-config-zardoy": "^0.2.14",
         "fs-extra": "^10.0.1",
         "glob": "^7.2.0",
+        "lodash": "^4.17.21",
         "mocha": "^9.2.0",
+        "rimraf": "^3.0.2",
         "tsm": "^2.2.1",
         "typescript": "^4.5.5",
         "vitest": "^0.8.1",
         "vscode-manifest": "^0.0.8"
     },
     "dependencies": {
-        "@zardoy/utils": "^0.0.7",
-        "@zardoy/vscode-utils": "^0.0.28",
+        "@zardoy/utils": "^0.0.10",
+        "@zardoy/vscode-utils": "^0.0.43",
         "chai": "^4.3.6",
         "chokidar-cli": "^3.0.0",
         "delay": "^5.0.0",
+        "esbuild": "^0.14.10",
         "escape-string-regexp": "^5.0.0",
         "got": "^11.8.3",
         "jsonc-parser": "^3.0.0",
@@ -116,6 +216,7 @@
         "string-dedent": "^2.0.0",
         "ts-essentials": "^9.1.2",
         "type-fest": "^2.11.2",
+        "typed-jsonfile": "^0.2.1",
         "vscode-framework": "^0.0.18",
         "vscode-snippet-parser": "^0.0.5"
     },

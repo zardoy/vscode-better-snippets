@@ -7,9 +7,30 @@
                 "--disable-extensions"
             ],
             "name": "Launch Extension",
-            "outFiles": ["${workspaceFolder}/out/**/*.js"],
+            "outFiles": [
+                "${workspaceFolder}/out/**/*.js"
+            ],
             "request": "launch",
             "type": "extensionHost"
-        }
+        },
+        // NEVER USE THIS!
+        // {
+        //     "name": "Launch Tests",
+        //     "type": "extensionHost",
+        //     "request": "launch",
+        //     "runtimeExecutable": "${execPath}",
+        //     "args": [
+        //         "--disable-extensions",
+        //         "--extensionDevelopmentPath=${workspaceRoot}/out",
+        //         "--extensionTestsPath=${workspaceRoot}/testsOut"
+        //     ],
+        //     "env": {
+        //         "NODE_ENV": "test"
+        //     },
+        //     "sourceMaps": true,
+        //     "outFiles": [
+        //         "${workspaceRoot}/out/*.js"
+        //     ],
+        // }
     ]
 }

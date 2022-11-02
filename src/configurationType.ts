@@ -1,6 +1,8 @@
 import * as vscode from 'vscode'
+// import { SyntaxKind } from 'typescript/lib/tsserverlibrary'
 
-export type SnippetLocation = 'fileStart' | 'comment' | 'lineStart' | 'topLineStart' | 'code'
+export const snippetLocation = ['fileStart', 'comment', 'lineStart', 'topLineStart', 'code'] as const
+export type SnippetLocation = typeof snippetLocation[number]
 
 type CommandDefinition =
     | string
@@ -31,6 +33,8 @@ type TestProp =
           matchWith?: 'startsWith' | 'includes' | 'endsWith'
       }
 
+type NpmDependency = string | { type: 'dev' | 'prod'; dep: string }
+
 export type GeneralSnippet = {
     /**
      * @suggestSortText "3"
@@ -47,8 +51,9 @@ export type GeneralSnippet = {
         // Unimplemented: inComments. topLineStart means line start without indendation, useful for top-level declaration snippets, like `export const`
         /**
          * Specify to restrict showing suggest in specific location
+         * @items "replace-locations-marker"
          */
-        locations?: SnippetLocation[]
+        locations?: any[]
         pathRegex?: string
         /** Shortcuts for complex path regexs. If specified, `pathRegex` is ignored */
         fileType?: 'package.json' | 'tsconfig.json'
@@ -73,15 +78,22 @@ export type GeneralSnippet = {
                            * @default 0
                            * @max 0
                            */
-                          indent: number
+                          indent: number | 'up'
                       }
                 )
         >
         /**
-         * Enable snippet only when following NPM dependencies are installed locally. TODO: implement
+         * Enable snippet only when following NPM dependencies are in package.json.
          */
-        // npmDependencies?: string[]
+        npmDependencies?: NpmDependency[]
     }
+    // ... of **first capture group** from ...
+    /**
+     * Wether to replace the matched content from `lineBeforeRegex` or `lineRegex` regex check. The first one takes precedence.
+     * Works only when end of content is matched (e.g. it will always work if regex ends with `$`)
+     * @sortText z9
+     */
+    replaceBeforeRegex?: boolean
     /** For JS langs only. How to resolve suggested imports if any */
     resolveImports?: {
         // specifier can be subst only for now
@@ -105,12 +117,6 @@ export type Configuration = {
      * @default true
      *  */
     enableBuiltinSnippets: boolean
-    // builtinSnippetsConfiguratin?: {
-    //     postifxes?: {
-    //         /** @default true */
-    //         normalizeEqeq: boolean
-    //     }
-    // }
     /**
      * Choose the output for useSnippet type:
      * ```ts
@@ -128,6 +134,16 @@ export type Configuration = {
      * @default false */
     enableExperimentalSnippets: boolean
     /**
+     * Don't display snippets with locations `fileStart`, `lineStart` and `topLineStart` locations if line after cursor has existing content that doesn't match the name of the snippet
+     * @default false
+     */
+    strictPositionLocations: boolean
+    /**
+     * Required for the following locations: `code` (which is default), `comment`, `string`
+     * @default true
+     */
+    enableTsPlugin: boolean
+    /**
      * @suggestSortText betterSnippets.1
      */
     customSnippets: Array<
@@ -143,7 +159,7 @@ export type Configuration = {
              * @suggestSortText !
              */
             name: string
-            /** Should be short. Always displayed in completion widget on the same raw as label. */
+            /** Should be short. Always displayed in completion widget on the right on the same line as label. */
             description?: string
             when?: {
                 /**
@@ -153,8 +169,6 @@ export type Configuration = {
                  */
                 triggerCharacters?: string[]
             }
-            /** @deprecated */
-            group?: string
             // formatting?: {
             //     /**
             //      * Always insert double quote. Prettier rules. Otherwise always insert single. Default: auto
@@ -173,8 +187,6 @@ export type Configuration = {
              * @default false
              */
             replaceTriggerCharacter?: boolean
-            /** @deprecated */
-            type?: string
         }
     >
     /**
@@ -233,20 +245,21 @@ export type Configuration = {
     customSnippetDefaults: {
         sortText?: string
         iconType?: SnippetType
-        /** @deprecated */
-        type?: string
-        /** Should be short. Always displayed in completion widget on the same raw as label. Default is 'Better Snippet' */
+        /** Should be short. Always displayed in completion widget on the right on the same line as label. Default is 'Better Snippet' */
         description?: string
-        /** @deprecated */
-        group?: string
         when?: {
             languages?: string[]
-            locations?: SnippetLocation[]
+            /**
+             * Specify to restrict showing suggest in specific location
+             * @items "replace-locations-marker"
+             */
+            locations?: any[]
             // TODO
             /** Restrict suggesting all snippets (instead of overriding, regexs will be merged) */
             pathRegex?: string
         }
     }
+    extensionSnippets: { [extId: string]: false }
     /**
      * (advanced) After which milliseconds stop observing on diagnostics to resovle snippet's `resolveImports`
      * @default 1500
@@ -257,11 +270,27 @@ export type Configuration = {
      * Define/change family of languages. You can use family's name instead of language id in when.
      */
     // TODO default is set in prepare.ts
-    // * Note that family name can overlap with language id, contributed by other extension. If this is case rename the family or set it to null (in case if family is builtin)
+    /** Note that family name can overlap with language id, contributed by other extension. If this is case rename the family or set it to null (in case if family is builtin) */
     languageSupersets: { [family: string]: string[] }
+    /**
+     * Which editing method to use when clicked on the snippet from view
+     * @default custom
+     */
+    // 'snippetsView.editor': 'settingsJson' | 'custom'
+    // typescriptLocations: {
+    //     [location: string]: {
+    //         mode: 'exclude' | 'include'
+    //         /** In which enable/disable tokens (final) */
+    //         kinds: keyof typeof SyntaxKind
+    //     }
+    // }
     /**
      * Experimental way to disable builtin snippets. Will be removed in future in favor of something else.
      * @uniqueItems true
      *  */
     'experimental.disableBuiltinSnippets': Array<'er' | 'et' | 'em' | 'ef' | 'ed' | 'useParam' | 'ts' | 'tsx' | 'codeblock' | 'dropdown'>
+    /**
+     * @uniqueItems
+     */
+    debugScopes: Array<'resolveImports' | 'snippetsRegexs' | 'snippets'>
 }

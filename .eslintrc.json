@@ -2,6 +2,12 @@
     "extends": "zardoy",
     "rules": {
         "no-template-curly-in-string": "off",
-        "@typescript-eslint/space-before-function-paren": "off"
+        "@typescript-eslint/space-before-function-paren": "off",
+        "@typescript-eslint/no-explicit-any": "off",
+        "unicorn/consistent-destructuring": "off",
+        "@typescript-eslint/naming-convention": "off",
+        "curly": "off",
+        "arrow-body-style": "off",
+        "@typescript-eslint/no-loop-func": "off"
     }
 }
