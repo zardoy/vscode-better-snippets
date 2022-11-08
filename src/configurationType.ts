@@ -1,7 +1,7 @@
 import * as vscode from 'vscode'
+import { snippetLocation } from './constants'
 // import { SyntaxKind } from 'typescript/lib/tsserverlibrary'
 
-export const snippetLocation = ['fileStart', 'comment', 'lineStart', 'topLineStart', 'code'] as const
 export type SnippetLocation = typeof snippetLocation[number]
 
 type CommandDefinition =

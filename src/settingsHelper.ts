@@ -3,8 +3,9 @@ import { findNodeAtLocation, getLocation, getNodeValue, Location, parseTree } fr
 import { getExtensionSetting, getExtensionSettingId } from 'vscode-framework'
 import { getJsonCompletingInfo, jsonPathEquals, jsonValuesToCompletions } from '@zardoy/vscode-utils/build/jsonCompletions'
 import { oneOf } from '@zardoy/utils'
-import { snippetLocation } from './configurationType'
+import { normalizeLanguages } from '@zardoy/vscode-utils/build/langs'
 import { getContributedLangInfo } from './langsUtils'
+import { snippetLocation } from './constants'
 
 const getSharedParsingInfo = (document: vscode.TextDocument, position: vscode.Position) => {
     const location = getLocation(document.getText(), document.offsetAt(position))

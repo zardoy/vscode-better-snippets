@@ -1,6 +1,7 @@
 {
     "extends": "@zardoy/tsconfig/node",
     "compilerOptions": {
+        "allowJs": true,
         "target": "ESNext",
         "lib": [
             "ESNext",

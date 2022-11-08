@@ -1,7 +1,7 @@
 //@ts-check
 const { defineConfig } = require('@zardoy/vscode-utils/build/defineConfig.cjs')
 const { patchPackageJson } = require('@zardoy/vscode-utils/build/patchPackageJson.cjs')
-const { snippetLocation } = require('./src/configurationType')
+const { snippetLocation } = require('./src/constants')
 
 patchPackageJson({
     async patchSettings(configuration) {
