@@ -154,7 +154,7 @@
     "scripts": {
         "start": "vscode-framework start",
         "start-web": "vscode-framework start --web",
-        "build": "vscode-framework build && node buildTsPlugin.mjs prod",
+        "build": "tsc && vscode-framework build && node buildTsPlugin.mjs prod",
         "watch-plugin": "node buildTsPlugin.mjs",
         "integration-test": "rimraf -rf ./testsOut/ && tsc -p tsconfig.test.json && node testsOut/runTests.js",
         "integration-test:watch": "chokidar \"test/integration/**\" -c \"pnpm integration-test\" --initial",

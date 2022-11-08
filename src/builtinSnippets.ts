@@ -19,14 +19,14 @@ const markdownTop = {
 type CustomSnippet = Configuration['customSnippets'][number]
 
 // todo set required: languages
-export const builtinSnippets: Configuration['customSnippets'] = (
+export const builtinSnippets: CustomSnippet[] = (
     [
         // js
         ...topLineSnippets.map(
             ([name, body]): CustomSnippet => ({
                 name,
                 body,
-                type: 'Event',
+                iconType: 'Event',
                 when: {
                     locations: ['topLineStart'],
                     languages: ['js'],
@@ -37,7 +37,7 @@ export const builtinSnippets: Configuration['customSnippets'] = (
             name: 'useParam',
             body: '',
             // experimentaly
-            type: 'Event',
+            iconType: 'Event',
             executeCommand: {
                 command: getExtensionCommandId('_applySpecialSnippet' as any),
                 arguments: ['useParam'],
@@ -81,4 +81,4 @@ export const builtinSnippets: Configuration['customSnippets'] = (
             when: markdownTop,
         },
     ] as Configuration['customSnippets']
-).map((snippet): CustomSnippet => ({ group: 'Builtin Better Snippet', ...snippet }))
+).map((snippet): CustomSnippet => ({ description: 'Builtin Better Snippet', ...snippet }))
