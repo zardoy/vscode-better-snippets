@@ -40,6 +40,15 @@ export const getConfigValueFromAllScopes = <T extends keyof ConditionalPick<Conf
     } = vscode.workspace.getConfiguration(process.env.IDS_PREFIX, null).inspect<any[]>(configKey)!
     return [...globalValue, ...workspaceValue, ...workspaceFolderValue] as any
 }
+
+export const getConfigValueFromAllScopesObj = <T extends keyof ConditionalPick<Configuration, Record<string, any>>>(configKey: T): Configuration[T] => {
+    const {
+        globalValue = {},
+        workspaceValue = {},
+        workspaceFolderValue = {},
+    } = vscode.workspace.getConfiguration(process.env.IDS_PREFIX, null).inspect<Record<string, any>>(configKey)!
+    return { ...globalValue, ...workspaceValue, ...workspaceFolderValue } as any
+}
 // #endregion
 
 // #region general

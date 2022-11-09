@@ -1,5 +1,5 @@
 // GENERATED. DON'T EDIT MANUALLY
-// md5hash: 0f773f3dafa84b2511ff7a62095151f5
+// md5hash: 1bdad5a3948f4944183417e84262a09d
 {
     "type": "object",
     "properties": {
@@ -34,18 +34,40 @@
         },
         "extendsGroups": {
             "description": "Here you can specify reusable parts for your custom & typing snippets\nThe name of group must not contain `:` as its reserved for builtin and extension packs groups",
-            "type": "object"
-        },
-        "customSnippets": {
-            "suggestSortText": "betterSnippets.1",
-            "type": "array",
-            "items": {
-                "allOf": [
-                    {
-                        "type": "object",
-                        "properties": {
-                            "when": {
-                                "suggestSortText": "3",
+            "type": "object",
+            "additionalProperties": {
+                "type": "object",
+                "properties": {
+                    "body": {
+                        "description": "If `false`:\n- In custom snippets: body will be used from snippet name\n- in typing snippets: sequence will not be removed, useful for just executing post actions such as commands",
+                        "suggestSortText": "2",
+                        "defaultSnippets": [
+                            {
+                                "body": "$1"
+                            }
+                        ],
+                        "anyOf": [
+                            {
+                                "type": "array",
+                                "items": {
+                                    "type": "string"
+                                }
+                            },
+                            {
+                                "enum": [
+                                    false
+                                ],
+                                "type": "boolean"
+                            },
+                            {
+                                "type": "string"
+                            }
+                        ]
+                    },
+                    "when": {
+                        "suggestSortText": "4",
+                        "allOf": [
+                            {
                                 "type": "object",
                                 "properties": {
                                     "lineHasRegex": {
@@ -286,84 +308,7 @@
                                     }
                                 }
                             },
-                            "replaceBeforeRegex": {
-                                "description": "Wether to replace the matched content from `lineBeforeRegex` or `lineRegex` regex check. The first one takes precedence.\nWorks only when end of content is matched (e.g. it will always work if regex ends with `$`)",
-                                "type": "boolean"
-                            },
-                            "resolveImports": {
-                                "description": "For JS langs only. How to resolve suggested imports if any",
-                                "type": "object",
-                                "additionalProperties": {
-                                    "type": "object",
-                                    "properties": {
-                                        "package": {
-                                            "type": "string"
-                                        }
-                                    }
-                                }
-                            },
-                            "executeCommand": {
-                                "description": "Execute custom command on snippet accept, doesn't work with resolveImports",
-                                "defaultSnippets": [
-                                    {
-                                        "body": "$1"
-                                    }
-                                ],
-                                "anyOf": [
-                                    {
-                                        "type": "object",
-                                        "properties": {
-                                            "command": {
-                                                "type": "string"
-                                            },
-                                            "arguments": {
-                                                "type": "array",
-                                                "items": {}
-                                            }
-                                        },
-                                        "required": [
-                                            "arguments",
-                                            "command"
-                                        ]
-                                    },
-                                    {
-                                        "type": "string"
-                                    }
-                                ]
-                            }
-                        }
-                    },
-                    {
-                        "type": "object",
-                        "properties": {
-                            "body": {
-                                "suggestSortText": "2",
-                                "defaultSnippets": [
-                                    {
-                                        "body": "$1"
-                                    }
-                                ],
-                                "anyOf": [
-                                    {
-                                        "type": "array",
-                                        "items": {
-                                            "type": "string"
-                                        }
-                                    },
-                                    {
-                                        "type": "string"
-                                    }
-                                ]
-                            },
-                            "name": {
-                                "suggestSortText": "!",
-                                "type": "string"
-                            },
-                            "description": {
-                                "description": "Should be short. Always displayed in completion widget on the right on the same line as label.",
-                                "type": "string"
-                            },
-                            "when": {
+                            {
                                 "type": "object",
                                 "properties": {
                                     "triggerCharacters": {
@@ -374,66 +319,917 @@
                                         }
                                     }
                                 }
-                            },
-                            "fileIcon": {
-                                "description": "If specified, `iconType` is ignored. It makes sense to use with custom file icon theme",
-                                "type": "string"
-                            },
-                            "folderIcon": {
-                                "description": "If specified, `iconType` and `fileIcon` is ignored. It makes sense to use with custom file icon theme",
-                                "type": "string"
-                            },
-                            "sortText": {
-                                "type": "string"
-                            },
-                            "iconType": {
-                                "anyOf": [
-                                    {
-                                        "enum": [
-                                            "Class",
-                                            "Color",
-                                            "Constant",
-                                            "Constructor",
-                                            "Enum",
-                                            "EnumMember",
-                                            "Event",
-                                            "Field",
-                                            "File",
-                                            "Folder",
-                                            "Function",
-                                            "Interface",
-                                            "Issue",
-                                            "Keyword",
-                                            "Method",
-                                            "Module",
-                                            "Operator",
-                                            "Property",
-                                            "Reference",
-                                            "Snippet",
-                                            "Struct",
-                                            "Text",
-                                            "TypeParameter",
-                                            "Unit",
-                                            "User",
-                                            "Value",
-                                            "Variable"
-                                        ],
+                            }
+                        ]
+                    },
+                    "replaceBeforeRegex": {
+                        "description": "Wether to replace the matched content from `lineBeforeRegex` or `lineRegex` regex check. The first one takes precedence.\nWorks only when end of content is matched (e.g. it will always work if regex ends with `$`)",
+                        "suggestSortText": "z9",
+                        "type": "boolean"
+                    },
+                    "resolveImports": {
+                        "description": "For JS langs only. How to resolve suggested imports if any",
+                        "type": "object",
+                        "additionalProperties": {
+                            "type": "object",
+                            "properties": {
+                                "package": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "executeCommand": {
+                        "description": "Execute custom command on snippet accept, doesn't work with resolveImports",
+                        "defaultSnippets": [
+                            {
+                                "body": "$1"
+                            }
+                        ],
+                        "anyOf": [
+                            {
+                                "type": "object",
+                                "properties": {
+                                    "command": {
                                         "type": "string"
                                     },
-                                    {
-                                        "type": "number"
+                                    "arguments": {
+                                        "type": "array",
+                                        "items": {}
                                     }
+                                },
+                                "required": [
+                                    "arguments",
+                                    "command"
                                 ]
                             },
-                            "replaceTriggerCharacter": {
-                                "description": "Only if `when.triggerCharacters` is used",
-                                "default": false,
-                                "type": "boolean"
+                            {
+                                "type": "string"
                             }
-                        },
-                        "required": [
-                            "body",
-                            "name"
+                        ]
+                    },
+                    "description": {
+                        "description": "Should be short. Always displayed in completion widget on the right on the same line as label.",
+                        "type": "string"
+                    },
+                    "fileIcon": {
+                        "description": "If specified, `iconType` is ignored. It makes sense to use with custom file icon theme",
+                        "type": "string"
+                    },
+                    "folderIcon": {
+                        "description": "If specified, `iconType` and `fileIcon` is ignored. It makes sense to use with custom file icon theme",
+                        "type": "string"
+                    },
+                    "sortText": {
+                        "type": "string"
+                    },
+                    "iconType": {
+                        "anyOf": [
+                            {
+                                "enum": [
+                                    "Class",
+                                    "Color",
+                                    "Constant",
+                                    "Constructor",
+                                    "Enum",
+                                    "EnumMember",
+                                    "Event",
+                                    "Field",
+                                    "File",
+                                    "Folder",
+                                    "Function",
+                                    "Interface",
+                                    "Issue",
+                                    "Keyword",
+                                    "Method",
+                                    "Module",
+                                    "Operator",
+                                    "Property",
+                                    "Reference",
+                                    "Snippet",
+                                    "Struct",
+                                    "Text",
+                                    "TypeParameter",
+                                    "Unit",
+                                    "User",
+                                    "Value",
+                                    "Variable"
+                                ],
+                                "type": "string"
+                            },
+                            {
+                                "type": "number"
+                            }
+                        ]
+                    },
+                    "replaceTriggerCharacter": {
+                        "description": "Only if `when.triggerCharacters` is used",
+                        "default": false,
+                        "type": "boolean"
+                    },
+                    "nameOrSequence": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "customSnippets": {
+            "suggestSortText": "betterSnippets.1",
+            "type": "array",
+            "items": {
+                "anyOf": [
+                    {
+                        "allOf": [
+                            {
+                                "type": "object",
+                                "properties": {
+                                    "body": {
+                                        "description": "If `false`:\n- In custom snippets: body will be used from snippet name\n- in typing snippets: sequence will not be removed, useful for just executing post actions such as commands",
+                                        "suggestSortText": "2",
+                                        "defaultSnippets": [
+                                            {
+                                                "body": "$1"
+                                            }
+                                        ],
+                                        "anyOf": [
+                                            {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            {
+                                                "enum": [
+                                                    false
+                                                ],
+                                                "type": "boolean"
+                                            },
+                                            {
+                                                "type": "string"
+                                            }
+                                        ]
+                                    },
+                                    "name": {
+                                        "suggestSortText": "!",
+                                        "type": "string"
+                                    }
+                                },
+                                "required": [
+                                    "body",
+                                    "name"
+                                ]
+                            },
+                            {
+                                "type": "object",
+                                "properties": {
+                                    "when": {
+                                        "suggestSortText": "4",
+                                        "allOf": [
+                                            {
+                                                "type": "object",
+                                                "properties": {
+                                                    "lineHasRegex": {
+                                                        "description": "Shouldn't be used with `Start` location as snippet would be hidden in that case",
+                                                        "type": "string"
+                                                    },
+                                                    "lineRegex": {
+                                                        "description": "Same as `lineHasRegex`, but the line will be tested from first character till current cursor position",
+                                                        "type": "string"
+                                                    },
+                                                    "languages": {
+                                                        "description": "Language identifier. Family name from `languageSupersets` can be used instead (e.g. js or react)",
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "locations": {
+                                                        "description": "Specify to restrict showing suggest in specific location",
+                                                        "items": "replace-locations-marker",
+                                                        "type": "array"
+                                                    },
+                                                    "pathRegex": {
+                                                        "type": "string"
+                                                    },
+                                                    "fileType": {
+                                                        "description": "Shortcuts for complex path regexs. If specified, `pathRegex` is ignored",
+                                                        "enum": [
+                                                            "package.json",
+                                                            "tsconfig.json"
+                                                        ],
+                                                        "type": "string"
+                                                    },
+                                                    "otherLines": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "anyOf": [
+                                                                {
+                                                                    "allOf": [
+                                                                        {
+                                                                            "type": "object",
+                                                                            "properties": {
+                                                                                "testRegex": {
+                                                                                    "description": "Tests against original string (with whitespaces)",
+                                                                                    "suggestSortText": "4",
+                                                                                    "type": "string"
+                                                                                }
+                                                                            },
+                                                                            "required": [
+                                                                                "testRegex"
+                                                                            ]
+                                                                        },
+                                                                        {
+                                                                            "type": "object",
+                                                                            "properties": {
+                                                                                "line": {
+                                                                                    "description": "Which line to pick (relative to current)",
+                                                                                    "suggestSortText": "1",
+                                                                                    "type": "number"
+                                                                                },
+                                                                                "displayIfNoLine": {
+                                                                                    "default": false,
+                                                                                    "type": "boolean"
+                                                                                }
+                                                                            },
+                                                                            "required": [
+                                                                                "line"
+                                                                            ]
+                                                                        }
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "allOf": [
+                                                                        {
+                                                                            "type": "object",
+                                                                            "properties": {
+                                                                                "testRegex": {
+                                                                                    "description": "Tests against original string (with whitespaces)",
+                                                                                    "suggestSortText": "4",
+                                                                                    "type": "string"
+                                                                                }
+                                                                            },
+                                                                            "required": [
+                                                                                "testRegex"
+                                                                            ]
+                                                                        },
+                                                                        {
+                                                                            "type": "object",
+                                                                            "properties": {
+                                                                                "indent": {
+                                                                                    "description": "How many levels up of indendation to look? By default 0 - any. Example: `-1`\nCurrently it is possible to lookup only above (negative number)",
+                                                                                    "suggestSortText": "2",
+                                                                                    "default": 0,
+                                                                                    "anyOf": [
+                                                                                        {
+                                                                                            "enum": [
+                                                                                                "up"
+                                                                                            ],
+                                                                                            "type": "string"
+                                                                                        },
+                                                                                        {
+                                                                                            "type": "number"
+                                                                                        }
+                                                                                    ]
+                                                                                }
+                                                                            },
+                                                                            "required": [
+                                                                                "indent"
+                                                                            ]
+                                                                        }
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "allOf": [
+                                                                        {
+                                                                            "type": "object",
+                                                                            "properties": {
+                                                                                "testString": {
+                                                                                    "description": "Tests against trimmed string",
+                                                                                    "suggestSortText": "3",
+                                                                                    "type": "string"
+                                                                                },
+                                                                                "matchWith": {
+                                                                                    "default": "startsWith",
+                                                                                    "enum": [
+                                                                                        "endsWith",
+                                                                                        "includes",
+                                                                                        "startsWith"
+                                                                                    ],
+                                                                                    "type": "string"
+                                                                                }
+                                                                            },
+                                                                            "required": [
+                                                                                "testString"
+                                                                            ]
+                                                                        },
+                                                                        {
+                                                                            "type": "object",
+                                                                            "properties": {
+                                                                                "line": {
+                                                                                    "description": "Which line to pick (relative to current)",
+                                                                                    "suggestSortText": "1",
+                                                                                    "type": "number"
+                                                                                },
+                                                                                "displayIfNoLine": {
+                                                                                    "default": false,
+                                                                                    "type": "boolean"
+                                                                                }
+                                                                            },
+                                                                            "required": [
+                                                                                "line"
+                                                                            ]
+                                                                        }
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "allOf": [
+                                                                        {
+                                                                            "type": "object",
+                                                                            "properties": {
+                                                                                "testString": {
+                                                                                    "description": "Tests against trimmed string",
+                                                                                    "suggestSortText": "3",
+                                                                                    "type": "string"
+                                                                                },
+                                                                                "matchWith": {
+                                                                                    "default": "startsWith",
+                                                                                    "enum": [
+                                                                                        "endsWith",
+                                                                                        "includes",
+                                                                                        "startsWith"
+                                                                                    ],
+                                                                                    "type": "string"
+                                                                                }
+                                                                            },
+                                                                            "required": [
+                                                                                "testString"
+                                                                            ]
+                                                                        },
+                                                                        {
+                                                                            "type": "object",
+                                                                            "properties": {
+                                                                                "indent": {
+                                                                                    "description": "How many levels up of indendation to look? By default 0 - any. Example: `-1`\nCurrently it is possible to lookup only above (negative number)",
+                                                                                    "suggestSortText": "2",
+                                                                                    "default": 0,
+                                                                                    "anyOf": [
+                                                                                        {
+                                                                                            "enum": [
+                                                                                                "up"
+                                                                                            ],
+                                                                                            "type": "string"
+                                                                                        },
+                                                                                        {
+                                                                                            "type": "number"
+                                                                                        }
+                                                                                    ]
+                                                                                }
+                                                                            },
+                                                                            "required": [
+                                                                                "indent"
+                                                                            ]
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        }
+                                                    },
+                                                    "npmDependencies": {
+                                                        "description": "Enable snippet only when following NPM dependencies are in package.json.",
+                                                        "type": "array",
+                                                        "items": {
+                                                            "anyOf": [
+                                                                {
+                                                                    "type": "object",
+                                                                    "properties": {
+                                                                        "type": {
+                                                                            "enum": [
+                                                                                "dev",
+                                                                                "prod"
+                                                                            ],
+                                                                            "type": "string"
+                                                                        },
+                                                                        "dep": {
+                                                                            "type": "string"
+                                                                        }
+                                                                    },
+                                                                    "required": [
+                                                                        "dep",
+                                                                        "type"
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "type": "string"
+                                                                }
+                                                            ]
+                                                        }
+                                                    }
+                                                }
+                                            },
+                                            {
+                                                "type": "object",
+                                                "properties": {
+                                                    "triggerCharacters": {
+                                                        "description": "The snippet will be visible only after typing specific character on the keyboard\nAdd '' (empty string) so it'll be visible after regular triggering or typing",
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "string"
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        ]
+                                    },
+                                    "replaceBeforeRegex": {
+                                        "description": "Wether to replace the matched content from `lineBeforeRegex` or `lineRegex` regex check. The first one takes precedence.\nWorks only when end of content is matched (e.g. it will always work if regex ends with `$`)",
+                                        "suggestSortText": "z9",
+                                        "type": "boolean"
+                                    },
+                                    "resolveImports": {
+                                        "description": "For JS langs only. How to resolve suggested imports if any",
+                                        "type": "object",
+                                        "additionalProperties": {
+                                            "type": "object",
+                                            "properties": {
+                                                "package": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    },
+                                    "executeCommand": {
+                                        "description": "Execute custom command on snippet accept, doesn't work with resolveImports",
+                                        "defaultSnippets": [
+                                            {
+                                                "body": "$1"
+                                            }
+                                        ],
+                                        "anyOf": [
+                                            {
+                                                "type": "object",
+                                                "properties": {
+                                                    "command": {
+                                                        "type": "string"
+                                                    },
+                                                    "arguments": {
+                                                        "type": "array",
+                                                        "items": {}
+                                                    }
+                                                },
+                                                "required": [
+                                                    "arguments",
+                                                    "command"
+                                                ]
+                                            },
+                                            {
+                                                "type": "string"
+                                            }
+                                        ]
+                                    },
+                                    "description": {
+                                        "description": "Should be short. Always displayed in completion widget on the right on the same line as label.",
+                                        "type": "string"
+                                    },
+                                    "fileIcon": {
+                                        "description": "If specified, `iconType` is ignored. It makes sense to use with custom file icon theme",
+                                        "type": "string"
+                                    },
+                                    "folderIcon": {
+                                        "description": "If specified, `iconType` and `fileIcon` is ignored. It makes sense to use with custom file icon theme",
+                                        "type": "string"
+                                    },
+                                    "sortText": {
+                                        "type": "string"
+                                    },
+                                    "iconType": {
+                                        "anyOf": [
+                                            {
+                                                "enum": [
+                                                    "Class",
+                                                    "Color",
+                                                    "Constant",
+                                                    "Constructor",
+                                                    "Enum",
+                                                    "EnumMember",
+                                                    "Event",
+                                                    "Field",
+                                                    "File",
+                                                    "Folder",
+                                                    "Function",
+                                                    "Interface",
+                                                    "Issue",
+                                                    "Keyword",
+                                                    "Method",
+                                                    "Module",
+                                                    "Operator",
+                                                    "Property",
+                                                    "Reference",
+                                                    "Snippet",
+                                                    "Struct",
+                                                    "Text",
+                                                    "TypeParameter",
+                                                    "Unit",
+                                                    "User",
+                                                    "Value",
+                                                    "Variable"
+                                                ],
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "number"
+                                            }
+                                        ]
+                                    },
+                                    "replaceTriggerCharacter": {
+                                        "description": "Only if `when.triggerCharacters` is used",
+                                        "default": false,
+                                        "type": "boolean"
+                                    }
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "allOf": [
+                            {
+                                "type": "object",
+                                "properties": {
+                                    "extends": {
+                                        "type": "string"
+                                    }
+                                },
+                                "required": [
+                                    "extends"
+                                ]
+                            },
+                            {
+                                "type": "object",
+                                "properties": {
+                                    "when": {
+                                        "suggestSortText": "4",
+                                        "allOf": [
+                                            {
+                                                "type": "object",
+                                                "properties": {
+                                                    "lineHasRegex": {
+                                                        "description": "Shouldn't be used with `Start` location as snippet would be hidden in that case",
+                                                        "type": "string"
+                                                    },
+                                                    "lineRegex": {
+                                                        "description": "Same as `lineHasRegex`, but the line will be tested from first character till current cursor position",
+                                                        "type": "string"
+                                                    },
+                                                    "languages": {
+                                                        "description": "Language identifier. Family name from `languageSupersets` can be used instead (e.g. js or react)",
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "locations": {
+                                                        "description": "Specify to restrict showing suggest in specific location",
+                                                        "items": "replace-locations-marker",
+                                                        "type": "array"
+                                                    },
+                                                    "pathRegex": {
+                                                        "type": "string"
+                                                    },
+                                                    "fileType": {
+                                                        "description": "Shortcuts for complex path regexs. If specified, `pathRegex` is ignored",
+                                                        "enum": [
+                                                            "package.json",
+                                                            "tsconfig.json"
+                                                        ],
+                                                        "type": "string"
+                                                    },
+                                                    "otherLines": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "anyOf": [
+                                                                {
+                                                                    "allOf": [
+                                                                        {
+                                                                            "type": "object",
+                                                                            "properties": {
+                                                                                "testRegex": {
+                                                                                    "description": "Tests against original string (with whitespaces)",
+                                                                                    "suggestSortText": "4",
+                                                                                    "type": "string"
+                                                                                }
+                                                                            },
+                                                                            "required": [
+                                                                                "testRegex"
+                                                                            ]
+                                                                        },
+                                                                        {
+                                                                            "type": "object",
+                                                                            "properties": {
+                                                                                "line": {
+                                                                                    "description": "Which line to pick (relative to current)",
+                                                                                    "suggestSortText": "1",
+                                                                                    "type": "number"
+                                                                                },
+                                                                                "displayIfNoLine": {
+                                                                                    "default": false,
+                                                                                    "type": "boolean"
+                                                                                }
+                                                                            },
+                                                                            "required": [
+                                                                                "line"
+                                                                            ]
+                                                                        }
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "allOf": [
+                                                                        {
+                                                                            "type": "object",
+                                                                            "properties": {
+                                                                                "testRegex": {
+                                                                                    "description": "Tests against original string (with whitespaces)",
+                                                                                    "suggestSortText": "4",
+                                                                                    "type": "string"
+                                                                                }
+                                                                            },
+                                                                            "required": [
+                                                                                "testRegex"
+                                                                            ]
+                                                                        },
+                                                                        {
+                                                                            "type": "object",
+                                                                            "properties": {
+                                                                                "indent": {
+                                                                                    "description": "How many levels up of indendation to look? By default 0 - any. Example: `-1`\nCurrently it is possible to lookup only above (negative number)",
+                                                                                    "suggestSortText": "2",
+                                                                                    "default": 0,
+                                                                                    "anyOf": [
+                                                                                        {
+                                                                                            "enum": [
+                                                                                                "up"
+                                                                                            ],
+                                                                                            "type": "string"
+                                                                                        },
+                                                                                        {
+                                                                                            "type": "number"
+                                                                                        }
+                                                                                    ]
+                                                                                }
+                                                                            },
+                                                                            "required": [
+                                                                                "indent"
+                                                                            ]
+                                                                        }
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "allOf": [
+                                                                        {
+                                                                            "type": "object",
+                                                                            "properties": {
+                                                                                "testString": {
+                                                                                    "description": "Tests against trimmed string",
+                                                                                    "suggestSortText": "3",
+                                                                                    "type": "string"
+                                                                                },
+                                                                                "matchWith": {
+                                                                                    "default": "startsWith",
+                                                                                    "enum": [
+                                                                                        "endsWith",
+                                                                                        "includes",
+                                                                                        "startsWith"
+                                                                                    ],
+                                                                                    "type": "string"
+                                                                                }
+                                                                            },
+                                                                            "required": [
+                                                                                "testString"
+                                                                            ]
+                                                                        },
+                                                                        {
+                                                                            "type": "object",
+                                                                            "properties": {
+                                                                                "line": {
+                                                                                    "description": "Which line to pick (relative to current)",
+                                                                                    "suggestSortText": "1",
+                                                                                    "type": "number"
+                                                                                },
+                                                                                "displayIfNoLine": {
+                                                                                    "default": false,
+                                                                                    "type": "boolean"
+                                                                                }
+                                                                            },
+                                                                            "required": [
+                                                                                "line"
+                                                                            ]
+                                                                        }
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "allOf": [
+                                                                        {
+                                                                            "type": "object",
+                                                                            "properties": {
+                                                                                "testString": {
+                                                                                    "description": "Tests against trimmed string",
+                                                                                    "suggestSortText": "3",
+                                                                                    "type": "string"
+                                                                                },
+                                                                                "matchWith": {
+                                                                                    "default": "startsWith",
+                                                                                    "enum": [
+                                                                                        "endsWith",
+                                                                                        "includes",
+                                                                                        "startsWith"
+                                                                                    ],
+                                                                                    "type": "string"
+                                                                                }
+                                                                            },
+                                                                            "required": [
+                                                                                "testString"
+                                                                            ]
+                                                                        },
+                                                                        {
+                                                                            "type": "object",
+                                                                            "properties": {
+                                                                                "indent": {
+                                                                                    "description": "How many levels up of indendation to look? By default 0 - any. Example: `-1`\nCurrently it is possible to lookup only above (negative number)",
+                                                                                    "suggestSortText": "2",
+                                                                                    "default": 0,
+                                                                                    "anyOf": [
+                                                                                        {
+                                                                                            "enum": [
+                                                                                                "up"
+                                                                                            ],
+                                                                                            "type": "string"
+                                                                                        },
+                                                                                        {
+                                                                                            "type": "number"
+                                                                                        }
+                                                                                    ]
+                                                                                }
+                                                                            },
+                                                                            "required": [
+                                                                                "indent"
+                                                                            ]
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        }
+                                                    },
+                                                    "npmDependencies": {
+                                                        "description": "Enable snippet only when following NPM dependencies are in package.json.",
+                                                        "type": "array",
+                                                        "items": {
+                                                            "anyOf": [
+                                                                {
+                                                                    "type": "object",
+                                                                    "properties": {
+                                                                        "type": {
+                                                                            "enum": [
+                                                                                "dev",
+                                                                                "prod"
+                                                                            ],
+                                                                            "type": "string"
+                                                                        },
+                                                                        "dep": {
+                                                                            "type": "string"
+                                                                        }
+                                                                    },
+                                                                    "required": [
+                                                                        "dep",
+                                                                        "type"
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "type": "string"
+                                                                }
+                                                            ]
+                                                        }
+                                                    }
+                                                }
+                                            },
+                                            {
+                                                "type": "object",
+                                                "properties": {
+                                                    "triggerCharacters": {
+                                                        "description": "The snippet will be visible only after typing specific character on the keyboard\nAdd '' (empty string) so it'll be visible after regular triggering or typing",
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "string"
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        ]
+                                    },
+                                    "replaceBeforeRegex": {
+                                        "description": "Wether to replace the matched content from `lineBeforeRegex` or `lineRegex` regex check. The first one takes precedence.\nWorks only when end of content is matched (e.g. it will always work if regex ends with `$`)",
+                                        "suggestSortText": "z9",
+                                        "type": "boolean"
+                                    },
+                                    "resolveImports": {
+                                        "description": "For JS langs only. How to resolve suggested imports if any",
+                                        "type": "object",
+                                        "additionalProperties": {
+                                            "type": "object",
+                                            "properties": {
+                                                "package": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    },
+                                    "executeCommand": {
+                                        "description": "Execute custom command on snippet accept, doesn't work with resolveImports",
+                                        "defaultSnippets": [
+                                            {
+                                                "body": "$1"
+                                            }
+                                        ],
+                                        "anyOf": [
+                                            {
+                                                "type": "object",
+                                                "properties": {
+                                                    "command": {
+                                                        "type": "string"
+                                                    },
+                                                    "arguments": {
+                                                        "type": "array",
+                                                        "items": {}
+                                                    }
+                                                },
+                                                "required": [
+                                                    "arguments",
+                                                    "command"
+                                                ]
+                                            },
+                                            {
+                                                "type": "string"
+                                            }
+                                        ]
+                                    },
+                                    "description": {
+                                        "description": "Should be short. Always displayed in completion widget on the right on the same line as label.",
+                                        "type": "string"
+                                    },
+                                    "fileIcon": {
+                                        "description": "If specified, `iconType` is ignored. It makes sense to use with custom file icon theme",
+                                        "type": "string"
+                                    },
+                                    "folderIcon": {
+                                        "description": "If specified, `iconType` and `fileIcon` is ignored. It makes sense to use with custom file icon theme",
+                                        "type": "string"
+                                    },
+                                    "sortText": {
+                                        "type": "string"
+                                    },
+                                    "iconType": {
+                                        "anyOf": [
+                                            {
+                                                "enum": [
+                                                    "Class",
+                                                    "Color",
+                                                    "Constant",
+                                                    "Constructor",
+                                                    "Enum",
+                                                    "EnumMember",
+                                                    "Event",
+                                                    "Field",
+                                                    "File",
+                                                    "Folder",
+                                                    "Function",
+                                                    "Interface",
+                                                    "Issue",
+                                                    "Keyword",
+                                                    "Method",
+                                                    "Module",
+                                                    "Operator",
+                                                    "Property",
+                                                    "Reference",
+                                                    "Snippet",
+                                                    "Struct",
+                                                    "Text",
+                                                    "TypeParameter",
+                                                    "Unit",
+                                                    "User",
+                                                    "Value",
+                                                    "Variable"
+                                                ],
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "number"
+                                            }
+                                        ]
+                                    },
+                                    "replaceTriggerCharacter": {
+                                        "description": "Only if `when.triggerCharacters` is used",
+                                        "default": false,
+                                        "type": "boolean"
+                                    }
+                                }
+                            }
                         ]
                     }
                 ]
@@ -443,346 +1239,676 @@
             "suggestSortText": "betterSnippets.2",
             "type": "array",
             "items": {
-                "allOf": [
+                "anyOf": [
                     {
-                        "type": "object",
-                        "properties": {
-                            "when": {
-                                "suggestSortText": "3",
+                        "allOf": [
+                            {
                                 "type": "object",
                                 "properties": {
-                                    "lineHasRegex": {
-                                        "description": "Shouldn't be used with `Start` location as snippet would be hidden in that case",
-                                        "type": "string"
-                                    },
-                                    "lineRegex": {
-                                        "description": "Same as `lineHasRegex`, but the line will be tested from first character till current cursor position",
-                                        "type": "string"
-                                    },
-                                    "languages": {
-                                        "description": "Language identifier. Family name from `languageSupersets` can be used instead (e.g. js or react)",
-                                        "type": "array",
-                                        "items": {
-                                            "type": "string"
-                                        }
-                                    },
-                                    "locations": {
-                                        "description": "Specify to restrict showing suggest in specific location",
-                                        "items": "replace-locations-marker",
-                                        "type": "array"
-                                    },
-                                    "pathRegex": {
-                                        "type": "string"
-                                    },
-                                    "fileType": {
-                                        "description": "Shortcuts for complex path regexs. If specified, `pathRegex` is ignored",
-                                        "enum": [
-                                            "package.json",
-                                            "tsconfig.json"
+                                    "body": {
+                                        "description": "If `false`:\n- In custom snippets: body will be used from snippet name\n- in typing snippets: sequence will not be removed, useful for just executing post actions such as commands",
+                                        "suggestSortText": "2",
+                                        "defaultSnippets": [
+                                            {
+                                                "body": "$1"
+                                            }
                                         ],
-                                        "type": "string"
-                                    },
-                                    "otherLines": {
-                                        "type": "array",
-                                        "items": {
-                                            "anyOf": [
-                                                {
-                                                    "allOf": [
-                                                        {
-                                                            "type": "object",
-                                                            "properties": {
-                                                                "testRegex": {
-                                                                    "description": "Tests against original string (with whitespaces)",
-                                                                    "suggestSortText": "4",
-                                                                    "type": "string"
-                                                                }
-                                                            },
-                                                            "required": [
-                                                                "testRegex"
-                                                            ]
-                                                        },
-                                                        {
-                                                            "type": "object",
-                                                            "properties": {
-                                                                "line": {
-                                                                    "description": "Which line to pick (relative to current)",
-                                                                    "suggestSortText": "1",
-                                                                    "type": "number"
-                                                                },
-                                                                "displayIfNoLine": {
-                                                                    "default": false,
-                                                                    "type": "boolean"
-                                                                }
-                                                            },
-                                                            "required": [
-                                                                "line"
-                                                            ]
-                                                        }
-                                                    ]
-                                                },
-                                                {
-                                                    "allOf": [
-                                                        {
-                                                            "type": "object",
-                                                            "properties": {
-                                                                "testRegex": {
-                                                                    "description": "Tests against original string (with whitespaces)",
-                                                                    "suggestSortText": "4",
-                                                                    "type": "string"
-                                                                }
-                                                            },
-                                                            "required": [
-                                                                "testRegex"
-                                                            ]
-                                                        },
-                                                        {
-                                                            "type": "object",
-                                                            "properties": {
-                                                                "indent": {
-                                                                    "description": "How many levels up of indendation to look? By default 0 - any. Example: `-1`\nCurrently it is possible to lookup only above (negative number)",
-                                                                    "suggestSortText": "2",
-                                                                    "default": 0,
-                                                                    "anyOf": [
-                                                                        {
-                                                                            "enum": [
-                                                                                "up"
-                                                                            ],
-                                                                            "type": "string"
-                                                                        },
-                                                                        {
-                                                                            "type": "number"
-                                                                        }
-                                                                    ]
-                                                                }
-                                                            },
-                                                            "required": [
-                                                                "indent"
-                                                            ]
-                                                        }
-                                                    ]
-                                                },
-                                                {
-                                                    "allOf": [
-                                                        {
-                                                            "type": "object",
-                                                            "properties": {
-                                                                "testString": {
-                                                                    "description": "Tests against trimmed string",
-                                                                    "suggestSortText": "3",
-                                                                    "type": "string"
-                                                                },
-                                                                "matchWith": {
-                                                                    "default": "startsWith",
-                                                                    "enum": [
-                                                                        "endsWith",
-                                                                        "includes",
-                                                                        "startsWith"
-                                                                    ],
-                                                                    "type": "string"
-                                                                }
-                                                            },
-                                                            "required": [
-                                                                "testString"
-                                                            ]
-                                                        },
-                                                        {
-                                                            "type": "object",
-                                                            "properties": {
-                                                                "line": {
-                                                                    "description": "Which line to pick (relative to current)",
-                                                                    "suggestSortText": "1",
-                                                                    "type": "number"
-                                                                },
-                                                                "displayIfNoLine": {
-                                                                    "default": false,
-                                                                    "type": "boolean"
-                                                                }
-                                                            },
-                                                            "required": [
-                                                                "line"
-                                                            ]
-                                                        }
-                                                    ]
-                                                },
-                                                {
-                                                    "allOf": [
-                                                        {
-                                                            "type": "object",
-                                                            "properties": {
-                                                                "testString": {
-                                                                    "description": "Tests against trimmed string",
-                                                                    "suggestSortText": "3",
-                                                                    "type": "string"
-                                                                },
-                                                                "matchWith": {
-                                                                    "default": "startsWith",
-                                                                    "enum": [
-                                                                        "endsWith",
-                                                                        "includes",
-                                                                        "startsWith"
-                                                                    ],
-                                                                    "type": "string"
-                                                                }
-                                                            },
-                                                            "required": [
-                                                                "testString"
-                                                            ]
-                                                        },
-                                                        {
-                                                            "type": "object",
-                                                            "properties": {
-                                                                "indent": {
-                                                                    "description": "How many levels up of indendation to look? By default 0 - any. Example: `-1`\nCurrently it is possible to lookup only above (negative number)",
-                                                                    "suggestSortText": "2",
-                                                                    "default": 0,
-                                                                    "anyOf": [
-                                                                        {
-                                                                            "enum": [
-                                                                                "up"
-                                                                            ],
-                                                                            "type": "string"
-                                                                        },
-                                                                        {
-                                                                            "type": "number"
-                                                                        }
-                                                                    ]
-                                                                }
-                                                            },
-                                                            "required": [
-                                                                "indent"
-                                                            ]
-                                                        }
-                                                    ]
+                                        "anyOf": [
+                                            {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "string"
                                                 }
-                                            ]
-                                        }
+                                            },
+                                            {
+                                                "enum": [
+                                                    false
+                                                ],
+                                                "type": "boolean"
+                                            },
+                                            {
+                                                "type": "string"
+                                            }
+                                        ]
                                     },
-                                    "npmDependencies": {
-                                        "description": "Enable snippet only when following NPM dependencies are in package.json.",
-                                        "type": "array",
-                                        "items": {
-                                            "anyOf": [
-                                                {
-                                                    "type": "object",
-                                                    "properties": {
-                                                        "type": {
-                                                            "enum": [
-                                                                "dev",
-                                                                "prod"
-                                                            ],
-                                                            "type": "string"
-                                                        },
-                                                        "dep": {
+                                    "sequence": {
+                                        "description": "Snippet will be accepted only after typing THE EXACT sequence of characters on the keyboard. Using arrows or mouse for navigating will reset the sequence (see settings)",
+                                        "suggestSortText": "!",
+                                        "type": "string"
+                                    }
+                                },
+                                "required": [
+                                    "body",
+                                    "sequence"
+                                ]
+                            },
+                            {
+                                "type": "object",
+                                "properties": {
+                                    "when": {
+                                        "suggestSortText": "4",
+                                        "allOf": [
+                                            {
+                                                "type": "object",
+                                                "properties": {
+                                                    "lineHasRegex": {
+                                                        "description": "Shouldn't be used with `Start` location as snippet would be hidden in that case",
+                                                        "type": "string"
+                                                    },
+                                                    "lineRegex": {
+                                                        "description": "Same as `lineHasRegex`, but the line will be tested from first character till current cursor position",
+                                                        "type": "string"
+                                                    },
+                                                    "languages": {
+                                                        "description": "Language identifier. Family name from `languageSupersets` can be used instead (e.g. js or react)",
+                                                        "type": "array",
+                                                        "items": {
                                                             "type": "string"
                                                         }
                                                     },
-                                                    "required": [
-                                                        "dep",
-                                                        "type"
-                                                    ]
-                                                },
-                                                {
-                                                    "type": "string"
+                                                    "locations": {
+                                                        "description": "Specify to restrict showing suggest in specific location",
+                                                        "items": "replace-locations-marker",
+                                                        "type": "array"
+                                                    },
+                                                    "pathRegex": {
+                                                        "type": "string"
+                                                    },
+                                                    "fileType": {
+                                                        "description": "Shortcuts for complex path regexs. If specified, `pathRegex` is ignored",
+                                                        "enum": [
+                                                            "package.json",
+                                                            "tsconfig.json"
+                                                        ],
+                                                        "type": "string"
+                                                    },
+                                                    "otherLines": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "anyOf": [
+                                                                {
+                                                                    "allOf": [
+                                                                        {
+                                                                            "type": "object",
+                                                                            "properties": {
+                                                                                "testRegex": {
+                                                                                    "description": "Tests against original string (with whitespaces)",
+                                                                                    "suggestSortText": "4",
+                                                                                    "type": "string"
+                                                                                }
+                                                                            },
+                                                                            "required": [
+                                                                                "testRegex"
+                                                                            ]
+                                                                        },
+                                                                        {
+                                                                            "type": "object",
+                                                                            "properties": {
+                                                                                "line": {
+                                                                                    "description": "Which line to pick (relative to current)",
+                                                                                    "suggestSortText": "1",
+                                                                                    "type": "number"
+                                                                                },
+                                                                                "displayIfNoLine": {
+                                                                                    "default": false,
+                                                                                    "type": "boolean"
+                                                                                }
+                                                                            },
+                                                                            "required": [
+                                                                                "line"
+                                                                            ]
+                                                                        }
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "allOf": [
+                                                                        {
+                                                                            "type": "object",
+                                                                            "properties": {
+                                                                                "testRegex": {
+                                                                                    "description": "Tests against original string (with whitespaces)",
+                                                                                    "suggestSortText": "4",
+                                                                                    "type": "string"
+                                                                                }
+                                                                            },
+                                                                            "required": [
+                                                                                "testRegex"
+                                                                            ]
+                                                                        },
+                                                                        {
+                                                                            "type": "object",
+                                                                            "properties": {
+                                                                                "indent": {
+                                                                                    "description": "How many levels up of indendation to look? By default 0 - any. Example: `-1`\nCurrently it is possible to lookup only above (negative number)",
+                                                                                    "suggestSortText": "2",
+                                                                                    "default": 0,
+                                                                                    "anyOf": [
+                                                                                        {
+                                                                                            "enum": [
+                                                                                                "up"
+                                                                                            ],
+                                                                                            "type": "string"
+                                                                                        },
+                                                                                        {
+                                                                                            "type": "number"
+                                                                                        }
+                                                                                    ]
+                                                                                }
+                                                                            },
+                                                                            "required": [
+                                                                                "indent"
+                                                                            ]
+                                                                        }
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "allOf": [
+                                                                        {
+                                                                            "type": "object",
+                                                                            "properties": {
+                                                                                "testString": {
+                                                                                    "description": "Tests against trimmed string",
+                                                                                    "suggestSortText": "3",
+                                                                                    "type": "string"
+                                                                                },
+                                                                                "matchWith": {
+                                                                                    "default": "startsWith",
+                                                                                    "enum": [
+                                                                                        "endsWith",
+                                                                                        "includes",
+                                                                                        "startsWith"
+                                                                                    ],
+                                                                                    "type": "string"
+                                                                                }
+                                                                            },
+                                                                            "required": [
+                                                                                "testString"
+                                                                            ]
+                                                                        },
+                                                                        {
+                                                                            "type": "object",
+                                                                            "properties": {
+                                                                                "line": {
+                                                                                    "description": "Which line to pick (relative to current)",
+                                                                                    "suggestSortText": "1",
+                                                                                    "type": "number"
+                                                                                },
+                                                                                "displayIfNoLine": {
+                                                                                    "default": false,
+                                                                                    "type": "boolean"
+                                                                                }
+                                                                            },
+                                                                            "required": [
+                                                                                "line"
+                                                                            ]
+                                                                        }
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "allOf": [
+                                                                        {
+                                                                            "type": "object",
+                                                                            "properties": {
+                                                                                "testString": {
+                                                                                    "description": "Tests against trimmed string",
+                                                                                    "suggestSortText": "3",
+                                                                                    "type": "string"
+                                                                                },
+                                                                                "matchWith": {
+                                                                                    "default": "startsWith",
+                                                                                    "enum": [
+                                                                                        "endsWith",
+                                                                                        "includes",
+                                                                                        "startsWith"
+                                                                                    ],
+                                                                                    "type": "string"
+                                                                                }
+                                                                            },
+                                                                            "required": [
+                                                                                "testString"
+                                                                            ]
+                                                                        },
+                                                                        {
+                                                                            "type": "object",
+                                                                            "properties": {
+                                                                                "indent": {
+                                                                                    "description": "How many levels up of indendation to look? By default 0 - any. Example: `-1`\nCurrently it is possible to lookup only above (negative number)",
+                                                                                    "suggestSortText": "2",
+                                                                                    "default": 0,
+                                                                                    "anyOf": [
+                                                                                        {
+                                                                                            "enum": [
+                                                                                                "up"
+                                                                                            ],
+                                                                                            "type": "string"
+                                                                                        },
+                                                                                        {
+                                                                                            "type": "number"
+                                                                                        }
+                                                                                    ]
+                                                                                }
+                                                                            },
+                                                                            "required": [
+                                                                                "indent"
+                                                                            ]
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        }
+                                                    },
+                                                    "npmDependencies": {
+                                                        "description": "Enable snippet only when following NPM dependencies are in package.json.",
+                                                        "type": "array",
+                                                        "items": {
+                                                            "anyOf": [
+                                                                {
+                                                                    "type": "object",
+                                                                    "properties": {
+                                                                        "type": {
+                                                                            "enum": [
+                                                                                "dev",
+                                                                                "prod"
+                                                                            ],
+                                                                            "type": "string"
+                                                                        },
+                                                                        "dep": {
+                                                                            "type": "string"
+                                                                        }
+                                                                    },
+                                                                    "required": [
+                                                                        "dep",
+                                                                        "type"
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "type": "string"
+                                                                }
+                                                            ]
+                                                        }
+                                                    }
                                                 }
-                                            ]
-                                        }
-                                    }
-                                }
-                            },
-                            "replaceBeforeRegex": {
-                                "description": "Wether to replace the matched content from `lineBeforeRegex` or `lineRegex` regex check. The first one takes precedence.\nWorks only when end of content is matched (e.g. it will always work if regex ends with `$`)",
-                                "type": "boolean"
-                            },
-                            "resolveImports": {
-                                "description": "For JS langs only. How to resolve suggested imports if any",
-                                "type": "object",
-                                "additionalProperties": {
-                                    "type": "object",
-                                    "properties": {
-                                        "package": {
-                                            "type": "string"
-                                        }
-                                    }
-                                }
-                            },
-                            "executeCommand": {
-                                "description": "Execute custom command on snippet accept, doesn't work with resolveImports",
-                                "defaultSnippets": [
-                                    {
-                                        "body": "$1"
-                                    }
-                                ],
-                                "anyOf": [
-                                    {
-                                        "type": "object",
-                                        "properties": {
-                                            "command": {
-                                                "type": "string"
                                             },
-                                            "arguments": {
-                                                "type": "array",
-                                                "items": {}
+                                            {
+                                                "type": "object",
+                                                "properties": {
+                                                    "lineBeforeRegex": {
+                                                        "description": "Recommnded instead of `lineRegex`, tests against what is before current snippet in the line\nExample:\n| - cursor, [...] - check position\nFor regular snippet `test` end position is before current word:\n`[before] test|`, `[before] beforetest|`,\nTyping snippet: cb\n`[before]cb|`, `[before ]cb|`,",
+                                                        "type": "string"
+                                                    }
+                                                }
                                             }
-                                        },
-                                        "required": [
-                                            "arguments",
-                                            "command"
                                         ]
                                     },
-                                    {
-                                        "type": "string"
-                                    }
-                                ]
-                            }
-                        }
-                    },
-                    {
-                        "type": "object",
-                        "properties": {
-                            "body": {
-                                "description": "If `false` sequence will not be removed, useful for just executing post actions such as commands",
-                                "suggestSortText": "2",
-                                "defaultSnippets": [
-                                    {
-                                        "body": "$1"
-                                    }
-                                ],
-                                "anyOf": [
-                                    {
-                                        "type": "array",
-                                        "items": {
-                                            "type": "string"
-                                        }
-                                    },
-                                    {
-                                        "enum": [
-                                            false
-                                        ],
+                                    "replaceBeforeRegex": {
+                                        "description": "Wether to replace the matched content from `lineBeforeRegex` or `lineRegex` regex check. The first one takes precedence.\nWorks only when end of content is matched (e.g. it will always work if regex ends with `$`)",
+                                        "suggestSortText": "z9",
                                         "type": "boolean"
                                     },
-                                    {
-                                        "type": "string"
-                                    }
-                                ]
-                            },
-                            "sequence": {
-                                "description": "Snippet will be accepted only after typing THE EXACT sequence of characters on the keyboard. Using arrows or mouse for navigating will reset the sequence (see settings)",
-                                "suggestSortText": "!",
-                                "type": "string"
-                            },
-                            "when": {
-                                "type": "object",
-                                "properties": {
-                                    "lineBeforeRegex": {
-                                        "description": "Recommnded instead of `lineRegex`, tests against what is before current snippet in the line\nExample:\n| - cursor, [...] - check position\nFor regular snippet `test` end position is before current word:\n`[before] test|`, `[before] beforetest|`,\nTyping snippet: cb\n`[before]cb|`, `[before ]cb|`,",
-                                        "type": "string"
+                                    "resolveImports": {
+                                        "description": "For JS langs only. How to resolve suggested imports if any",
+                                        "type": "object",
+                                        "additionalProperties": {
+                                            "type": "object",
+                                            "properties": {
+                                                "package": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    },
+                                    "executeCommand": {
+                                        "description": "Execute custom command on snippet accept, doesn't work with resolveImports",
+                                        "defaultSnippets": [
+                                            {
+                                                "body": "$1"
+                                            }
+                                        ],
+                                        "anyOf": [
+                                            {
+                                                "type": "object",
+                                                "properties": {
+                                                    "command": {
+                                                        "type": "string"
+                                                    },
+                                                    "arguments": {
+                                                        "type": "array",
+                                                        "items": {}
+                                                    }
+                                                },
+                                                "required": [
+                                                    "arguments",
+                                                    "command"
+                                                ]
+                                            },
+                                            {
+                                                "type": "string"
+                                            }
+                                        ]
                                     }
                                 }
                             }
-                        },
-                        "required": [
-                            "body",
-                            "sequence"
+                        ]
+                    },
+                    {
+                        "allOf": [
+                            {
+                                "type": "object",
+                                "properties": {
+                                    "extends": {
+                                        "type": "string"
+                                    }
+                                },
+                                "required": [
+                                    "extends"
+                                ]
+                            },
+                            {
+                                "type": "object",
+                                "properties": {
+                                    "when": {
+                                        "suggestSortText": "4",
+                                        "allOf": [
+                                            {
+                                                "type": "object",
+                                                "properties": {
+                                                    "lineHasRegex": {
+                                                        "description": "Shouldn't be used with `Start` location as snippet would be hidden in that case",
+                                                        "type": "string"
+                                                    },
+                                                    "lineRegex": {
+                                                        "description": "Same as `lineHasRegex`, but the line will be tested from first character till current cursor position",
+                                                        "type": "string"
+                                                    },
+                                                    "languages": {
+                                                        "description": "Language identifier. Family name from `languageSupersets` can be used instead (e.g. js or react)",
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "locations": {
+                                                        "description": "Specify to restrict showing suggest in specific location",
+                                                        "items": "replace-locations-marker",
+                                                        "type": "array"
+                                                    },
+                                                    "pathRegex": {
+                                                        "type": "string"
+                                                    },
+                                                    "fileType": {
+                                                        "description": "Shortcuts for complex path regexs. If specified, `pathRegex` is ignored",
+                                                        "enum": [
+                                                            "package.json",
+                                                            "tsconfig.json"
+                                                        ],
+                                                        "type": "string"
+                                                    },
+                                                    "otherLines": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "anyOf": [
+                                                                {
+                                                                    "allOf": [
+                                                                        {
+                                                                            "type": "object",
+                                                                            "properties": {
+                                                                                "testRegex": {
+                                                                                    "description": "Tests against original string (with whitespaces)",
+                                                                                    "suggestSortText": "4",
+                                                                                    "type": "string"
+                                                                                }
+                                                                            },
+                                                                            "required": [
+                                                                                "testRegex"
+                                                                            ]
+                                                                        },
+                                                                        {
+                                                                            "type": "object",
+                                                                            "properties": {
+                                                                                "line": {
+                                                                                    "description": "Which line to pick (relative to current)",
+                                                                                    "suggestSortText": "1",
+                                                                                    "type": "number"
+                                                                                },
+                                                                                "displayIfNoLine": {
+                                                                                    "default": false,
+                                                                                    "type": "boolean"
+                                                                                }
+                                                                            },
+                                                                            "required": [
+                                                                                "line"
+                                                                            ]
+                                                                        }
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "allOf": [
+                                                                        {
+                                                                            "type": "object",
+                                                                            "properties": {
+                                                                                "testRegex": {
+                                                                                    "description": "Tests against original string (with whitespaces)",
+                                                                                    "suggestSortText": "4",
+                                                                                    "type": "string"
+                                                                                }
+                                                                            },
+                                                                            "required": [
+                                                                                "testRegex"
+                                                                            ]
+                                                                        },
+                                                                        {
+                                                                            "type": "object",
+                                                                            "properties": {
+                                                                                "indent": {
+                                                                                    "description": "How many levels up of indendation to look? By default 0 - any. Example: `-1`\nCurrently it is possible to lookup only above (negative number)",
+                                                                                    "suggestSortText": "2",
+                                                                                    "default": 0,
+                                                                                    "anyOf": [
+                                                                                        {
+                                                                                            "enum": [
+                                                                                                "up"
+                                                                                            ],
+                                                                                            "type": "string"
+                                                                                        },
+                                                                                        {
+                                                                                            "type": "number"
+                                                                                        }
+                                                                                    ]
+                                                                                }
+                                                                            },
+                                                                            "required": [
+                                                                                "indent"
+                                                                            ]
+                                                                        }
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "allOf": [
+                                                                        {
+                                                                            "type": "object",
+                                                                            "properties": {
+                                                                                "testString": {
+                                                                                    "description": "Tests against trimmed string",
+                                                                                    "suggestSortText": "3",
+                                                                                    "type": "string"
+                                                                                },
+                                                                                "matchWith": {
+                                                                                    "default": "startsWith",
+                                                                                    "enum": [
+                                                                                        "endsWith",
+                                                                                        "includes",
+                                                                                        "startsWith"
+                                                                                    ],
+                                                                                    "type": "string"
+                                                                                }
+                                                                            },
+                                                                            "required": [
+                                                                                "testString"
+                                                                            ]
+                                                                        },
+                                                                        {
+                                                                            "type": "object",
+                                                                            "properties": {
+                                                                                "line": {
+                                                                                    "description": "Which line to pick (relative to current)",
+                                                                                    "suggestSortText": "1",
+                                                                                    "type": "number"
+                                                                                },
+                                                                                "displayIfNoLine": {
+                                                                                    "default": false,
+                                                                                    "type": "boolean"
+                                                                                }
+                                                                            },
+                                                                            "required": [
+                                                                                "line"
+                                                                            ]
+                                                                        }
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "allOf": [
+                                                                        {
+                                                                            "type": "object",
+                                                                            "properties": {
+                                                                                "testString": {
+                                                                                    "description": "Tests against trimmed string",
+                                                                                    "suggestSortText": "3",
+                                                                                    "type": "string"
+                                                                                },
+                                                                                "matchWith": {
+                                                                                    "default": "startsWith",
+                                                                                    "enum": [
+                                                                                        "endsWith",
+                                                                                        "includes",
+                                                                                        "startsWith"
+                                                                                    ],
+                                                                                    "type": "string"
+                                                                                }
+                                                                            },
+                                                                            "required": [
+                                                                                "testString"
+                                                                            ]
+                                                                        },
+                                                                        {
+                                                                            "type": "object",
+                                                                            "properties": {
+                                                                                "indent": {
+                                                                                    "description": "How many levels up of indendation to look? By default 0 - any. Example: `-1`\nCurrently it is possible to lookup only above (negative number)",
+                                                                                    "suggestSortText": "2",
+                                                                                    "default": 0,
+                                                                                    "anyOf": [
+                                                                                        {
+                                                                                            "enum": [
+                                                                                                "up"
+                                                                                            ],
+                                                                                            "type": "string"
+                                                                                        },
+                                                                                        {
+                                                                                            "type": "number"
+                                                                                        }
+                                                                                    ]
+                                                                                }
+                                                                            },
+                                                                            "required": [
+                                                                                "indent"
+                                                                            ]
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        }
+                                                    },
+                                                    "npmDependencies": {
+                                                        "description": "Enable snippet only when following NPM dependencies are in package.json.",
+                                                        "type": "array",
+                                                        "items": {
+                                                            "anyOf": [
+                                                                {
+                                                                    "type": "object",
+                                                                    "properties": {
+                                                                        "type": {
+                                                                            "enum": [
+                                                                                "dev",
+                                                                                "prod"
+                                                                            ],
+                                                                            "type": "string"
+                                                                        },
+                                                                        "dep": {
+                                                                            "type": "string"
+                                                                        }
+                                                                    },
+                                                                    "required": [
+                                                                        "dep",
+                                                                        "type"
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "type": "string"
+                                                                }
+                                                            ]
+                                                        }
+                                                    }
+                                                }
+                                            },
+                                            {
+                                                "type": "object",
+                                                "properties": {
+                                                    "lineBeforeRegex": {
+                                                        "description": "Recommnded instead of `lineRegex`, tests against what is before current snippet in the line\nExample:\n| - cursor, [...] - check position\nFor regular snippet `test` end position is before current word:\n`[before] test|`, `[before] beforetest|`,\nTyping snippet: cb\n`[before]cb|`, `[before ]cb|`,",
+                                                        "type": "string"
+                                                    }
+                                                }
+                                            }
+                                        ]
+                                    },
+                                    "replaceBeforeRegex": {
+                                        "description": "Wether to replace the matched content from `lineBeforeRegex` or `lineRegex` regex check. The first one takes precedence.\nWorks only when end of content is matched (e.g. it will always work if regex ends with `$`)",
+                                        "suggestSortText": "z9",
+                                        "type": "boolean"
+                                    },
+                                    "resolveImports": {
+                                        "description": "For JS langs only. How to resolve suggested imports if any",
+                                        "type": "object",
+                                        "additionalProperties": {
+                                            "type": "object",
+                                            "properties": {
+                                                "package": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    },
+                                    "executeCommand": {
+                                        "description": "Execute custom command on snippet accept, doesn't work with resolveImports",
+                                        "defaultSnippets": [
+                                            {
+                                                "body": "$1"
+                                            }
+                                        ],
+                                        "anyOf": [
+                                            {
+                                                "type": "object",
+                                                "properties": {
+                                                    "command": {
+                                                        "type": "string"
+                                                    },
+                                                    "arguments": {
+                                                        "type": "array",
+                                                        "items": {}
+                                                    }
+                                                },
+                                                "required": [
+                                                    "arguments",
+                                                    "command"
+                                                ]
+                                            },
+                                            {
+                                                "type": "string"
+                                            }
+                                        ]
+                                    }
+                                }
+                            }
                         ]
                     }
                 ]

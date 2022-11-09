@@ -29,11 +29,11 @@ import {
     normalizeWhenLangs,
     snippetDefaults,
     snippetsConfig,
-    TypingSnippetUnresolved,
 } from './snippet'
 import { getAllLoadedSnippets } from './loadedSnippets'
 import registerForceInsertSnippet from './forceInsertSnippet'
 import { ExposedExtensionApi } from './extensionApi'
+import { TypingSnippetUnresolved } from './configurationType'
 
 export const registerSnippetsEvent = new vscode.EventEmitter<void>()
 
@@ -204,6 +204,7 @@ export const activate = () => {
         snippetsConfig.strictPositionLocations = getExtensionSetting('strictPositionLocations')
         snippetsConfig.enableTsPlugin = getExtensionSetting('enableTsPlugin')
         snippetsConfig.languageSupersets = getExtensionSetting('languageSupersets')
+        snippetsConfig.extendsGroups = getExtensionSetting('extendsGroups')
     }
 
     let snippetsRegistered = false
@@ -212,7 +213,7 @@ export const activate = () => {
 
         const snippetsToLoadByLang = getAllLoadedSnippets()
         const typingSnippets: CustomTypingSnippet[] = [
-            ...getConfigValueFromAllScopes('typingSnippets').map(snippet => mergeSnippetWithDefaults(snippet)),
+            ...(getConfigValueFromAllScopes('typingSnippets') as TypingSnippetUnresolved[]).map(snippet => mergeSnippetWithDefaults(snippet)),
             ...getAllExtensionSnippets('typingSnippets'),
         ]
         const snippetsToLoadFlattened = [...Object.values(snippetsToLoadByLang).flat(1), ...typingSnippets]
@@ -547,7 +548,8 @@ export const activate = () => {
             affectsConfiguration(getExtensionSettingId('experimental.disableBuiltinSnippets')) ||
             affectsConfiguration(getExtensionSettingId('languageSupersets')) ||
             affectsConfiguration(getExtensionSettingId('strictPositionLocations')) ||
-            affectsConfiguration(getExtensionSettingId('enableTsPlugin'))
+            affectsConfiguration(getExtensionSettingId('enableTsPlugin')) ||
+            affectsConfiguration(getExtensionSettingId('extendsGroups'))
         ) {
             console.log('Snippets configuration updated')
             registerSnippetsEvent.fire()

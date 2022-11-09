@@ -1,5 +1,6 @@
 import { getExtensionSetting } from 'vscode-framework'
 import { builtinSnippets } from './builtinSnippets'
+import { CustomSnippetUnresolved } from './configurationType'
 import { CustomSnippet, getAllExtensionSnippets, mergeSnippetWithDefaults } from './snippet'
 import { getConfigValueFromAllScopes } from './util'
 
@@ -7,7 +8,7 @@ export const getAllLoadedSnippets = () => {
     const disableBuiltinSnippets = getConfigValueFromAllScopes('experimental.disableBuiltinSnippets')
 
     const snippetsToLoad = [
-        ...getConfigValueFromAllScopes('customSnippets'),
+        ...(getConfigValueFromAllScopes('customSnippets') as CustomSnippetUnresolved[]),
         ...(getExtensionSetting('enableBuiltinSnippets') ? builtinSnippets.filter(snippet => !disableBuiltinSnippets.includes(snippet.name as any)) : []),
     ]
 
