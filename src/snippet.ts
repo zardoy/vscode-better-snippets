@@ -8,6 +8,9 @@ import { Configuration } from './configurationType'
 import { ExposedExtensionApi } from './extensionApi'
 import { registerSnippetsEvent } from './extension'
 
+// mutates on init
+export const snippetsConfig: Pick<Configuration, 'strictPositionLocations' | 'enableTsPlugin' | 'languageSupersets'> = {} as any
+
 // #region types
 export type CustomSnippet = CustomSnippetUnresolved & typeof unmergedSnippetDefaults
 export type CustomSnippetUnresolved = Configuration['customSnippets'][number]
@@ -46,9 +49,9 @@ export const getSnippetsDefaults = (): DeepRequired<Configuration['customSnippet
     return mergeDeepRight(unmergedSnippetDefaults, getExtensionSetting('customSnippetDefaults'))
 }
 
-export const normalizeWhenLangs = (langs: string[], langSupersets: Record<string, string[]>) => {
+export const normalizeWhenLangs = (langs: string[]) => {
     const [negativeLangs, positiveLangs] = partition(x => x.startsWith('!'), langs)
-    return normalizeLanguages(positiveLangs, langSupersets).filter(lang => !negativeLangs.includes(lang))
+    return normalizeLanguages(positiveLangs, snippetsConfig.languageSupersets).filter(lang => !negativeLangs.includes(lang))
 }
 
 export const unmergedSnippetDefaults: DeepRequired<Configuration['customSnippetDefaults']> = {

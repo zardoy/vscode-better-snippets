@@ -1,13 +1,12 @@
 import * as vscode from 'vscode'
 import { findNodeAtLocation, getLocation, getNodeValue, parseTree } from 'jsonc-parser'
-import { getExtensionSetting, getExtensionSettingId } from 'vscode-framework'
+import { getExtensionSettingId } from 'vscode-framework'
 import { getJsonCompletingInfo, jsonPathEquals, jsonValuesToCompletions } from '@zardoy/vscode-utils/build/jsonCompletions'
 import { oneOf } from '@zardoy/utils'
-import { normalizeLanguages } from '@zardoy/vscode-utils/build/langs'
 import { uniqBy } from 'lodash'
 import { getContributedLangInfo } from './langsUtils'
 import { snippetLocation } from './constants'
-import { Configuration } from './configurationType'
+import { normalizeWhenLangs, snippetsConfig } from './snippet'
 
 const getSharedParsingInfo = (document: vscode.TextDocument, position: vscode.Position) => {
     const location = getLocation(document.getText(), document.offsetAt(position))
@@ -60,9 +59,8 @@ export default () => {
                 }
 
                 if (isAnySnippetOrDefaults && jsonPathEquals(localPath, ['when', 'languages'], true)) {
-                    const languageSupersets = getExtensionSetting('languageSupersets')
                     const positiveIncludedLangs = arrValue.filter(x => !x.startsWith('!'))
-                    const langsToNegate = nodeValue?.startsWith('!') ? normalizeLanguages(positiveIncludedLangs, languageSupersets) : undefined
+                    const langsToNegate = nodeValue?.startsWith('!') ? normalizeWhenLangs(positiveIncludedLangs) : undefined
 
                     const completions = langsToNegate
                         ? [
@@ -80,7 +78,7 @@ export default () => {
                                   insideStringRange,
                               ).map((c, i) => ({ ...c, sortText: `b${i}` })),
                           ]
-                        : [...supersetsToCompletions(languageSupersets), ...(await getLanguageCompletions(insideStringRange))]
+                        : [...supersetsToCompletions(), ...(await getLanguageCompletions(insideStringRange))]
                     return uniqueCompletions(completions, arrValue)
                 }
 
@@ -204,7 +202,9 @@ const getInsideSnippetBodyCompletions = (range: vscode.Range) => {
     return jsonValuesToCompletions(['$TM_SELECTED_TEXT', '$TM_CURRENT_LINE', '$TM_CURRENT_WORD', '$CLIPBOARD'], range)
 }
 
-function supersetsToCompletions(languageSupersets: Configuration['languageSupersets']) {
+function supersetsToCompletions() {
+    const { languageSupersets } = snippetsConfig
+
     return Object.keys(languageSupersets).map(
         (key, index): vscode.CompletionItem => ({
             label: key,

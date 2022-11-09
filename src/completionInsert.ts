@@ -5,7 +5,7 @@ import delay from 'delay'
 import { range } from 'rambda'
 import { oneOf } from '@zardoy/utils'
 import { Debug } from './util'
-import { CustomSnippet } from './snippet'
+import { CustomSnippet, snippetsConfig } from './snippet'
 
 const debug = Debug('resolveImports')
 
@@ -85,7 +85,6 @@ export const registerCompletionInsert = () => {
                     }
             }
 
-            const langsSupersets = getExtensionSetting('languageSupersets')
             const disposable = vscode.languages.onDidChangeDiagnostics(observeDiagnosticsChanges)
             setTimeout(async () => {
                 disposable.dispose()
@@ -100,7 +99,7 @@ export const registerCompletionInsert = () => {
                     const packagePath = importsConfig[indentifier]!.package
                     const installable =
                         process.env.PLATFORM !== 'web' &&
-                        (langsSupersets.js ?? []).includes(document.languageId) &&
+                        (snippetsConfig.languageSupersets.js ?? []).includes(document.languageId) &&
                         packagePath &&
                         ['./', '../'].every(predicate => !packagePath.startsWith(predicate))
                     return {

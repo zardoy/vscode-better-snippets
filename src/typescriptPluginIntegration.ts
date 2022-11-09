@@ -1,7 +1,7 @@
 import * as vscode from 'vscode'
 import type { RequestResponseData } from '../typescript-plugin/src/requestData'
 import { SnippetLocation } from './configurationType'
-import { snippetsConfig } from './filterSnippets'
+import { snippetsConfig } from './snippet'
 
 export const makeTypescriptPluginRequest = async ({ uri }: vscode.TextDocument, position: vscode.Position): Promise<RequestResponseData | undefined> => {
     if (!snippetsConfig.enableTsPlugin) return

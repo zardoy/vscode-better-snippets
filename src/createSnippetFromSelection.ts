@@ -4,7 +4,7 @@ import { getExtensionCommandId, getExtensionSetting, registerExtensionCommand, s
 import { normalizeLanguages, areLangsEquals } from '@zardoy/vscode-utils/build/langs'
 import { Configuration } from './configurationType'
 import { RevealSnippetOptions } from './settingsJsonSnippetCommands'
-import { getSnippetsDefaults } from './snippet'
+import { getSnippetsDefaults, normalizeWhenLangs, snippetsConfig } from './snippet'
 
 export const registerCreateSnippetFromSelection = () => {
     registerExtensionCommand('createSnippetFromSelection', async (_, snippetName?: string) => {
@@ -12,12 +12,12 @@ export const registerCreateSnippetFromSelection = () => {
         if (!activeEditor) return
         const { document } = activeEditor
 
-        const langsSupersets = getExtensionSetting('languageSupersets')
-        const foundSupportedSupersets = Object.entries(langsSupersets).filter(([, langs]) => langs.includes(document.languageId))
+        const { languageSupersets } = snippetsConfig
+        const foundSupportedSupersets = Object.entries(languageSupersets).filter(([, langs]) => langs.includes(document.languageId))
         // TODO allow to pick many when global snippet file is set
         const snippetDefaults = getSnippetsDefaults()
-        const defaultLanguages = normalizeLanguages(snippetDefaults.when.languages, langsSupersets)
-        const langId =
+        const defaultLanguages = normalizeWhenLangs(snippetDefaults.when.languages)
+        const selectedLang =
             foundSupportedSupersets.length === 0
                 ? document.languageId
                 : await showQuickPick<string>(
@@ -39,7 +39,7 @@ export const registerCreateSnippetFromSelection = () => {
                           title: 'Select language(s) in which snippet will be suggested',
                       },
                   )
-        if (langId === undefined) return
+        if (selectedLang === undefined) return
         const snippetLines = stringDedent(document.getText(activeEditor.selection)).split(/\r?\n/)
         if (!snippetName)
             snippetName = await vscode.window.showInputBox({
@@ -50,7 +50,7 @@ export const registerCreateSnippetFromSelection = () => {
 
         if (snippetName === undefined) return
         const snippetWhen: Configuration['customSnippets'][number]['when'] = {
-            ...(areLangsEquals(defaultLanguages, normalizeLanguages(langId, langsSupersets)) ? null : { languages: [langId] }),
+            ...(areLangsEquals(defaultLanguages, normalizeWhenLangs([selectedLang])) ? null : { languages: [selectedLang] }),
         }
         const configuration = vscode.workspace.getConfiguration(process.env.IDS_PREFIX)
         const existingCustomSnippets = configuration.get<any[]>('customSnippets') ?? []
