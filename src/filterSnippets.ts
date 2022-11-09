@@ -3,10 +3,7 @@ import { partition } from 'rambda'
 import { Configuration, SnippetLocation } from './configurationType'
 import { getValidTsRelatedLocations, possiblyRelatedTsLocations } from './typescriptPluginIntegration'
 import { npmFilterSnippets } from './npmDependencies'
-import { CustomSnippet, CustomTypingSnippet } from './snippet'
-
-// mutates on init
-export const snippetsConfig: Pick<Configuration, 'strictPositionLocations' | 'enableTsPlugin'> = {} as any
+import { CustomSnippet, CustomTypingSnippet, snippetsConfig } from './snippet'
 
 const filterSnippetByLocationShared = (
     snippetLocationsInput: Array<SnippetLocation & string>,
@@ -67,11 +64,10 @@ export const filterWithSecondPhaseIfNeeded = async <T extends CustomSnippet | Cu
     snippets: T[],
     document: vscode.TextDocument,
     position: vscode.Position,
-    langsSupersets: Configuration['languageSupersets'],
 ): Promise<T[]> => {
     snippets = await npmFilterSnippets(document, snippets)
     if (
-        !(langsSupersets.js ?? []).includes(document.languageId) ||
+        !(snippetsConfig.languageSupersets.js ?? []).includes(document.languageId) ||
         snippets.every(snippet => snippet.when.locations.every(loc => !possiblyRelatedTsLocations.includes(loc.replace(/^!/, ''))))
     )
         return snippets

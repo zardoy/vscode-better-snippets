@@ -1,20 +1,12 @@
 /* eslint-disable no-empty-function */
 import * as vscode from 'vscode'
 import { oneOf } from '@zardoy/utils'
-import {
-    CommandHandler,
-    getExtensionCommandId,
-    getExtensionContributionsPrefix,
-    getExtensionSetting,
-    registerExtensionCommand,
-    Settings,
-} from 'vscode-framework'
+import { CommandHandler, getExtensionCommandId, getExtensionContributionsPrefix, registerExtensionCommand, Settings } from 'vscode-framework'
 import { sort } from 'rambda'
-import { normalizeLanguages } from '@zardoy/vscode-utils/build/langs'
 import { watchExtensionSettings } from '@zardoy/vscode-utils/build/settings'
 import { CommonSnippet, getSnippetsSettingValue, RevealSnippetOptions } from './settingsJsonSnippetCommands'
 import { GeneralSnippet } from './configurationType'
-import { getSnippetsDefaults } from './snippet'
+import { getSnippetsDefaults, normalizeWhenLangs } from './snippet'
 
 const SCHEME = `${getExtensionContributionsPrefix()}virtualSnippets`
 
@@ -246,7 +238,7 @@ export const registerViews = () => {
         if (!snippet) return
         const primaryLanguage = (snippet?.when?.languages ?? getSnippetsDefaults().when.languages)[0]
         if (!primaryLanguage) return
-        void vscode.languages.setTextDocumentLanguage(textEditor.document, normalizeLanguages(primaryLanguage, getExtensionSetting('languageSupersets'))[0]!)
+        void vscode.languages.setTextDocumentLanguage(textEditor.document, normalizeWhenLangs([primaryLanguage])[0]!)
     })
     // #endregion
 

@@ -16,7 +16,7 @@ import { registerCreateSnippetFromSelection } from './createSnippetFromSelection
 import settingsHelper from './settingsHelper'
 import { registerViews } from './views'
 import { registerSnippetSettingsJsonCommands } from './settingsJsonSnippetCommands'
-import { filterSnippetByLocationPhase1, filterWithSecondPhaseIfNeeded, snippetsConfig } from './filterSnippets'
+import { filterSnippetByLocationPhase1, filterWithSecondPhaseIfNeeded } from './filterSnippets'
 import { registerSnippetsMigrateCommands } from './migrateSnippets'
 import { changeNpmDepsWatcherState } from './npmDependencies'
 import {
@@ -28,6 +28,7 @@ import {
     mergeSnippetWithDefaults,
     normalizeWhenLangs,
     snippetDefaults,
+    snippetsConfig,
     TypingSnippetUnresolved,
 } from './snippet'
 import { getAllLoadedSnippets } from './loadedSnippets'
@@ -199,13 +200,16 @@ export const activate = () => {
         return includedSnippets
     }
 
+    const updateCachedSettings = () => {
+        snippetsConfig.strictPositionLocations = getExtensionSetting('strictPositionLocations')
+        snippetsConfig.enableTsPlugin = getExtensionSetting('enableTsPlugin')
+        snippetsConfig.languageSupersets = getExtensionSetting('languageSupersets')
+    }
+
     let snippetsRegistered = false
     const registerSnippets = () => {
         snippetsRegistered = true
-        snippetsConfig.strictPositionLocations = getExtensionSetting('strictPositionLocations')
-        snippetsConfig.enableTsPlugin = getExtensionSetting('enableTsPlugin')
 
-        const langsSupersets = getExtensionSetting('languageSupersets')
         const snippetsToLoadByLang = getAllLoadedSnippets()
         const typingSnippets: CustomTypingSnippet[] = [
             ...getConfigValueFromAllScopes('typingSnippets').map(snippet => mergeSnippetWithDefaults(snippet)),
@@ -229,7 +233,7 @@ export const activate = () => {
 
                 let triggerFromInner = false
                 const disposable = vscode.languages.registerCompletionItemProvider(
-                    normalizeWhenLangs([language], langsSupersets),
+                    normalizeWhenLangs([language]),
                     {
                         async provideCompletionItems(document, position, _token, { triggerCharacter }) {
                             // if (context.triggerKind !== vscode.CompletionTriggerKind.Invoke) return
@@ -243,7 +247,7 @@ export const activate = () => {
 
                             const firstPhaseSnippets = getCurrentSnippets('completion', snippetsToCheck, document, position, language)
 
-                            const includedSnippets = await filterWithSecondPhaseIfNeeded(firstPhaseSnippets, document, position, langsSupersets)
+                            const includedSnippets = await filterWithSecondPhaseIfNeeded(firstPhaseSnippets, document, position)
                             return includedSnippets.map(
                                 ({
                                     body,
@@ -403,13 +407,12 @@ export const activate = () => {
                         let appliableTypingSnippets = getCurrentSnippets(
                             'typing',
                             typingSnippets.filter(
-                                ({ sequence, when }) =>
-                                    normalizeWhenLangs(when.languages, langsSupersets).includes(document.languageId) && lastTypedSeq.endsWith(sequence),
+                                ({ sequence, when }) => normalizeWhenLangs(when.languages).includes(document.languageId) && lastTypedSeq.endsWith(sequence),
                             ),
                             document,
                             endPosition,
                         )
-                        appliableTypingSnippets = await filterWithSecondPhaseIfNeeded(appliableTypingSnippets, document, endPosition, langsSupersets)
+                        appliableTypingSnippets = await filterWithSecondPhaseIfNeeded(appliableTypingSnippets, document, endPosition)
                         if (appliableTypingSnippets.length > 2) console.warn(`Multiple appliable typing snippets found: ${appliableTypingSnippets.join(', ')}`)
                         const snippet = appliableTypingSnippets[0]
                         if (!snippet) return
@@ -523,12 +526,17 @@ export const activate = () => {
         if (snippetsRegistered) {
             vscode.Disposable.from(...disposables).dispose()
             disposables = []
+            updateCachedSettings()
             registerSnippets()
         }
         // otherwise just wait until registered later
     })
 
-    registerSnippets()
+    updateCachedSettings()
+    setTimeout(() => {
+        // register them after extension host packs contribution completed (happens sync)
+        registerSnippets()
+    })
     vscode.workspace.onDidChangeConfiguration(({ affectsConfiguration }) => {
         if (
             affectsConfiguration(getExtensionSettingId('customSnippets')) ||
