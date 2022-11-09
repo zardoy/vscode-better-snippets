@@ -19,7 +19,7 @@ export default () => {
             allLangSnippets.push(...snippets)
         }
 
-        const body = name
+        let body = name
             ? allLangSnippets.find(s => s.name === name)?.body
             : await showQuickPick(
                   allLangSnippets.map(({ name, description, body }) => ({
@@ -29,6 +29,7 @@ export default () => {
                   })),
               )
         if (body === undefined) return
+        if (body === false) body = name
         void editor.insertSnippet(new vscode.SnippetString(Array.isArray(body) ? body.join('\n') : body))
     })
 }

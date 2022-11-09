@@ -184,7 +184,9 @@ export const activate = () => {
             if (!snippetMatchLocation) continue
 
             let newBody = Array.isArray(body) ? body.join('\n') : body
-            if (newBody !== false) {
+            if (newBody === false) {
+                newBody = name
+            } else {
                 for (const [groupName, groupValue] of Object.entries(regexGroups)) {
                     newBody = newBody.replace(new RegExp(`(?<!\\\\)${escapeStringRegexp(`$${groupName}`)}`, 'g'), groupValue)
                 }

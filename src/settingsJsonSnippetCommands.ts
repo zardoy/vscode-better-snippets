@@ -2,8 +2,9 @@ import * as vscode from 'vscode'
 import { findNodeAtLocation, parseTree } from 'jsonc-parser'
 import { getExtensionSettingId, registerExtensionCommand, Settings } from 'vscode-framework'
 import { findCustomArray } from '@zardoy/utils'
+import { CustomSnippetUnresolved, TypingSnippetUnresolved } from './configurationType'
 
-export type CommonSnippet = Settings['customSnippets'][number] | Settings['typingSnippets'][number]
+export type CommonSnippet = CustomSnippetUnresolved | TypingSnippetUnresolved
 export const getSnippetsSettingValue = (configKey: keyof Settings, isLocal: boolean) => {
     const {
         globalValue = [],
