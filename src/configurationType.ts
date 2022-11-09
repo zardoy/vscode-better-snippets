@@ -144,6 +144,11 @@ export type Configuration = {
      */
     enableTsPlugin: boolean
     /**
+     * Here you can specify reusable parts for your custom & typing snippets
+     * The name of group must not contain `:` as its reserved for builtin and extension packs groups
+     */
+    extendsGroups: Record<string, GeneralSnippet>
+    /**
      * @suggestSortText betterSnippets.1
      */
     customSnippets: Array<

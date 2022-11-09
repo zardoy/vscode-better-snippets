@@ -1,5 +1,5 @@
 // GENERATED. DON'T EDIT MANUALLY
-// md5hash: 057e1eb92107ba0c22afa3976c06e559
+// md5hash: 0f773f3dafa84b2511ff7a62095151f5
 {
     "type": "object",
     "properties": {
@@ -31,6 +31,10 @@
             "description": "Required for the following locations: `code` (which is default), `comment`, `string`",
             "default": true,
             "type": "boolean"
+        },
+        "extendsGroups": {
+            "description": "Here you can specify reusable parts for your custom & typing snippets\nThe name of group must not contain `:` as its reserved for builtin and extension packs groups",
+            "type": "object"
         },
         "customSnippets": {
             "suggestSortText": "betterSnippets.1",
@@ -936,6 +940,7 @@
         "enableExperimentalSnippets",
         "enableTsPlugin",
         "experimental.disableBuiltinSnippets",
+        "extendsGroups",
         "extensionSnippets",
         "languageSupersets",
         "snippetCreator.showSnippetAfterCreation",
