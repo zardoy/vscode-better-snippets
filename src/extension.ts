@@ -26,6 +26,7 @@ import {
     getExtensionApi,
     initSnippetDefaults,
     mergeSnippetWithDefaults,
+    normalizeWhenLangs,
     snippetDefaults,
     TypingSnippetUnresolved,
 } from './snippet'
@@ -68,8 +69,11 @@ export const activate = () => {
             const { body, when } = snippet
             const name = getSnippetDebugName(snippet)
 
-            const { locations, fileType, ...regexes } = when
+            const { locations, fileType, languages, ...regexes } = when
             const docPath = document.uri.path
+
+            const negativeLanguages = languages.filter(language => language.startsWith('!')).map(language => language.slice(1))
+            if (negativeLanguages.length > 0 && vscode.languages.match(negativeLanguages, document)) continue
 
             const regexGroups: Record<string, string> = {}
             const metadata: SnippetResolvedMetadata = {} as any // todo
@@ -225,7 +229,7 @@ export const activate = () => {
 
                 let triggerFromInner = false
                 const disposable = vscode.languages.registerCompletionItemProvider(
-                    normalizeLanguages(language, langsSupersets),
+                    normalizeWhenLangs([language], langsSupersets),
                     {
                         async provideCompletionItems(document, position, _token, { triggerCharacter }) {
                             // if (context.triggerKind !== vscode.CompletionTriggerKind.Invoke) return
@@ -400,7 +404,7 @@ export const activate = () => {
                             'typing',
                             typingSnippets.filter(
                                 ({ sequence, when }) =>
-                                    normalizeLanguages(when.languages, langsSupersets).includes(document.languageId) && lastTypedSeq.endsWith(sequence),
+                                    normalizeWhenLangs(when.languages, langsSupersets).includes(document.languageId) && lastTypedSeq.endsWith(sequence),
                             ),
                             document,
                             endPosition,
@@ -414,7 +418,7 @@ export const activate = () => {
                         // TODO continue exploration
                         // const isSnippet = body !== false && /(?<!\\)\$/.exec(body)
                         const isSnippet = true
-                        if (body !== false)
+                        if (body !== false) {
                             // #region remove sequence content
                             await new Promise<void>(resolve => {
                                 internalDocumentChange = true
@@ -459,6 +463,7 @@ export const activate = () => {
                                     },
                                 )
                             })
+                        }
                         // #endregion
 
                         if (body !== false && isSnippet) await editor.insertSnippet(new vscode.SnippetString(body))

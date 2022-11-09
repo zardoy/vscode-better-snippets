@@ -1,11 +1,13 @@
 import * as vscode from 'vscode'
-import { findNodeAtLocation, getLocation, getNodeValue, Location, parseTree } from 'jsonc-parser'
+import { findNodeAtLocation, getLocation, getNodeValue, parseTree } from 'jsonc-parser'
 import { getExtensionSetting, getExtensionSettingId } from 'vscode-framework'
 import { getJsonCompletingInfo, jsonPathEquals, jsonValuesToCompletions } from '@zardoy/vscode-utils/build/jsonCompletions'
 import { oneOf } from '@zardoy/utils'
 import { normalizeLanguages } from '@zardoy/vscode-utils/build/langs'
+import { uniqBy } from 'lodash'
 import { getContributedLangInfo } from './langsUtils'
 import { snippetLocation } from './constants'
+import { Configuration } from './configurationType'
 
 const getSharedParsingInfo = (document: vscode.TextDocument, position: vscode.Position) => {
     const location = getLocation(document.getText(), document.offsetAt(position))
@@ -43,11 +45,12 @@ export default () => {
             async provideCompletionItems(document, position, token, context) {
                 const sharedParsingInfo = getSharedParsingInfo(document, position)
                 if (!sharedParsingInfo) return
-                const { nodeValue, path, insideStringRange, isAnySnippet, isAnySnippetOrDefaults, localPath } = sharedParsingInfo
+                const { root, nodeValue, path, insideStringRange, isAnySnippet, isAnySnippetOrDefaults, localPath } = sharedParsingInfo
                 if (!insideStringRange) return
+                const arrValue: string[] = typeof path.at(-1) === 'number' ? getEditingArrayValue(root, path) : undefined
 
                 if (jsonPathEquals(path, [getExtensionSettingId('languageSupersets'), '*'], true)) {
-                    return getLanguageCompletions(insideStringRange)
+                    return uniqueCompletions(await getLanguageCompletions(insideStringRange), arrValue)
                 }
 
                 if (isAnySnippet && jsonPathEquals(localPath, ['body'])) {
@@ -58,23 +61,36 @@ export default () => {
 
                 if (isAnySnippetOrDefaults && jsonPathEquals(localPath, ['when', 'languages'], true)) {
                     const languageSupersets = getExtensionSetting('languageSupersets')
-                    return [
-                        Object.keys(languageSupersets).map(
-                            (key, index): vscode.CompletionItem => ({
-                                label: key,
-                                kind: vscode.CompletionItemKind.Variable,
-                                sortText: index.toString(),
-                                detail: languageSupersets[key]!.join(', '),
-                            }),
-                        ),
-                        ...(await getLanguageCompletions(insideStringRange)),
-                    ].flat(1)
+                    const positiveIncludedLangs = arrValue.filter(x => !x.startsWith('!'))
+                    const langsToNegate = nodeValue?.startsWith('!') ? normalizeLanguages(positiveIncludedLangs, languageSupersets) : undefined
+
+                    const completions = langsToNegate
+                        ? [
+                              //   ...supersetsToCompletions(
+                              //       Object.fromEntries(
+                              //           Object.entries(languageSupersets)
+                              //               .filter(([, value]) => {
+                              //                   return value.every(lang => langsToNegate.includes(lang))
+                              //               })
+                              //               .map(([key, value]) => [`!${key}`, value]),
+                              //       ),
+                              //   ),
+                              ...jsonValuesToCompletions(
+                                  langsToNegate.map(x => `!${x}`),
+                                  insideStringRange,
+                              ).map((c, i) => ({ ...c, sortText: `b${i}` })),
+                          ]
+                        : [...supersetsToCompletions(languageSupersets), ...(await getLanguageCompletions(insideStringRange))]
+                    return uniqueCompletions(completions, arrValue)
                 }
 
                 if (isAnySnippetOrDefaults && jsonPathEquals(localPath, ['when', 'locations'], true)) {
-                    return jsonValuesToCompletions(
-                        snippetLocation.map(loc => (nodeValue?.startsWith('!') ? `!${loc}` : loc)),
-                        insideStringRange,
+                    return uniqueCompletions(
+                        jsonValuesToCompletions(
+                            snippetLocation.map(loc => (nodeValue?.startsWith('!') ? `!${loc}` : loc)),
+                            insideStringRange,
+                        ),
+                        arrValue,
                     )
                 }
 
@@ -92,6 +108,7 @@ export default () => {
             },
         },
         '"',
+        '!',
     )
 
     vscode.languages.registerCodeActionsProvider(selector, {
@@ -183,5 +200,30 @@ export default () => {
 
 const getLanguageCompletions = async (range: vscode.Range) => jsonValuesToCompletions(await vscode.languages.getLanguages(), range)
 
-const getInsideSnippetBodyCompletions = (range: vscode.Range) =>
-    jsonValuesToCompletions(['$TM_SELECTED_TEXT', '$TM_CURRENT_LINE', '$TM_CURRENT_WORD', '$CLIPBOARD'], range)
+const getInsideSnippetBodyCompletions = (range: vscode.Range) => {
+    return jsonValuesToCompletions(['$TM_SELECTED_TEXT', '$TM_CURRENT_LINE', '$TM_CURRENT_WORD', '$CLIPBOARD'], range)
+}
+
+function supersetsToCompletions(languageSupersets: Configuration['languageSupersets']) {
+    return Object.keys(languageSupersets).map(
+        (key, index): vscode.CompletionItem => ({
+            label: key,
+            kind: vscode.CompletionItemKind.Variable,
+            sortText: index.toString(),
+            detail: languageSupersets[key]!.join(', '),
+        }),
+    )
+}
+
+function getEditingArrayValue(root, path) {
+    return getNodeValue(findNodeAtLocation(root, path.slice(0, -1))!)?.filter((_, i) => i !== path.at(-1))
+}
+
+function uniqueCompletions<T extends vscode.CompletionItem>(completions: T[], arrValue: any[] | undefined): T[] {
+    let filteredCompletions = uniqBy(completions, ({ label, kind }) => `${label as string}${kind!}`)
+    if (arrValue) {
+        filteredCompletions = filteredCompletions.filter(({ label }) => !arrValue.includes(label as string))
+    }
+
+    return filteredCompletions
+}

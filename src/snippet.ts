@@ -1,8 +1,9 @@
 import * as vscode from 'vscode'
 import { DeepRequired } from 'ts-essentials'
-import { mergeDeepRight } from 'rambda'
+import { mergeDeepRight, partition } from 'rambda'
 import { getExtensionSetting, getExtensionSettingId } from 'vscode-framework'
 import { omitObj, pickObj } from '@zardoy/utils'
+import { normalizeLanguages } from '@zardoy/vscode-utils/build/langs'
 import { Configuration } from './configurationType'
 import { ExposedExtensionApi } from './extensionApi'
 import { registerSnippetsEvent } from './extension'
@@ -41,8 +42,14 @@ export const mergeSnippetWithDefaults = <T extends CustomSnippetUnresolved | Typ
     )
 }
 
-export const getSnippetsDefaults = (): DeepRequired<Configuration['customSnippetDefaults']> =>
-    mergeDeepRight(unmergedSnippetDefaults, getExtensionSetting('customSnippetDefaults'))
+export const getSnippetsDefaults = (): DeepRequired<Configuration['customSnippetDefaults']> => {
+    return mergeDeepRight(unmergedSnippetDefaults, getExtensionSetting('customSnippetDefaults'))
+}
+
+export const normalizeWhenLangs = (langs: string[], langSupersets: Record<string, string[]>) => {
+    const [negativeLangs, positiveLangs] = partition(x => x.startsWith('!'), langs)
+    return normalizeLanguages(positiveLangs, langSupersets).filter(lang => !negativeLangs.includes(lang))
+}
 
 export const unmergedSnippetDefaults: DeepRequired<Configuration['customSnippetDefaults']> = {
     sortText: undefined!,

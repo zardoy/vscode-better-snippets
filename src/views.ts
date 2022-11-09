@@ -152,7 +152,11 @@ class TreeDataProvider extends BaseTreeDataProvider {
 
                 const snippetsByLangs: Record<string, typeof normalizedSnippets> = {}
                 for (const snippet of normalizedSnippets) {
-                    const snippetLangs = sort((a, b) => a.localeCompare(b), snippet.when?.languages ?? snippetDefaults.when.languages)
+                    const snippetLangs = sort((a, b) => {
+                        if (a.startsWith('!') && !b.startsWith('!')) return 1
+                        if (!a.startsWith('!') && b.startsWith('!')) return -1
+                        return a.localeCompare(b)
+                    }, snippet.when?.languages ?? snippetDefaults.when.languages)
                     const langsDisplay = snippetLangs.join(', ')
                     ;(snippetsByLangs[langsDisplay] ??= []).push(snippet)
                 }
@@ -195,7 +199,7 @@ export const registerViews = () => {
         readFile(uri) {
             const { configKey, isLocal, snippetIndex } = parseProviderUriSnippet(uri)
             const body = getSnippetsSettingValue(configKey as any, isLocal)[snippetIndex]?.body
-            if (!body) throw new Error(`Snippet ${configKey} with index ${snippetIndex} doesn't have valid body`)
+            if (!body && body !== '') throw new Error(`Snippet ${configKey} with index ${snippetIndex} doesn't have valid body`)
             return new TextEncoder().encode(Array.isArray(body) ? body.join('\n') : body)
         },
         rename() {},
