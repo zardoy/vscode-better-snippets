@@ -55,6 +55,7 @@ export const activate = () => {
         /** end position */
         position: vscode.Position,
         displayLanguage = document.languageId,
+        // eslint-disable-next-line max-params
     ): Array<Omit<T, 'body'> & { body: T extends CustomSnippet ? string : string | false; metadata?: SnippetResolvedMetadata }> => {
         const log = (...args) => console.log(`[${debugType}]`, ...args)
         const debug = (...args) => console.debug(`[${debugType}]`, ...args)
@@ -128,7 +129,7 @@ export const activate = () => {
                     if (!isStringMatches(document.lineAt(position.line + (lineDiff as Extract<typeof lineDiff, { line: any }>).line).text, lineDiff))
                         continue snippet
 
-                // eslint-disable-next-line no-inner-declarations
+                // eslint-disable-next-line no-inner-declarations, no-empty-function
                 function changeIndentDiffsType(arg: any): asserts arg is Array<Extract<typeof indentDiffs[0], { indent: any }>> {}
                 changeIndentDiffsType(indentDiffs)
 
@@ -194,7 +195,7 @@ export const activate = () => {
 
             includedSnippets.push({
                 ...snippet,
-                body: newBody as string,
+                body: newBody,
                 metadata: objectUndefinedIfEmpty(metadata),
             })
         }
