@@ -4,12 +4,6 @@ const { patchPackageJson } = require('@zardoy/vscode-utils/build/patchPackageJso
 const { snippetLocation } = require('./src/constants')
 
 patchPackageJson({
-    async patchSettings(configuration) {
-        const { defaultLanguageSupersets } = await import('@zardoy/vscode-utils/build/langs.js')
-        // TODO move it from here
-        configuration['languageSupersets'].default = defaultLanguageSupersets
-        return configuration
-    },
     rawPatchManifest(manifest) {
         return JSON.parse(
             JSON.stringify(manifest).replaceAll(
@@ -30,6 +24,23 @@ const config = defineConfig({
     // target: 'web',
     // webOpen: 'web',
     target: { desktop: true, web: true },
+    extendPropsGenerators: [
+        async () => {
+            const { defaultLanguageSupersets } = await import('@zardoy/vscode-utils/build/langs.js')
+
+            return {
+                contributes: {
+                    configuration: {
+                        properties: {
+                            'betterSnippets.languageSupersets': {
+                                default: defaultLanguageSupersets,
+                            },
+                        },
+                    },
+                },
+            }
+        },
+    ],
 })
 
 module.exports = config
