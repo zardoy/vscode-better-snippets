@@ -22,7 +22,7 @@ specifiers:
   '@vscode/test-electron': ^2.1.5
   '@zardoy/tsconfig': ^1.4.0
   '@zardoy/utils': ^0.0.10
-  '@zardoy/vscode-utils': ^0.0.44
+  '@zardoy/vscode-utils': ^0.0.45
   chai: ^4.3.6
   chokidar-cli: ^3.0.0
   cross-env: ^7.0.3
@@ -55,7 +55,7 @@ specifiers:
 
 dependencies:
   '@zardoy/utils': 0.0.10
-  '@zardoy/vscode-utils': 0.0.44_3wjxqtud57hursbaqheex54bh4
+  '@zardoy/vscode-utils': 0.0.45_3wjxqtud57hursbaqheex54bh4
   chai: 4.3.6
   chokidar-cli: 3.0.0
   delay: 5.0.0
@@ -859,8 +859,8 @@ packages:
       type-fest: 2.19.0
     dev: false
 
-  /@zardoy/vscode-utils/0.0.44_3wjxqtud57hursbaqheex54bh4:
-    resolution: {integrity: sha512-wWYafcAhac36r3lAtDx1+DcaTWPrKVekKYoiATE99pE5OElLnbMYXNO4c6JQyxj2t8S4YEhmLkwRwpJFHrJqsA==}
+  /@zardoy/vscode-utils/0.0.45_3wjxqtud57hursbaqheex54bh4:
+    resolution: {integrity: sha512-s90L2ctTxtQJGn9YEkSVxd1IjUhyc8Hzzyxu8CK2Ndt8UqZTgb2zXQfk1/Dds2aPZIswXrYtel+2sUGrKl7PMw==}
     engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
     hasBin: true
     peerDependencies:
@@ -3287,7 +3287,7 @@ packages:
   /jsonfile/4.0.0:
     resolution: {integrity: sha1-h3Gq4HmbZAdrdmQPygWPnBDjPss=}
     optionalDependencies:
-      graceful-fs: 4.2.9
+      graceful-fs: 4.2.10
     dev: true
 
   /jsonfile/6.1.0:
@@ -3295,7 +3295,7 @@ packages:
     dependencies:
       universalify: 2.0.0
     optionalDependencies:
-      graceful-fs: 4.2.9
+      graceful-fs: 4.2.10
 
   /keygrip/1.1.0:
     resolution: {integrity: sha512-iYSchDJ+liQ8iwbSI2QqsQOvqv58eJCEanyJPJi+Khyu8smkcKSFUCbPwzFcL7YVtZ6eONjqRX/38caJ7QjRAQ==}
