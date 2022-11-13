@@ -2,11 +2,11 @@
 import * as vscode from 'vscode'
 import { oneOf } from '@zardoy/utils'
 import { CommandHandler, getExtensionCommandId, getExtensionContributionsPrefix, registerExtensionCommand, Settings } from 'vscode-framework'
-import { sort } from 'rambda'
+import { groupBy, sort } from 'rambda'
 import { watchExtensionSettings } from '@zardoy/vscode-utils/build/settings'
 import { CommonSnippet, getSnippetsSettingValue, RevealSnippetOptions } from './settingsJsonSnippetCommands'
 import { GeneralSnippet } from './configurationType'
-import { getSnippetsDefaults, normalizeWhenLangs } from './snippet'
+import { getSnippetsDefaults, mergeSnippetWithDefaults, normalizeWhenLangs } from './snippet'
 
 const SCHEME = `${getExtensionContributionsPrefix()}virtualSnippets`
 
@@ -19,7 +19,7 @@ const views = {
 type ViewType = keyof typeof views
 
 abstract class BaseTreeDataProvider implements vscode.TreeDataProvider<vscode.TreeItem> {
-    grouping: 'none' | 'language' = 'language'
+    grouping: 'none' | 'language' | 'extendsGroup' = 'language'
     hidden = true
 
     private readonly _onDidChangeTreeData: vscode.EventEmitter<vscode.TreeItem | undefined | void> = new vscode.EventEmitter<
@@ -29,7 +29,7 @@ abstract class BaseTreeDataProvider implements vscode.TreeDataProvider<vscode.Tr
     // eslint-disable-next-line @typescript-eslint/member-ordering
     readonly onDidChangeTreeData: vscode.Event<vscode.TreeItem | undefined | void> = this._onDidChangeTreeData.event
 
-    getTreeItem(elem) {
+    getTreeItem(elem: any) {
         return elem
     }
 
@@ -110,65 +110,79 @@ class TreeDataProvider extends BaseTreeDataProvider {
             return treeItem
         }
 
-        const getNormalizedSnippets = (): Array<GeneralSnippet & TreeItemProps> => {
-            const handleBody = (body: CommonSnippet['body']) => {
-                if (body === undefined) return '<MISSING BODY>'
-                if (body === false) return '<ACTION ONLY>'
-                return (Array.isArray(body) ? body.join('\n') : body) /* .replaceAll('\n', '↵ ') */
-                    .replaceAll('\n', ' ')
-                    .replaceAll('\t', '\\t')
-            }
-
-            const settingValue = getSnippetsSettingValue(configKey, isLocal)
-            return settingValue.map((snippet, index) => {
-                const label = 'sequence' in snippet ? snippet.sequence : snippet.name
-                return {
-                    ...snippet,
-                    label,
-                    originalIndex: index,
-                    description: handleBody(snippet.body),
-                    hasBody: [false, null, undefined].every(x => x !== snippet.body),
-                    fileName: label,
-                }
-            })
+        const treeItemWithSnippets = (label: string, snippets: typeof normalizedSnippets) => {
+            const treeItem = new vscode.TreeItem(label, vscode.TreeItemCollapsibleState.Collapsed) as TreeItemWithTreeItems
+            treeItem.items = snippets.map(snippet => getTreeItem(snippet))
+            const LIMIT = 15
+            treeItem.description = `(${snippets.length}) ${snippets
+                .slice(0, LIMIT)
+                .map(snippet => snippet.label)
+                .join(', ')}${snippets.length > LIMIT ? '...' : ''}`
+            return treeItem
         }
 
-        const normalizedSnippets = getNormalizedSnippets()
+        const objectToTreeSnippets = (obj: Record<string, typeof normalizedSnippets>) => {
+            return Object.entries(obj).map(([displayKey, snippets]) => treeItemWithSnippets(displayKey, snippets))
+        }
+
+        const normalizedSnippets = getNormalizedSnippets(configKey, isLocal)
 
         switch (this.grouping) {
             case 'none':
                 return normalizedSnippets.map(snippet => getTreeItem(snippet))
 
             case 'language': {
-                const snippetDefaults = getSnippetsDefaults()
-
                 const snippetsByLangs: Record<string, typeof normalizedSnippets> = {}
                 for (const snippet of normalizedSnippets) {
                     const snippetLangs = sort((a, b) => {
                         if (a.startsWith('!') && !b.startsWith('!')) return 1
                         if (!a.startsWith('!') && b.startsWith('!')) return -1
                         return a.localeCompare(b)
-                    }, snippet.when?.languages ?? snippetDefaults.when.languages)
+                    }, snippet.when.languages)
                     const langsDisplay = snippetLangs.join(', ')
                     ;(snippetsByLangs[langsDisplay] ??= []).push(snippet)
                 }
 
-                return Object.entries(snippetsByLangs).map(([langsDisplay, snippets]) => {
-                    const treeItem = new vscode.TreeItem(langsDisplay, vscode.TreeItemCollapsibleState.Collapsed) as TreeItemWithTreeItems
-                    treeItem.items = snippets.map(snippet => getTreeItem(snippet))
-                    const LIMIT = 15
-                    treeItem.description = `(${snippets.length}) ${snippets
-                        .slice(0, LIMIT)
-                        .map(snippet => snippet.label)
-                        .join(', ')}${snippets.length > LIMIT ? '...' : ''}`
-                    return treeItem
-                })
+                return objectToTreeSnippets(snippetsByLangs)
+            }
+
+            case 'extendsGroup': {
+                return objectToTreeSnippets(
+                    groupBy(snippet => {
+                        return (snippet as any).extends ?? 'No extends group'
+                    }, normalizedSnippets),
+                )
             }
 
             default:
                 break
         }
     }
+}
+
+const getNormalizedSnippets = (configKey: keyof Settings, isLocal: boolean) => {
+    const handleBody = (body: CommonSnippet['body']) => {
+        if (body === undefined) return '<MISSING BODY>'
+        if (body === false) return '<ACTION ONLY>'
+        return (Array.isArray(body) ? body.join('\n') : body) /* .replaceAll('\n', '↵ ') */
+            .replaceAll('\n', ' ')
+            .replaceAll('\t', '\\t')
+    }
+
+    const settingValue = getSnippetsSettingValue(configKey, isLocal)
+    return settingValue
+        .map(snippet => mergeSnippetWithDefaults(snippet))
+        .map((snippet, index) => {
+            const label = 'sequence' in snippet ? snippet.sequence : snippet.name
+            return {
+                ...snippet,
+                label,
+                originalIndex: index,
+                description: handleBody(snippet.body),
+                hasBody: [false, null, undefined].every(x => x !== snippet.body),
+                fileName: label,
+            }
+        })
 }
 
 const parseProviderUriSnippet = (uri: vscode.Uri) => {
@@ -190,8 +204,8 @@ export const registerViews = () => {
         },
         readFile(uri) {
             const { configKey, isLocal, snippetIndex } = parseProviderUriSnippet(uri)
-            const body = getSnippetsSettingValue(configKey as any, isLocal)[snippetIndex]?.body
-            if (!body && body !== '') throw new Error(`Snippet ${configKey} with index ${snippetIndex} doesn't have valid body`)
+            const body = mergeSnippetWithDefaults(getSnippetsSettingValue(configKey as any, isLocal)[snippetIndex]!)?.body
+            if (!body && body !== '') throw new Error(`Snippet ${configKey} with index ${snippetIndex} doesn't have valid body (${body})`)
             return new TextEncoder().encode(Array.isArray(body) ? body.join('\n') : body)
         },
         rename() {},
@@ -276,7 +290,7 @@ export const registerViews = () => {
 
     registerExtensionCommand('groupBy#none', groupByHandler)
     registerExtensionCommand('groupBy#language', groupByHandler)
-    // registerExtensionCommand('groupBy#extendsGroup', groupByHandler)
+    registerExtensionCommand('groupBy#extendsGroup', groupByHandler)
 
     updateGroupingContext('language')
 }
