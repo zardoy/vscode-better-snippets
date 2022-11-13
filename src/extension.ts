@@ -34,6 +34,7 @@ import { getAllLoadedSnippets } from './loadedSnippets'
 import registerForceInsertSnippet from './forceInsertSnippet'
 import { ExposedExtensionApi } from './extensionApi'
 import { TypingSnippetUnresolved } from './configurationType'
+import registerDebugCommands from './debugCommands'
 
 export const registerSnippetsEvent = new vscode.EventEmitter<void>()
 
@@ -566,6 +567,7 @@ export const activate = () => {
     registerSnippetSettingsJsonCommands()
     registerSnippetsMigrateCommands()
     registerForceInsertSnippet()
+    registerDebugCommands()
 
     const exposedApi: ExposedExtensionApi = {
         getAPI: getExtensionApi,
