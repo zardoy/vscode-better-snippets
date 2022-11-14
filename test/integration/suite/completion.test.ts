@@ -2,10 +2,7 @@ import * as vscode from 'vscode'
 
 import { expect } from 'chai'
 import delay from 'delay'
-// eslint-disable-next-line @typescript-eslint/prefer-ts-expect-error
-//@ts-ignore
-import type { Configuration } from '../../../src/configurationType'
-import { clearEditorText, getFirstCompletionItem } from './utils'
+import { clearEditorText, getFirstCompletionItem, updateExtensionSetting } from './utils'
 
 const getFirstItemInsertText = async (pos: vscode.Position) => {
     const firstItem = await getFirstCompletionItem(pos)
@@ -42,8 +39,16 @@ describe('Basic copmletions', () => {
             .then(async newDocument => {
                 document = newDocument
                 await vscode.window.showTextDocument(document)
-                const configKey: keyof Configuration = 'customSnippets'
-                const configValue: Configuration['customSnippets'] = [
+                await updateExtensionSetting('extendsGroups', {
+                    'destruct-extends-group': {
+                        nameOrSequence: 'destruct3',
+                        body: 'const { $LAST } = $EXPR',
+                        when: {
+                            languages: ['$$LANG'],
+                        },
+                    },
+                })
+                await updateExtensionSetting('customSnippets', [
                     {
                         name: 'fileStartTest',
                         body: '',
@@ -54,18 +59,18 @@ describe('Basic copmletions', () => {
                         },
                     },
                     {
-                        name: 'destruct3',
-                        body: 'const { $LAST } = $EXPR',
+                        extends: 'destruct-extends-group',
                         when: {
                             lineRegex: '(?<EXPR>(\\.?\\w)+)\\.(?<LAST>\\w+)\\.\\w*$',
                             triggerCharacters: ['.', ''],
-                            languages: ['markdown'],
                             locations: [],
                         },
                         replaceBeforeRegex: true,
+                        // eslint-disable-next-line @typescript-eslint/prefer-ts-expect-error
+                        // @ts-ignore extends group variable
+                        $LANG: 'markdown',
                     },
-                ]
-                await vscode.workspace.getConfiguration('betterSnippets').update(configKey, configValue, vscode.ConfigurationTarget.Global)
+                ])
             })
             .then(done)
     })
