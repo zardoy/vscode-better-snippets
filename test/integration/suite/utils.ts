@@ -1,6 +1,10 @@
 import * as vscode from 'vscode'
 import _ from 'lodash'
 
+// eslint-disable-next-line @typescript-eslint/prefer-ts-expect-error
+//@ts-ignore
+import type { Configuration } from '../../../src/configurationType'
+
 export const clearEditorText = async (editor: vscode.TextEditor, resetContent = '') => {
     await new Promise<void>(resolve => {
         const { document } = editor
@@ -18,6 +22,10 @@ export const clearEditorText = async (editor: vscode.TextEditor, resetContent = 
             builder.replace(new vscode.Range(new vscode.Position(0, 0), document.lineAt(document.lineCount - 1).range.end), resetContent),
         )
     })
+}
+
+export const updateExtensionSetting = async <T extends keyof Configuration>(key: T, val: Configuration[T]) => {
+    await vscode.workspace.getConfiguration('betterSnippets').update(key, val, vscode.ConfigurationTarget.Global)
 }
 
 export const getCompletionItems = async (pos?: vscode.Position) => {

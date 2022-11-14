@@ -88,6 +88,81 @@ Note that:
 
 ![vscode javascript auto imports](https://user-images.githubusercontent.com/46503702/188254222-64fbf138-de7c-49a0-8237-cf62bf678c57.gif)
 
+## Reuse Snippet Data
+
+You can use `betterSnippets.extendsGroups` setting to extract common snippet data or even by creating your own snippet pack extension!
+
+Example usage of `betterSnippets.extendsGroups`:
+
+```json
+"betterSnippets.extendsGroups": {
+    "reactUse": {
+        "when": {
+            "locations": [
+                "lineStart"
+            ],
+            "languages": [
+                "react"
+            ],
+            "otherLines": [
+                {
+                    "indent": -1,
+                    "testRegex": "function|=>|React.FC"
+                }
+            ]
+        }
+    }
+},
+"betterSnippets.customSnippets": [
+    {
+        "extends": "reactUse",
+        "name": "useInitEffect",
+        "body": [
+            "useEffect(() => {",
+            "\t$1",
+            "}, []);"
+        ],
+        "resolveImports": {
+            "useEffect": {
+                "package": "react"
+            }
+        },
+    },
+]
+```
+
+You can reuse any custom or typing snippet data in this setting. For reusing name or sequence use `nameOrSequence` property.
+
+With special variables syntax (notice double `$` in extendsGroups):
+
+```json
+"betterSnippets.extendsGroups": {
+    "reactImport": {
+        "resolveImports": {
+            "$$FUNC": {
+                "package": "$$PACKAGE"
+            }
+        },
+        "when":{
+            "npmDependencies": ["$$PACKAGE"]
+        }
+    }
+},
+"betterSnippets.customSnippets": [
+    {
+        "extends": "reactImport",
+        "name": "useInitEffect",
+        "body": [
+            "useEffect(() => {",
+            "\t$1",
+            "}, []);"
+        ],
+        "$FUNC": "useEffect",
+        "$PACKAGE": "preact"
+    },
+]
+```
+
 ### Experimental TS Snippets
 
 Disabled by default, can be enabled with `betterSnippets.enableExperimentalSnippets` setting.

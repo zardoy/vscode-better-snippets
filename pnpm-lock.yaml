@@ -820,7 +820,7 @@ packages:
       koa-static: 5.0.0
       minimist: 1.2.5
       playwright: 1.14.1
-      vscode-uri: 3.0.3
+      vscode-uri: 3.0.6
     transitivePeerDependencies:
       - bufferutil
       - supports-color
@@ -2682,7 +2682,7 @@ packages:
         optional: true
     dependencies:
       '@types/jsonfile': 6.1.0
-      fs-extra: 10.0.1
+      fs-extra: 10.1.0
       jsonfile: 6.1.0
       ts-morph: 12.2.0
       typescript: 4.8.4
@@ -3287,7 +3287,7 @@ packages:
   /jsonfile/4.0.0:
     resolution: {integrity: sha1-h3Gq4HmbZAdrdmQPygWPnBDjPss=}
     optionalDependencies:
-      graceful-fs: 4.2.9
+      graceful-fs: 4.2.10
     dev: true
 
   /jsonfile/6.1.0:
@@ -3295,7 +3295,7 @@ packages:
     dependencies:
       universalify: 2.0.0
     optionalDependencies:
-      graceful-fs: 4.2.9
+      graceful-fs: 4.2.10
 
   /keygrip/1.1.0:
     resolution: {integrity: sha512-iYSchDJ+liQ8iwbSI2QqsQOvqv58eJCEanyJPJi+Khyu8smkcKSFUCbPwzFcL7YVtZ6eONjqRX/38caJ7QjRAQ==}
@@ -4912,7 +4912,7 @@ packages:
       code-block-writer: 11.0.0
       commander: 8.3.0
       cosmiconfig: 7.0.1
-      fs-extra: 10.0.1
+      fs-extra: 10.1.0
       generated-module: 0.0.2_typescript@4.8.4
       lodash: 4.17.21
       quicktype-core: 6.0.70
@@ -5187,10 +5187,6 @@ packages:
 
   /vscode-snippet-parser/0.0.5:
     resolution: {integrity: sha512-iJ5e7g5sCQJ5LRt5nGWtw10oHj44a+6flLAYbGlA2Jbu32UQtjJqGnaT/1TzMV8Tlig/fsrHf7NoMlAT8N+FmA==}
-    dev: false
-
-  /vscode-uri/3.0.3:
-    resolution: {integrity: sha512-EcswR2S8bpR7fD0YPeS7r2xXExrScVMxg4MedACaWHEtx9ftCF/qHG1xGkolzTPcEmjTavCQgbVzHUIdTMzFGA==}
     dev: false
 
   /vscode-uri/3.0.6:

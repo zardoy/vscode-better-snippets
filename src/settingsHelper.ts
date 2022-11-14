@@ -1,5 +1,5 @@
 import * as vscode from 'vscode'
-import { findNodeAtLocation, getLocation, getNodeValue, parseTree } from 'jsonc-parser'
+import { findNodeAtLocation, getLocation, getNodeValue, JSONPath, Node, parseTree } from 'jsonc-parser'
 import { getExtensionSettingId } from 'vscode-framework'
 import { getJsonCompletingInfo, jsonPathEquals, jsonValuesToCompletions } from '@zardoy/vscode-utils/build/jsonCompletions'
 import { oneOf } from '@zardoy/utils'
@@ -7,6 +7,7 @@ import { uniqBy } from 'lodash'
 import { getContributedLangInfo } from './langsUtils'
 import { snippetLocation } from './constants'
 import { normalizeWhenLangs, snippetsConfig } from './snippet'
+import { getConfigValueFromAllScopesObj } from './util'
 
 const getSharedParsingInfo = (document: vscode.TextDocument, position: vscode.Position) => {
     const location = getLocation(document.getText(), document.offsetAt(position))
@@ -17,8 +18,9 @@ const getSharedParsingInfo = (document: vscode.TextDocument, position: vscode.Po
     if (!jsonCompletingInfo) return
     const { insideStringRange } = jsonCompletingInfo
     const isAnySnippet = oneOf(path[0], getExtensionSettingId('customSnippets'), getExtensionSettingId('typingSnippets'))
-    const isAnySnippetOrDefaults = isAnySnippet || path[0] === getExtensionSettingId('customSnippetDefaults')
-    const localPath = path.slice(2)
+    const isSnippetDefaults = path[0] === getExtensionSettingId('customSnippetDefaults')
+    const isAnySnippetOrDefaults = isAnySnippet || isSnippetDefaults || path[0] === getExtensionSettingId('extendsGroups')
+    const localPath = isSnippetDefaults ? path.slice(1) : path.slice(2)
 
     const lastSegment = path.at(-1)
     const isInRegexProp = isAnySnippetOrDefaults && typeof lastSegment === 'string' && lastSegment.includes('Regex')
@@ -41,10 +43,41 @@ export default () => {
     vscode.languages.registerCompletionItemProvider(
         selector,
         {
-            async provideCompletionItems(document, position, token, context) {
+            // eslint-disable-next-line complexity
+            async provideCompletionItems(document: vscode.TextDocument, position: vscode.Position, token: any, context: any) {
+                const root = parseTree(document.getText())!
+                const location = getLocation(document.getText(), document.offsetAt(position))
+                if (
+                    location.isAtPropertyKey &&
+                    location.matches([getExtensionSettingId('customSnippets'), '*', '*']) &&
+                    location.previousNode!.value.startsWith('$')
+                ) {
+                    const { offset, length } = location.previousNode!
+                    const extendingKeyName = findNodeAtLocation(root, [...location.path.slice(0, -1), 'extends'])?.value
+                    if (!extendingKeyName) return
+                    // todo support extensions
+                    // todo do not suggest used
+                    const targetNode = findNodeAtLocation(root, [getExtensionSettingId('extendsGroups'), extendingKeyName])
+                    const targetExtendsGroupValue = targetNode && getNodeValue(targetNode)
+                    if (!targetExtendsGroupValue) return
+                    const complRange = new vscode.Range(document.positionAt(offset + 2), document.positionAt(offset + 2 + length - 3))
+                    const collectedExtendsKeys: string[] = []
+                    const collectExtendsData = (data: Record<string, any> | undefined | any[]) => {
+                        if (typeof data !== 'object') return
+                        for (const [, value] of Object.entries(data)) {
+                            if (typeof value === 'string') {
+                                collectedExtendsKeys.push(...(value.match(/\$\$[\w\d]+/gi)?.map(x => x.slice(2)) ?? []))
+                            } else collectExtendsData(value)
+                        }
+                    }
+
+                    collectExtendsData(targetExtendsGroupValue)
+                    return jsonValuesToCompletions(collectedExtendsKeys, complRange)
+                }
+
                 const sharedParsingInfo = getSharedParsingInfo(document, position)
                 if (!sharedParsingInfo) return
-                const { root, nodeValue, path, insideStringRange, isAnySnippet, isAnySnippetOrDefaults, localPath } = sharedParsingInfo
+                const { nodeValue, path, insideStringRange, isAnySnippet, isAnySnippetOrDefaults, localPath } = sharedParsingInfo
                 if (!insideStringRange) return
                 const arrValue: string[] = typeof path.at(-1) === 'number' ? getEditingArrayValue(root, path) : undefined
 
@@ -58,48 +91,53 @@ export default () => {
                     return range && getInsideSnippetBodyCompletions(range)
                 }
 
-                if (isAnySnippetOrDefaults && jsonPathEquals(localPath, ['when', 'languages'], true)) {
-                    const positiveIncludedLangs = arrValue.filter(x => !x.startsWith('!'))
-                    const langsToNegate = nodeValue?.startsWith('!') ? normalizeWhenLangs(positiveIncludedLangs) : undefined
+                if (isAnySnippetOrDefaults) {
+                    if (jsonPathEquals(localPath, ['when', 'languages'], true)) {
+                        const positiveIncludedLangs = arrValue.filter(x => !x.startsWith('!'))
+                        const langsToNegate = nodeValue?.startsWith('!') ? normalizeWhenLangs(positiveIncludedLangs) : undefined
 
-                    const completions = langsToNegate
-                        ? [
-                              //   ...supersetsToCompletions(
-                              //       Object.fromEntries(
-                              //           Object.entries(languageSupersets)
-                              //               .filter(([, value]) => {
-                              //                   return value.every(lang => langsToNegate.includes(lang))
-                              //               })
-                              //               .map(([key, value]) => [`!${key}`, value]),
-                              //       ),
-                              //   ),
-                              ...jsonValuesToCompletions(
-                                  langsToNegate.map(x => `!${x}`),
-                                  insideStringRange,
-                              ).map((c, i) => ({ ...c, sortText: `b${i}` })),
-                          ]
-                        : [...supersetsToCompletions(), ...(await getLanguageCompletions(insideStringRange))]
-                    return uniqueCompletions(completions, arrValue)
-                }
+                        const completions = langsToNegate
+                            ? [
+                                  //   ...supersetsToCompletions(
+                                  //       Object.fromEntries(
+                                  //           Object.entries(languageSupersets)
+                                  //               .filter(([, value]) => {
+                                  //                   return value.every(lang => langsToNegate.includes(lang))
+                                  //               })
+                                  //               .map(([key, value]) => [`!${key}`, value]),
+                                  //       ),
+                                  //   ),
+                                  ...jsonValuesToCompletions(
+                                      langsToNegate.map(x => `!${x}`),
+                                      insideStringRange,
+                                  ).map((c, i) => ({ ...c, sortText: `b${i}` })),
+                              ]
+                            : [...supersetsToCompletions(), ...(await getLanguageCompletions(insideStringRange))]
+                        return uniqueCompletions(completions, arrValue)
+                    }
 
-                if (isAnySnippetOrDefaults && jsonPathEquals(localPath, ['when', 'locations'], true)) {
-                    return uniqueCompletions(
-                        jsonValuesToCompletions(
-                            snippetLocation.map(loc => (nodeValue?.startsWith('!') ? `!${loc}` : loc)),
-                            insideStringRange,
-                        ),
-                        arrValue,
-                    )
-                }
+                    if (jsonPathEquals(localPath, ['when', 'locations'], true)) {
+                        return uniqueCompletions(
+                            jsonValuesToCompletions(
+                                snippetLocation.map(loc => (nodeValue?.startsWith('!') ? `!${loc}` : loc)),
+                                insideStringRange,
+                            ),
+                            arrValue,
+                        )
+                    }
 
-                // TODO it suggests in arg!
-                if (
-                    jsonPathEquals(localPath, ['executeCommand']) ||
-                    jsonPathEquals(localPath, ['executeCommand'], true) ||
-                    jsonPathEquals(localPath, ['executeCommand', 'command']) ||
-                    jsonPathEquals(localPath, ['executeCommand', '*', 'command'])
-                ) {
-                    return jsonValuesToCompletions(await vscode.commands.getCommands(true), insideStringRange)
+                    if (
+                        jsonPathEquals(localPath, ['executeCommand']) ||
+                        jsonPathEquals(localPath, ['executeCommand'], true) ||
+                        jsonPathEquals(localPath, ['executeCommand', 'command']) ||
+                        jsonPathEquals(localPath, ['executeCommand', '*', 'command'])
+                    ) {
+                        return jsonValuesToCompletions(await vscode.commands.getCommands(true), insideStringRange)
+                    }
+
+                    if (jsonPathEquals(localPath, ['extends'])) {
+                        return jsonValuesToCompletions(Object.keys(getConfigValueFromAllScopesObj('extendsGroups')))
+                    }
                 }
 
                 return undefined
@@ -107,10 +145,11 @@ export default () => {
         },
         '"',
         '!',
+        '$',
     )
 
     vscode.languages.registerCodeActionsProvider(selector, {
-        provideCodeActions(document, _range, context, token) {
+        provideCodeActions(document: vscode.TextDocument, _range: { end: vscode.Position }, context: any, token: any) {
             const sharedParsingInfo = getSharedParsingInfo(document, _range.end)
             if (!sharedParsingInfo) return
             // we don't have code actions, having relation to any range, ideally we should check start = end node
@@ -158,7 +197,7 @@ export default () => {
     })
 
     vscode.languages.registerHoverProvider(selector, {
-        provideHover(document, position, token) {
+        provideHover(document: vscode.TextDocument, position: vscode.Position, token: any) {
             const sharedParsingInfo = getSharedParsingInfo(document, position)
             if (!sharedParsingInfo) return
             const { isAnySnippet, localPath, insideStringRange, nodeValue } = sharedParsingInfo
@@ -194,6 +233,31 @@ export default () => {
             }
         },
     })
+
+    vscode.languages.registerDefinitionProvider(selector, {
+        provideDefinition(document: vscode.TextDocument, position: vscode.Position, token: any) {
+            const sharedParsingInfo = getSharedParsingInfo(document, position)
+            if (!sharedParsingInfo) return
+            const { root, isAnySnippetOrDefaults, localPath, insideStringRange, nodeValue } = sharedParsingInfo
+            if (!insideStringRange) return
+            if (isAnySnippetOrDefaults && jsonPathEquals(localPath, ['extends'])) {
+                const targetNode = findNodeAtLocation(root, [getExtensionSettingId('extendsGroups'), nodeValue])
+                if (!targetNode) return
+
+                const pos = document.positionAt(targetNode.offset)
+                const selectionRange = new vscode.Range(pos, pos)
+                const locationLink: vscode.DefinitionLink = {
+                    targetUri: document.uri,
+                    targetRange: selectionRange.with({ end: document.positionAt(targetNode.offset + targetNode.length) }),
+                    targetSelectionRange: selectionRange,
+                    originSelectionRange: insideStringRange,
+                }
+                return [locationLink]
+            }
+
+            return undefined
+        },
+    })
 }
 
 const getLanguageCompletions = async (range: vscode.Range) => jsonValuesToCompletions(await vscode.languages.getLanguages(), range)
@@ -215,8 +279,8 @@ function supersetsToCompletions() {
     )
 }
 
-function getEditingArrayValue(root, path) {
-    return getNodeValue(findNodeAtLocation(root, path.slice(0, -1))!)?.filter((_, i) => i !== path.at(-1))
+function getEditingArrayValue(root: Node, path: JSONPath) {
+    return getNodeValue(findNodeAtLocation(root, path.slice(0, -1))!)?.filter((_: any, i: any) => i !== path.at(-1))
 }
 
 function uniqueCompletions<T extends vscode.CompletionItem>(completions: T[], arrValue: any[] | undefined): T[] {

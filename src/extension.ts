@@ -29,11 +29,12 @@ import {
     normalizeWhenLangs,
     snippetDefaults,
     snippetsConfig,
-    TypingSnippetUnresolved,
 } from './snippet'
 import { getAllLoadedSnippets } from './loadedSnippets'
 import registerForceInsertSnippet from './forceInsertSnippet'
 import { ExposedExtensionApi } from './extensionApi'
+import { TypingSnippetUnresolved } from './configurationType'
+import registerDebugCommands from './debugCommands'
 
 export const registerSnippetsEvent = new vscode.EventEmitter<void>()
 
@@ -55,6 +56,7 @@ export const activate = () => {
         /** end position */
         position: vscode.Position,
         displayLanguage = document.languageId,
+        // eslint-disable-next-line max-params
     ): Array<Omit<T, 'body'> & { body: T extends CustomSnippet ? string : string | false; metadata?: SnippetResolvedMetadata }> => {
         const log = (...args) => console.log(`[${debugType}]`, ...args)
         const debug = (...args) => console.debug(`[${debugType}]`, ...args)
@@ -128,7 +130,7 @@ export const activate = () => {
                     if (!isStringMatches(document.lineAt(position.line + (lineDiff as Extract<typeof lineDiff, { line: any }>).line).text, lineDiff))
                         continue snippet
 
-                // eslint-disable-next-line no-inner-declarations
+                // eslint-disable-next-line no-inner-declarations, no-empty-function
                 function changeIndentDiffsType(arg: any): asserts arg is Array<Extract<typeof indentDiffs[0], { indent: any }>> {}
                 changeIndentDiffsType(indentDiffs)
 
@@ -184,7 +186,9 @@ export const activate = () => {
             if (!snippetMatchLocation) continue
 
             let newBody = Array.isArray(body) ? body.join('\n') : body
-            if (newBody !== false) {
+            if (newBody === false) {
+                newBody = name
+            } else {
                 for (const [groupName, groupValue] of Object.entries(regexGroups)) {
                     newBody = newBody.replace(new RegExp(`(?<!\\\\)${escapeStringRegexp(`$${groupName}`)}`, 'g'), groupValue)
                 }
@@ -192,7 +196,7 @@ export const activate = () => {
 
             includedSnippets.push({
                 ...snippet,
-                body: newBody as string,
+                body: newBody,
                 metadata: objectUndefinedIfEmpty(metadata),
             })
         }
@@ -204,6 +208,7 @@ export const activate = () => {
         snippetsConfig.strictPositionLocations = getExtensionSetting('strictPositionLocations')
         snippetsConfig.enableTsPlugin = getExtensionSetting('enableTsPlugin')
         snippetsConfig.languageSupersets = getExtensionSetting('languageSupersets')
+        snippetsConfig.extendsGroups = getExtensionSetting('extendsGroups')
     }
 
     let snippetsRegistered = false
@@ -212,7 +217,7 @@ export const activate = () => {
 
         const snippetsToLoadByLang = getAllLoadedSnippets()
         const typingSnippets: CustomTypingSnippet[] = [
-            ...getConfigValueFromAllScopes('typingSnippets').map(snippet => mergeSnippetWithDefaults(snippet)),
+            ...(getConfigValueFromAllScopes('typingSnippets') as TypingSnippetUnresolved[]).map(snippet => mergeSnippetWithDefaults(snippet)),
             ...getAllExtensionSnippets('typingSnippets'),
         ]
         const snippetsToLoadFlattened = [...Object.values(snippetsToLoadByLang).flat(1), ...typingSnippets]
@@ -547,7 +552,8 @@ export const activate = () => {
             affectsConfiguration(getExtensionSettingId('experimental.disableBuiltinSnippets')) ||
             affectsConfiguration(getExtensionSettingId('languageSupersets')) ||
             affectsConfiguration(getExtensionSettingId('strictPositionLocations')) ||
-            affectsConfiguration(getExtensionSettingId('enableTsPlugin'))
+            affectsConfiguration(getExtensionSettingId('enableTsPlugin')) ||
+            affectsConfiguration(getExtensionSettingId('extendsGroups'))
         ) {
             console.log('Snippets configuration updated')
             registerSnippetsEvent.fire()
@@ -561,6 +567,7 @@ export const activate = () => {
     registerSnippetSettingsJsonCommands()
     registerSnippetsMigrateCommands()
     registerForceInsertSnippet()
+    registerDebugCommands()
 
     const exposedApi: ExposedExtensionApi = {
         getAPI: getExtensionApi,

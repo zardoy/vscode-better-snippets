@@ -1,6 +1,6 @@
 import dedent from 'string-dedent'
 import { getExtensionCommandId } from 'vscode-framework'
-import { Configuration } from './configurationType'
+import { Configuration, CustomSnippetUnresolved } from './configurationType'
 
 const topLineSnippets: Array<[string, string]> = [
     // er is much faster to type rather than ec
@@ -16,14 +16,12 @@ const markdownTop = {
     languages: ['markdown'],
 }
 
-type CustomSnippet = Configuration['customSnippets'][number]
-
 // todo set required: languages
-export const builtinSnippets: CustomSnippet[] = (
+export const builtinSnippets: CustomSnippetUnresolved[] = (
     [
         // js
         ...topLineSnippets.map(
-            ([name, body]): CustomSnippet => ({
+            ([name, body]): CustomSnippetUnresolved => ({
                 name,
                 body,
                 iconType: 'Event',
@@ -80,5 +78,5 @@ export const builtinSnippets: CustomSnippet[] = (
             `,
             when: markdownTop,
         },
-    ] as Configuration['customSnippets']
-).map((snippet): CustomSnippet => ({ description: 'Builtin Better Snippet', ...snippet }))
+    ] as CustomSnippetUnresolved[]
+).map((snippet): CustomSnippetUnresolved => ({ description: 'Builtin Better Snippet', ...snippet }))

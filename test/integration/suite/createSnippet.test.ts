@@ -1,6 +1,6 @@
 import * as vscode from 'vscode'
 import { expect } from 'chai'
-import { Configuration } from '../../../src/configurationType'
+import { CustomSnippetUnresolved } from '../../../src/configurationType'
 import { clearEditorText } from './utils'
 
 describe('Create snippet', () => {
@@ -29,7 +29,7 @@ describe('Create snippet', () => {
         let snippetName = 'createdSnippet1'
         await vscode.commands.executeCommand('betterSnippets.createSnippetFromSelection', snippetName)
         const assertSnippet = (snippetName: string) => {
-            const configValue = vscode.workspace.getConfiguration('betterSnippets').get<Configuration['customSnippets']>('customSnippets')!
+            const configValue = vscode.workspace.getConfiguration('betterSnippets').get<CustomSnippetUnresolved[]>('customSnippets')!
             const lastSnippet = configValue.slice(-1)[0]
             expect(lastSnippet?.name, snippetName).to.deep.equal(snippetName)
             expect(lastSnippet?.body, snippetName).to.deep.equal(['function test() {', '\t0\t1', '\t\t2', '}'])

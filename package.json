@@ -61,6 +61,10 @@
             {
                 "command": "forceInsertCustomSnippet",
                 "title": "Force Insert Custom Snippet"
+            },
+            {
+                "command": "showAllResolvedSnippets",
+                "title": "Show All Resolved Snippets"
             }
         ],
         "menus": {
@@ -84,6 +88,11 @@
                     "command": "groupBy#language",
                     "when": "view =~ /betterSnippets.globalSnippets|betterSnippets.globalTypingSnippets|betterSnippets.workspaceSnippets|betterSnippets.workspaceTypingSnippets/",
                     "group": "1_header@2"
+                },
+                {
+                    "command": "groupBy#extendsGroup",
+                    "when": "view =~ /betterSnippets.globalSnippets|betterSnippets.globalTypingSnippets|betterSnippets.workspaceSnippets|betterSnippets.workspaceTypingSnippets/",
+                    "group": "1_header@3"
                 }
             ],
             "view/item/context": [

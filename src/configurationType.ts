@@ -37,7 +37,17 @@ type NpmDependency = string | { type: 'dev' | 'prod'; dep: string }
 
 export type GeneralSnippet = {
     /**
-     * @suggestSortText "3"
+     * If `false`:
+     * - In custom snippets: body will be used from snippet name
+     * - in typing snippets: sequence will not be removed, useful for just executing post actions such as commands
+     * @suggestSortText "2"
+     * @defaultSnippets [{
+     *   "body": "$1"
+     * }]
+     */
+    body: string | string[] | false
+    /**
+     * @suggestSortText "4"
      */
     when?: {
         /** Shouldn't be used with `Start` location as snippet would be hidden in that case */
@@ -91,7 +101,7 @@ export type GeneralSnippet = {
     /**
      * Wether to replace the matched content from `lineBeforeRegex` or `lineRegex` regex check. The first one takes precedence.
      * Works only when end of content is matched (e.g. it will always work if regex ends with `$`)
-     * @sortText z9
+     * @suggestSortText "z9"
      */
     replaceBeforeRegex?: boolean
     /** For JS langs only. How to resolve suggested imports if any */
@@ -110,6 +120,68 @@ export type GeneralSnippet = {
      */
     executeCommand?: CommandDefinition /* | CommandDefinition[] */
 }
+
+export type CustomSnippetUnresolved = GeneralSnippet & {
+    /**
+     * @suggestSortText !
+     */
+    name: string
+    /** Should be short. Always displayed in completion widget on the right on the same line as label. */
+    description?: string
+    when?: {
+        /**
+         * The snippet will be visible only after typing specific character on the keyboard
+         * Add '' (empty string) so it'll be visible after regular triggering or typing
+         * @length 1
+         */
+        triggerCharacters?: string[]
+    }
+    // formatting?: {
+    //     /**
+    //      * Always insert double quote. Prettier rules. Otherwise always insert single. Default: auto
+    //      */
+    //     doubleQuotes?: boolean
+    //     insertSemicolon?: boolean
+    // }
+    /** If specified, `iconType` is ignored. It makes sense to use with custom file icon theme */
+    fileIcon?: string
+    /** If specified, `iconType` and `fileIcon` is ignored. It makes sense to use with custom file icon theme */
+    folderIcon?: string
+    sortText?: string | null
+    iconType?: SnippetType
+    /**
+     * Only if `when.triggerCharacters` is used
+     * @default false
+     */
+    replaceTriggerCharacter?: boolean
+}
+
+export type TypingSnippetUnresolved = GeneralSnippet & {
+    /**
+     * Snippet will be accepted only after typing THE EXACT sequence of characters on the keyboard. Using arrows or mouse for navigating will reset the sequence (see settings)
+     * @suggestSortText !
+     */
+    sequence: string
+    when?: {
+        // TODO support in regular snippets and move to GeneralSnippet
+        // TODO rewrite snippet example
+        /**
+         * Recommnded instead of `lineRegex`, tests against what is before current snippet in the line
+         * Example:
+         * | - cursor, [...] - check position
+         * For regular snippet `test` end position is before current word:
+         * `[before] test|`, `[before] beforetest|`,
+         * Typing snippet: cb
+         * `[before]cb|`, `[before ]cb|`,
+         */
+        lineBeforeRegex?: string
+    }
+}
+
+type TypingSnippetResolved = (Pick<TypingSnippetUnresolved, 'body' | 'sequence'> | { /** @suggestSortText "3" */ extends: string }) &
+    Omit<TypingSnippetUnresolved, 'body' | 'sequence'>
+type CustomSnippetResolved = (Pick<CustomSnippetUnresolved, 'body' | 'name'> | { /** @suggestSortText "3" */ extends: string }) &
+    Omit<CustomSnippetUnresolved, 'body' | 'name'>
 
 export type Configuration = {
     /**
@@ -144,85 +216,24 @@ export type Configuration = {
      */
     enableTsPlugin: boolean
     /**
+     * Here you can specify reusable parts for your custom & typing snippets
+     * The name of group must not contain `:` as its reserved for builtin and extension packs groups
+     */
+    extendsGroups: {
+        [groupName: string]: Partial<
+            Omit<CustomSnippetUnresolved, 'name'> & {
+                nameOrSequence: string
+            }
+        >
+    }
+    /**
      * @suggestSortText betterSnippets.1
      */
-    customSnippets: Array<
-        GeneralSnippet & {
-            /**
-             * @suggestSortText "2"
-             * @defaultSnippets [{
-             *   "body": "$1"
-             * }]
-             */
-            body: string | string[]
-            /**
-             * @suggestSortText !
-             */
-            name: string
-            /** Should be short. Always displayed in completion widget on the right on the same line as label. */
-            description?: string
-            when?: {
-                /**
-                 * The snippet will be visible only after typing specific character on the keyboard
-                 * Add '' (empty string) so it'll be visible after regular triggering or typing
-                 * @length 1
-                 */
-                triggerCharacters?: string[]
-            }
-            // formatting?: {
-            //     /**
-            //      * Always insert double quote. Prettier rules. Otherwise always insert single. Default: auto
-            //      */
-            //     doubleQuotes?: boolean
-            //     insertSemicolon?: boolean
-            // }
-            /** If specified, `iconType` is ignored. It makes sense to use with custom file icon theme */
-            fileIcon?: string
-            /** If specified, `iconType` and `fileIcon` is ignored. It makes sense to use with custom file icon theme */
-            folderIcon?: string
-            sortText?: string | null
-            iconType?: SnippetType
-            /**
-             * Only if `when.triggerCharacters` is used
-             * @default false
-             */
-            replaceTriggerCharacter?: boolean
-        }
-    >
+    customSnippets: CustomSnippetResolved[]
     /**
      * @suggestSortText betterSnippets.2
      */
-    typingSnippets: Array<
-        GeneralSnippet & {
-            /**
-             * If `false` sequence will not be removed, useful for just executing post actions such as commands
-             * @suggestSortText "2"
-             * @defaultSnippets [{
-             *   "body": "$1"
-             * }]
-             */
-            body: string | string[] | false
-            /**
-             * Snippet will be accepted only after typing THE EXACT sequence of characters on the keyboard. Using arrows or mouse for navigating will reset the sequence (see settings)
-             * @suggestSortText !
-             */
-            sequence: string
-            when?: {
-                // TODO support in regular snippets and move to GeneralSnippet
-                // TODO rewrite snippet example
-                /**
-                 * Recommnded instead of `lineRegex`, tests against what is before current snippet in the line
-                 * Example:
-                 * | - cursor, [...] - check position
-                 * For regular snippet `test` end position is before current word:
-                 * `[before] test|`, `[before] beforetest|`,
-                 * Typing snippet: cb
-                 * `[before]cb|`, `[before ]cb|`,
-                 */
-                lineBeforeRegex?: string
-            }
-        }
-    >
+    typingSnippets: TypingSnippetResolved[]
     /** @default true */
     typingSnippetsUndoStops: boolean
     /**
