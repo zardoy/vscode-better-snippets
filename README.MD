@@ -163,8 +163,6 @@ With special variables syntax (notice double `$` in extendsGroups):
 ]
 ```
 
-#### Extends Groups
-
 ### Experimental TS Snippets
 
 Disabled by default, can be enabled with `betterSnippets.enableExperimentalSnippets` setting.
