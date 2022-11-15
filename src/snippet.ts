@@ -41,7 +41,7 @@ export const mergeSnippetWithDefaults = <T extends CustomSnippetUnresolved | Typ
     const extendsGroupName = snippet['extends']
     let extendsData: Record<string, any> = {}
     if (extendsGroupName) {
-        extendsData = snippetsConfig.extendsGroups[extendsGroupName] ?? allContributedExtendsGroups.get(extendsGroupName) ?? {}
+        extendsData = snippetsConfig.extendsGroups[extendsGroupName] ?? allContributedExtendsGroups[extendsGroupName] ?? {}
         if ('nameOrSequence' in extendsData) {
             // eslint-disable-next-line no-multi-assign
             extendsData.name = extendsData.sequence = extendsData.nameOrSequence
