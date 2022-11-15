@@ -149,7 +149,7 @@ export const activate = () => {
     }
 
     let snippetsRegistered = false
-    const registerSnippets = () => {
+    const registerSnippetsInner = () => {
         snippetsRegistered = true
 
         const snippetsToLoadByLang = getAllLoadedSnippets()
@@ -462,6 +462,14 @@ export const activate = () => {
         }
 
         registerExperimentalSnippets(disposables)
+    }
+
+    const registerSnippets = () => {
+        try {
+            registerSnippetsInner()
+        } catch (err) {
+            void vscode.window.showErrorMessage(`Failed to register snippets: ${err.message}`)
+        }
     }
 
     registerSnippetsEvent.event(() => {
