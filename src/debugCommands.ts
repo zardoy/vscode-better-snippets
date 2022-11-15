@@ -1,6 +1,7 @@
 import * as vscode from 'vscode'
 import { showQuickPick } from '@zardoy/vscode-utils/build/quickPick'
-import { getExtensionSetting, getExtensionSettingId, registerExtensionCommand } from 'vscode-framework'
+import { getExtensionSetting, getExtensionSettingId, registerExtensionCommand, VSCodeQuickPickItem } from 'vscode-framework'
+import { compact } from '@zardoy/utils'
 import { CustomSnippetUnresolved, TypingSnippetUnresolved } from './configurationType'
 import { getAllExtensionSnippets, mergeSnippetWithDefaults } from './snippet'
 import { getConfigValueFromAllScopes } from './util'
@@ -36,20 +37,23 @@ export default () => {
         })
         await vscode.window.showTextDocument(document)
     })
+
     registerExtensionCommand('copySnippetsFromSettingsJson', async () => {
         const configurationKey = await showQuickPick((['customSnippets', 'typingSnippets'] as const).map(x => ({ label: x, value: x })))
         if (!configurationKey) return
         const snippetsSettingValue = getExtensionSetting(configurationKey)
         const selectedSnippetsToShare = await showQuickPick(
             snippetsSettingValue.map(snippet => {
-                const name: string = 'name' in snippet ? snippet.name : snippet.sequence
+                const name: string = ('name' in snippet ? snippet.name : snippet.sequence) ?? snippet.extends
                 return {
                     label: name,
                     value: snippet,
+                    description: compact([snippet.extends, snippet.body]).join(' '),
                 }
             }),
             {
                 canPickMany: true,
+                matchOnDescription: true,
             },
         )
         if (!selectedSnippetsToShare) return
