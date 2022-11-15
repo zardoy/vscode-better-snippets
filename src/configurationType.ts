@@ -78,6 +78,8 @@ export type GeneralSnippet = {
                           line: number /*  | number[] */
                           /** @default false */
                           displayIfNoLine?: boolean
+                          /** @default false */
+                          skipEmptyLines?: boolean
                       }
                     | {
                           // TODO support negative

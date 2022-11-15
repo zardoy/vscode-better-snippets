@@ -1,5 +1,5 @@
 // GENERATED. DON'T EDIT MANUALLY
-// md5hash: 213f79930f40d32850a335aabf17754a
+// md5hash: bebdf46d636535679bc359bb9160cad5
 {
     "type": "object",
     "properties": {
@@ -131,6 +131,10 @@
                                                                 "displayIfNoLine": {
                                                                     "default": false,
                                                                     "type": "boolean"
+                                                                },
+                                                                "skipEmptyLines": {
+                                                                    "default": false,
+                                                                    "type": "boolean"
                                                                 }
                                                             },
                                                             "required": [
@@ -213,6 +217,10 @@
                                                                     "type": "number"
                                                                 },
                                                                 "displayIfNoLine": {
+                                                                    "default": false,
+                                                                    "type": "boolean"
+                                                                },
+                                                                "skipEmptyLines": {
                                                                     "default": false,
                                                                     "type": "boolean"
                                                                 }
@@ -549,6 +557,10 @@
                                                                                 "displayIfNoLine": {
                                                                                     "default": false,
                                                                                     "type": "boolean"
+                                                                                },
+                                                                                "skipEmptyLines": {
+                                                                                    "default": false,
+                                                                                    "type": "boolean"
                                                                                 }
                                                                             },
                                                                             "required": [
@@ -631,6 +643,10 @@
                                                                                     "type": "number"
                                                                                 },
                                                                                 "displayIfNoLine": {
+                                                                                    "default": false,
+                                                                                    "type": "boolean"
+                                                                                },
+                                                                                "skipEmptyLines": {
                                                                                     "default": false,
                                                                                     "type": "boolean"
                                                                                 }
@@ -932,6 +948,10 @@
                                                                                 "displayIfNoLine": {
                                                                                     "default": false,
                                                                                     "type": "boolean"
+                                                                                },
+                                                                                "skipEmptyLines": {
+                                                                                    "default": false,
+                                                                                    "type": "boolean"
                                                                                 }
                                                                             },
                                                                             "required": [
@@ -1014,6 +1034,10 @@
                                                                                     "type": "number"
                                                                                 },
                                                                                 "displayIfNoLine": {
+                                                                                    "default": false,
+                                                                                    "type": "boolean"
+                                                                                },
+                                                                                "skipEmptyLines": {
                                                                                     "default": false,
                                                                                     "type": "boolean"
                                                                                 }
@@ -1352,6 +1376,10 @@
                                                                                 "displayIfNoLine": {
                                                                                     "default": false,
                                                                                     "type": "boolean"
+                                                                                },
+                                                                                "skipEmptyLines": {
+                                                                                    "default": false,
+                                                                                    "type": "boolean"
                                                                                 }
                                                                             },
                                                                             "required": [
@@ -1434,6 +1462,10 @@
                                                                                     "type": "number"
                                                                                 },
                                                                                 "displayIfNoLine": {
+                                                                                    "default": false,
+                                                                                    "type": "boolean"
+                                                                                },
+                                                                                "skipEmptyLines": {
                                                                                     "default": false,
                                                                                     "type": "boolean"
                                                                                 }
@@ -1673,6 +1705,10 @@
                                                                                 "displayIfNoLine": {
                                                                                     "default": false,
                                                                                     "type": "boolean"
+                                                                                },
+                                                                                "skipEmptyLines": {
+                                                                                    "default": false,
+                                                                                    "type": "boolean"
                                                                                 }
                                                                             },
                                                                             "required": [
@@ -1755,6 +1791,10 @@
                                                                                     "type": "number"
                                                                                 },
                                                                                 "displayIfNoLine": {
+                                                                                    "default": false,
+                                                                                    "type": "boolean"
+                                                                                },
+                                                                                "skipEmptyLines": {
                                                                                     "default": false,
                                                                                     "type": "boolean"
                                                                                 }

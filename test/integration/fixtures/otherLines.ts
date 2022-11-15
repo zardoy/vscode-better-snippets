@@ -1,26 +1,47 @@
 /* eslint-disable unicorn/no-abusive-eslint-disable */
-/* eslint-disable */
+/* eslint-disable */ // = - only this snippet, ! - no snippets
+// =import
 import * as vscode from 'vscode'
+// =import
+
+// =import
+
+const a = ''
+// !
+
+// !
 
 export const activate = someData => {
-    // 1
-    // 2
+    // !
     if (someData || false) {
-        // 3
+        // !
         const someObj = {
             'a-:/b/'(): Partial<Record<string, any>> | void {
-                // 4
+                // !
                 if (false) {
-                    // 5 !c
+                    // !
                 }
-                // 6
+                // !
             },
             c: 56,
         }
     }
     for (const iterator of []) {
-        // 7 c
+        if (true) {
+            // =continue
+        }
+
+        // =continue
+    }
+    // !
+    while (true) {
+        if (true) {
+            // !
+        }
+
+        // =break
     }
 }
 
 const stringsArr = ['']
+// !

@@ -1,10 +1,6 @@
-/* eslint-disable complexity */
-/* eslint-disable max-depth */
 import * as vscode from 'vscode'
 import { normalizeRegex } from '@zardoy/vscode-utils/build/settings'
-import { normalizeLanguages } from '@zardoy/vscode-utils/build/langs'
 import { SnippetParser } from 'vscode-snippet-parser'
-import { partition } from 'rambda'
 import { extensionCtx, getExtensionCommandId, getExtensionSetting, getExtensionSettingId } from 'vscode-framework'
 import { ensureHasProp, oneOf } from '@zardoy/utils'
 import escapeStringRegexp from 'escape-string-regexp'
@@ -35,6 +31,7 @@ import registerForceInsertSnippet from './forceInsertSnippet'
 import { ExposedExtensionApi } from './extensionApi'
 import { TypingSnippetUnresolved } from './configurationType'
 import registerDebugCommands from './debugCommands'
+import { isOtherLinesMatches } from './otherLines'
 
 export const registerSnippetsEvent = new vscode.EventEmitter<void>()
 
@@ -68,7 +65,7 @@ export const activate = () => {
         const lineText = line.text
         const includedSnippets: Array<T & { body: string; metadata?: SnippetResolvedMetadata }> = []
 
-        snippet: for (const snippet of snippets) {
+        for (const snippet of snippets) {
             const { body, when } = snippet
             const name = getSnippetDebugName(snippet)
 
@@ -106,68 +103,8 @@ export const activate = () => {
                 return false
             }
 
-            if (when.otherLines) {
-                const [lineDiffs, indentDiffs] = partition(otherLine => 'line' in otherLine, when.otherLines)
-
-                const isStringMatches = (lineText: string, testAgainst: typeof when.otherLines[number]) => {
-                    // method or arrow func also included
-                    // const functionRegex = /(\([^()]*)\)(?:: .+)? (?:=>|{)/
-                    if ('preset' in testAgainst)
-                        // if (testAgainst.preset === 'function') return functionRegex.test(lineText)
-                        return false
-
-                    if ('testString' in testAgainst) return lineText.trim()[testAgainst.matchWith ?? 'startsWith'](testAgainst.testString)
-
-                    // TODO(perf) investigate time for creating RegExp instance
-                    const match = new RegExp(normalizeRegex(testAgainst.testRegex)).exec(lineText)
-                    Object.assign(regexGroups, match?.groups)
-                    if (!match) debug(`Snippet ${name} skipped due to line regex: (${testAgainst.testRegex} against ${lineText})`)
-                    return !!match
-                }
-
-                // TODO-low debug message
-                for (const lineDiff of lineDiffs)
-                    if (!isStringMatches(document.lineAt(position.line + (lineDiff as Extract<typeof lineDiff, { line: any }>).line).text, lineDiff))
-                        continue snippet
-
-                // eslint-disable-next-line no-inner-declarations, no-empty-function
-                function changeIndentDiffsType(arg: any): asserts arg is Array<Extract<typeof indentDiffs[0], { indent: any }>> {}
-                changeIndentDiffsType(indentDiffs)
-
-                if (indentDiffs.length > 0 && position.line !== 0) {
-                    let indentDiffLevel = 0
-                    let indent = document.lineAt(position).firstNonWhitespaceCharacterIndex
-                    for (let i = position.line - 1; i >= 0; i--) {
-                        const line = document.lineAt(i)
-                        const lineText = line.text
-                        const currentIndent = line.firstNonWhitespaceCharacterIndex
-                        // skip empty lines
-                        if (lineText === '') continue
-                        // console.log(i + 1, indent, nextIndent)
-                        if (currentIndent >= indent) continue
-                        if (currentIndent < indent) indent = currentIndent
-                        indentDiffLevel++
-                        // TODO(perf) investigate optimization
-                        for (let i = 0; i < indentDiffs.length; i++) {
-                            const { indent: requiredIndentDiff, ...matchingParams } = indentDiffs[i]!
-                            if (-indentDiffLevel === requiredIndentDiff || requiredIndentDiff === 'up') {
-                                if (!isStringMatches(lineText, matchingParams as any)) console.log('false', currentIndent, line.lineNumber)
-
-                                if (
-                                    !isStringMatches(lineText, matchingParams as any) &&
-                                    (requiredIndentDiff !== 'up' || currentIndent === 0 || line.lineNumber === 0)
-                                )
-                                    continue snippet
-                                indentDiffs.splice(i, 1)
-                                i--
-                            }
-                        }
-
-                        if (indentDiffs.length === 0) break
-                    }
-
-                    if (indentDiffs.length > 0) continue
-                }
+            if (!isOtherLinesMatches(document, position, snippet, regexGroups, debug)) {
+                continue
             }
 
             if (
