@@ -65,6 +65,10 @@
             {
                 "command": "showAllResolvedSnippets",
                 "title": "Show All Resolved Snippets"
+            },
+            {
+                "command": "copySnippetsFromSettingsJson",
+                "title": "Copy Snippets From Settings Json"
             }
         ],
         "menus": {

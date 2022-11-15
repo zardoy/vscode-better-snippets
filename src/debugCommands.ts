@@ -1,5 +1,6 @@
 import * as vscode from 'vscode'
-import { registerExtensionCommand } from 'vscode-framework'
+import { showQuickPick } from '@zardoy/vscode-utils/build/quickPick'
+import { getExtensionSetting, getExtensionSettingId, registerExtensionCommand } from 'vscode-framework'
 import { CustomSnippetUnresolved, TypingSnippetUnresolved } from './configurationType'
 import { getAllExtensionSnippets, mergeSnippetWithDefaults } from './snippet'
 import { getConfigValueFromAllScopes } from './util'
@@ -34,5 +35,39 @@ export default () => {
             language: 'jsonc',
         })
         await vscode.window.showTextDocument(document)
+    })
+    registerExtensionCommand('copySnippetsFromSettingsJson', async () => {
+        const configurationKey = await showQuickPick((['customSnippets', 'typingSnippets'] as const).map(x => ({ label: x, value: x })))
+        if (!configurationKey) return
+        const snippetsSettingValue = getExtensionSetting(configurationKey)
+        const selectedSnippetsToShare = await showQuickPick(
+            snippetsSettingValue.map(snippet => {
+                const name: string = 'name' in snippet ? snippet.name : snippet.sequence
+                return {
+                    label: name,
+                    value: snippet,
+                }
+            }),
+            {
+                canPickMany: true,
+            },
+        )
+        if (!selectedSnippetsToShare) return
+        const extendsGroupsToInclude = {}
+        for (const { extends: extendsGroup } of selectedSnippetsToShare) {
+            if (!extendsGroup) continue
+            const addExtendsGroup = getExtensionSetting('extendsGroups')[extendsGroup]
+            if (!addExtendsGroup) continue
+            extendsGroupsToInclude[extendsGroup] = addExtendsGroup
+        }
+
+        const rootObjectToCopy: Record<string, any> = {
+            [getExtensionSettingId(configurationKey)]: selectedSnippetsToShare,
+        }
+        if (Object.keys(extendsGroupsToInclude).length > 0) {
+            rootObjectToCopy[getExtensionSettingId('extendsGroups')] = extendsGroupsToInclude
+        }
+
+        await vscode.env.clipboard.writeText(JSON.stringify(rootObjectToCopy, undefined, 4))
     })
 }
