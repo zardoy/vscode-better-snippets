@@ -19,8 +19,9 @@ export = function ({ typescript: ts }: { typescript: typeof import('typescript/l
                 if (options?.triggerCharacter === ('betterSnippetsRequest' as any)) {
                     let kind: RequestResponseData['kind'] = 'else'
 
-                    const spanOfEnclosingComment = info.languageService.getSpanOfEnclosingComment(fileName, position, false)
-                    if (spanOfEnclosingComment && spanOfEnclosingComment.start + spanOfEnclosingComment.length !== position) {
+                    const multilineComment = info.languageService.getSpanOfEnclosingComment(fileName, position, true)
+                    const singleLineComment = !multilineComment && !!info.languageService.getSpanOfEnclosingComment(fileName, position, false)
+                    if ((multilineComment && multilineComment.start + multilineComment.length !== position) || singleLineComment) {
                         kind = 'comment'
                     } else {
                         const sourceFile = info.languageService.getProgram()!.getSourceFile(fileName)!

@@ -1,18 +1,33 @@
 {
     "configurations": [
         {
+            "name": "Launch Extension",
             "args": [
                 "--extensionDevelopmentPath=${workspaceFolder}/out",
                 //
                 "--disable-extensions"
             ],
-            "name": "Launch Extension",
             "outFiles": [
                 "${workspaceFolder}/out/**/*.js"
             ],
+            "type": "extensionHost",
             "request": "launch",
-            "type": "extensionHost"
+            "env": {
+                "TSS_DEBUG": "9229",
+                "TSS_REMOTE_DEBUG": "9229"
+            }
         },
+        {
+            "name": "Attach to TS Server",
+            "type": "node",
+            "request": "attach",
+            "protocol": "inspector",
+            "port": 9229,
+            "sourceMaps": true,
+            "outFiles": [
+                "${workspaceFolder}/out/**/*.js"
+            ],
+        }
         // NEVER USE THIS!
         // {
         //     "name": "Launch Tests",

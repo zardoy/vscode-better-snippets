@@ -101,7 +101,7 @@ describe('TypeScript Features', () => {
 
     describe('TS plugin integrations', () => {
         it('Banned code positions', async () => {
-            const [string, { '|': negativePositions, $: positivePositions }] = stringWithPositions('$const a = "|"/*|*/$', ['|', '$'])
+            const [string, { '|': negativePositions, $: positivePositions }] = stringWithPositions('$const a = "|"/*|*/$\n$// |', ['|', '$'])
             await clearEditorText(editor, string)
             const acceptCompletion = async (character: number) => {
                 const pos = new vscode.Position(0, character)
