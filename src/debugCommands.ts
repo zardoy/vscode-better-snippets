@@ -1,16 +1,15 @@
 import * as vscode from 'vscode'
 import { showQuickPick } from '@zardoy/vscode-utils/build/quickPick'
-import { getExtensionSetting, getExtensionSettingId, registerExtensionCommand, VSCodeQuickPickItem } from 'vscode-framework'
+import { getExtensionSetting, getExtensionSettingId, registerExtensionCommand } from 'vscode-framework'
 import { compact } from '@zardoy/utils'
-import { CustomSnippetUnresolved, TypingSnippetUnresolved } from './configurationType'
 import { getAllExtensionSnippets, mergeSnippetWithDefaults } from './snippet'
 import { getConfigValueFromAllScopes } from './util'
 
 export default () => {
     registerExtensionCommand('showAllResolvedSnippets', async () => {
         // todo reuse getters from views.ts
-        const customUser = (getConfigValueFromAllScopes('customSnippets') as CustomSnippetUnresolved[]).map(snippet => mergeSnippetWithDefaults(snippet))
-        const typingUser = (getConfigValueFromAllScopes('typingSnippets') as TypingSnippetUnresolved[]).map(snippet => mergeSnippetWithDefaults(snippet))
+        const customUser = getConfigValueFromAllScopes('customSnippets').map(snippet => mergeSnippetWithDefaults(snippet))
+        const typingUser = getConfigValueFromAllScopes('typingSnippets').map(snippet => mergeSnippetWithDefaults(snippet))
 
         const customExt = getAllExtensionSnippets('customSnippets')
         const typingExt = getAllExtensionSnippets('typingSnippets')

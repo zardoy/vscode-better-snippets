@@ -1,4 +1,5 @@
 import * as vscode from 'vscode'
+import { Simplify } from 'type-fest'
 import { snippetLocation } from './constants'
 // import { SyntaxKind } from 'typescript/lib/tsserverlibrary'
 
@@ -46,6 +47,8 @@ export type GeneralSnippet = {
      * }]
      */
     body: string | string[] | false
+    /** @suggestSortText "3" */
+    extends?: string
     /**
      * @suggestSortText "4"
      */
@@ -180,11 +183,6 @@ export type TypingSnippetUnresolved = GeneralSnippet & {
     }
 }
 
-type TypingSnippetResolved = (Pick<TypingSnippetUnresolved, 'body' | 'sequence'> | { /** @suggestSortText "3" */ extends: string }) &
-    Omit<TypingSnippetUnresolved, 'body' | 'sequence'>
-type CustomSnippetResolved = (Pick<CustomSnippetUnresolved, 'body' | 'name'> | { /** @suggestSortText "3" */ extends: string }) &
-    Omit<CustomSnippetUnresolved, 'body' | 'name'>
-
 export type Configuration = {
     /**
      * Include builtin JS/MD snippets
@@ -231,11 +229,11 @@ export type Configuration = {
     /**
      * @suggestSortText betterSnippets.1
      */
-    customSnippets: CustomSnippetResolved[]
+    customSnippets: Array<Simplify<CustomSnippetUnresolved>>
     /**
      * @suggestSortText betterSnippets.2
      */
-    typingSnippets: TypingSnippetResolved[]
+    typingSnippets: Array<Simplify<TypingSnippetUnresolved>>
     /** @default true */
     typingSnippetsUndoStops: boolean
     /**
@@ -254,7 +252,10 @@ export type Configuration = {
      * @default true
      * */
     'snippetCreator.showSnippetAfterCreation': boolean
-    /** Override default values for every snippet */
+    /**
+     * Override default values for every snippet
+     * @additionalProperties false
+     */
     customSnippetDefaults: {
         sortText?: string
         iconType?: SnippetType

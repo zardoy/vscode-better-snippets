@@ -29,7 +29,6 @@ import {
 import { getAllLoadedSnippets } from './loadedSnippets'
 import registerForceInsertSnippet from './forceInsertSnippet'
 import { ExposedExtensionApi } from './extensionApi'
-import { TypingSnippetUnresolved } from './configurationType'
 import registerDebugCommands from './debugCommands'
 import { isOtherLinesMatches } from './otherLines'
 
@@ -154,7 +153,7 @@ export const activate = () => {
 
         const snippetsToLoadByLang = getAllLoadedSnippets()
         const typingSnippets: CustomTypingSnippet[] = [
-            ...(getConfigValueFromAllScopes('typingSnippets') as TypingSnippetUnresolved[]).map(snippet => mergeSnippetWithDefaults(snippet)),
+            ...getConfigValueFromAllScopes('typingSnippets').map(snippet => mergeSnippetWithDefaults(snippet)),
             ...getAllExtensionSnippets('typingSnippets'),
         ]
         const snippetsToLoadFlattened = [...Object.values(snippetsToLoadByLang).flat(1), ...typingSnippets]

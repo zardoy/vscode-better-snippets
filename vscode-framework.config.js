@@ -40,6 +40,23 @@ const config = defineConfig({
                 },
             }
         },
+        ({ generatedManifest }) => {
+            // @ts-ignore
+            const { properties } = generatedManifest.contributes.configuration
+            for (const [i, key] of ['betterSnippets.customSnippets', 'betterSnippets.typingSnippets'].entries()) {
+                const snippetsProp = properties[key].items
+                const requiredProps = [[i ? 'sequence' : 'name', 'body'], ['extends']]
+                snippetsProp.anyOf = requiredProps.map(props => ({ required: props }))
+                snippetsProp.required = undefined
+                snippetsProp.additionalProperties = false
+                snippetsProp.patternProperties = {
+                    '^\\$': {},
+                }
+            }
+
+            properties['betterSnippets.extendsGroups'].additionalProperties.additionalProperties = false
+            return {}
+        },
     ],
 })
 

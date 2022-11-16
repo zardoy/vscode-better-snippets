@@ -5,7 +5,6 @@ import { CommandHandler, getExtensionCommandId, getExtensionContributionsPrefix,
 import { groupBy, sort } from 'rambda'
 import { watchExtensionSettings } from '@zardoy/vscode-utils/build/settings'
 import { CommonSnippet, getSnippetsSettingValue, RevealSnippetOptions } from './settingsJsonSnippetCommands'
-import { GeneralSnippet } from './configurationType'
 import { getSnippetsDefaults, mergeSnippetWithDefaults, normalizeWhenLangs } from './snippet'
 
 const SCHEME = `${getExtensionContributionsPrefix()}virtualSnippets`

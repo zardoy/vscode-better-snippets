@@ -26,5 +26,5 @@ experiment-*
 
 out
 src/generated.ts
-# TODO have no idea why TJS generates it
 src/configurationType.js
+src/configurationTypeCache.jsonc

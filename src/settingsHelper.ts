@@ -1,6 +1,6 @@
 import * as vscode from 'vscode'
 import { findNodeAtLocation, getLocation, getNodeValue, JSONPath, Node, parseTree } from 'jsonc-parser'
-import { getExtensionSettingId } from 'vscode-framework'
+import { extensionCtx, getExtensionSettingId } from 'vscode-framework'
 import { getJsonCompletingInfo, jsonPathEquals, jsonValuesToCompletions } from '@zardoy/vscode-utils/build/jsonCompletions'
 import { oneOf } from '@zardoy/utils'
 import { uniqBy } from 'lodash'
@@ -198,9 +198,28 @@ export default () => {
 
     vscode.languages.registerHoverProvider(selector, {
         provideHover(document: vscode.TextDocument, position: vscode.Position, token: any) {
+            const location = getLocation(document.getText(), document.offsetAt(position))
+            if (location.isAtPropertyKey && location.path[0]?.toString().startsWith('betterSnippets')) {
+                const diagnosticUnderCursor = vscode.languages.getDiagnostics(document.uri).find(({ range }) => range.contains(position))
+                const unknownSnippetProp = diagnosticUnderCursor && /Property (\w+) is not allowed./.exec(diagnosticUnderCursor.message)?.[1]
+                if (unknownSnippetProp) {
+                    const allPossibleWhenProps: string[] = []
+                    for (const { properties } of extensionCtx.extension.packageJSON.contributes.configuration.properties['betterSnippets.customSnippets'].items
+                        .properties.when.allOf) {
+                        allPossibleWhenProps.push(...Object.keys(properties))
+                    }
+
+                    if (allPossibleWhenProps.includes(unknownSnippetProp)) {
+                        return {
+                            contents: [new vscode.MarkdownString(`Did you mean to move \`${unknownSnippetProp}\` to \`when\` clause?`)],
+                        }
+                    }
+                }
+            }
+
             const sharedParsingInfo = getSharedParsingInfo(document, position)
             if (!sharedParsingInfo) return
-            const { isAnySnippet, localPath, insideStringRange, nodeValue } = sharedParsingInfo
+            const { nodeValue, insideStringRange, isAnySnippet, localPath } = sharedParsingInfo
             if (!insideStringRange) return
             let providerResult: vscode.Hover | undefined
             try {
