@@ -1,10 +1,8 @@
 //@ts-check
 import buildTsPlugin from '@zardoy/vscode-utils/build/buildTypescriptPlugin.js'
 
-const prod = process.argv[2] === 'prod'
+const watch = process.argv[2] === '--watch'
 
 await buildTsPlugin('typescript-plugin', undefined, undefined, {
-    logLevel: 'info',
-    watch: !prod,
-    minify: prod,
+    minify: !watch,
 })
