@@ -60,6 +60,25 @@ export = function ({ typescript: ts }: { typescript: typeof import('typescript/l
                 return info.languageService.getCompletionsAtPosition(fileName, position, options)
             }
 
+            const disableSyntaxErrorsInViewEditor = () => {
+                if (info.project.projectKind !== ts.server.ProjectKind.Inferred) return
+                const openedFiles = [...(info.project.projectService.openFiles.keys() as any)] as string[]
+                let ourFileRoot: string | undefined
+                for (const openedFile of openedFiles) {
+                    const beforeRootIdx = openedFile.indexOf('/^/bettersnippets.virtualsnippets/')
+                    if (beforeRootIdx === -1) continue
+                    ourFileRoot = openedFile.slice(0, beforeRootIdx)
+                    break
+                }
+                let currentRoot = info.languageServiceHost.getCurrentDirectory().toLowerCase()
+                if (currentRoot === '/') currentRoot = ''
+                if (ourFileRoot === undefined || currentRoot !== ourFileRoot) {
+                    return
+                }
+                proxy.getSyntacticDiagnostics = () => []
+            }
+            disableSyntaxErrorsInViewEditor()
+
             return proxy
         },
         onConfigurationChanged(config: any) {
