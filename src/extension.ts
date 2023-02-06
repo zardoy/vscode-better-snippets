@@ -410,7 +410,9 @@ export const activate = () => {
                         }
                         // #endregion
 
-                        if (body !== false && isSnippet) await editor.insertSnippet(new vscode.SnippetString(body))
+                        if (body !== false && isSnippet)
+                            await editor.insertSnippet(new vscode.SnippetString(body), editor.selection.start.translate(undefined, -snippet.sequence.length))
+
                         if (executeCommand) {
                             // TODO extract fn
                             const command = typeof executeCommand === 'string' ? { command: executeCommand, arguments: [] } : executeCommand
