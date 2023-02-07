@@ -57,7 +57,7 @@ export const activate = () => {
         const log = (...args) => console.log(`[${debugType}]`, ...args)
         const debug = (...args) => console.debug(`[${debugType}]`, ...args)
         log(displayLanguage, 'for', snippets.length, 'snippets')
-        const getSnippetDebugName = (snippet: typeof snippets[number]) => ('name' in snippet ? snippet.name : snippet.sequence)
+        const getSnippetDebugName = (snippet: (typeof snippets)[number]) => ('name' in snippet ? snippet.name : snippet.sequence)
         debug('Active snippets:', snippets.map(getSnippetDebugName))
 
         const line = document.lineAt(position.line)

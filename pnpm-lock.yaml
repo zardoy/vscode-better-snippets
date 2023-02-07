@@ -39,7 +39,6 @@ specifiers:
   mocha: ^9.2.0
   modify-json-file: ^1.2.2
   path-browserify: ^1.0.1
-  prettier: ^2.5.1
   rambda: ^6.9.0
   rimraf: ^3.0.2
   string-dedent: ^2.0.0
@@ -66,7 +65,6 @@ dependencies:
   lodash: 4.17.21
   modify-json-file: 1.2.2
   path-browserify: 1.0.1
-  prettier: 2.5.1
   rambda: 6.9.0
   string-dedent: 2.0.0
   ts-essentials: 9.1.2_typescript@4.8.4
@@ -4088,12 +4086,6 @@ packages:
     resolution: {integrity: sha512-vkcDPrRZo1QZLbn5RLGPpg/WmIQ65qoWWhcGKf/b5eplkkarX0m9z8ppCat4mlOqUsWpyNuYgO3VRyrYHSzX5g==}
     engines: {node: '>= 0.8.0'}
     dev: true
-
-  /prettier/2.5.1:
-    resolution: {integrity: sha512-vBZcPRUR5MZJwoyi3ZoyQlc1rXeEck8KgeC9AwwOn+exuxLxq5toTRDTSaVrXHxelDMHy9zlicw8u66yxoSUFg==}
-    engines: {node: '>=10.13.0'}
-    hasBin: true
-    dev: false
 
   /pretty-format/27.5.1:
     resolution: {integrity: sha512-Qb1gy5OrP5+zDf2Bvnzdl3jsTf1qXVMazbvCoKhtKqVs4/YK4ozX4gKQJJVyNe+cajNPn0KoC0MC3FUmaHWEmQ==}

@@ -3,7 +3,7 @@ import { Simplify } from 'type-fest'
 import { snippetLocation } from './constants'
 // import { SyntaxKind } from 'typescript/lib/tsserverlibrary'
 
-export type SnippetLocation = typeof snippetLocation[number]
+export type SnippetLocation = (typeof snippetLocation)[number]
 
 type CommandDefinition =
     | string
