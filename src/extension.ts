@@ -4,6 +4,7 @@ import { SnippetParser } from 'vscode-snippet-parser'
 import { extensionCtx, getExtensionCommandId, getExtensionSetting, getExtensionSettingId } from 'vscode-framework'
 import { ensureHasProp, oneOf } from '@zardoy/utils'
 import escapeStringRegexp from 'escape-string-regexp'
+import * as semver from 'semver'
 import { completionAddTextEdit, getConfigValueFromAllScopes, normalizeFilePathRegex, objectUndefinedIfEmpty } from './util'
 import { registerExperimentalSnippets } from './experimentalSnippets'
 import { CompletionInsertArg, registerCompletionInsert } from './completionInsert'
@@ -304,6 +305,7 @@ export const activate = () => {
             // TODO losing errors here for some reason
             vscode.workspace.onDidChangeTextDocument(
                 ({ contentChanges, document, reason }) => {
+                    // eslint-disable-next-line complexity
                     ;(async () => {
                         // ignore if nothing is changed
                         if (contentChanges.length === 0) return
@@ -410,8 +412,11 @@ export const activate = () => {
                         }
                         // #endregion
 
-                        if (body !== false && isSnippet)
-                            await editor.insertSnippet(new vscode.SnippetString(body), editor.selection.start.translate(undefined, -snippet.sequence.length))
+                        if (body !== false && isSnippet) {
+                            const useNewVscodeHack = semver.compare(vscode.version, '1.74.0') >= 0
+                            const insertPos = useNewVscodeHack ? editor.selection.start.translate(undefined, -snippet.sequence.length) : undefined
+                            await editor.insertSnippet(new vscode.SnippetString(body), insertPos)
+                        }
 
                         if (executeCommand) {
                             // TODO extract fn
