@@ -2,19 +2,29 @@
 import * as vscode from 'vscode'
 import { expect } from 'chai'
 import delay from 'delay'
+import { after } from 'mocha'
 import { Configuration } from '../../../src/configurationType'
 import { clearEditorText } from './utils'
 
-describe('Typing snippets', () => {
+describe.only('Typing snippets', () => {
     const resultingBody = 'EXAMPLE'
     const triggerSequence = 'cb '
     const triggerSequenceWithoutBody = 'cbb'
+    const triggerSequenceWithMultilineBody = 'cm '
 
     let editor: vscode.TextEditor
     let document: vscode.TextDocument
 
     const typeSequence = async (seq: string) => {
         for (const letter of seq) await vscode.commands.executeCommand('type', { text: letter })
+    }
+
+    let preserveContentMode = true
+    const setPreserveContentMode = async (newMode: boolean) => {
+        await vscode.workspace
+            .getConfiguration('betterSnippets')
+            .update('typingSnippetsUndoBehavior', newMode ? 'sequence-content' : 'no-sequence-content', vscode.ConfigurationTarget.Global)
+        preserveContentMode = newMode
     }
 
     /** With delay, enough for comparing triggered result */
@@ -24,7 +34,7 @@ describe('Typing snippets', () => {
             await new Promise<void>(resolve => {
                 let isFirst = true
                 const { dispose } = vscode.workspace.onDidChangeTextDocument(() => {
-                    if (isFirst) {
+                    if (!preserveContentMode && isFirst) {
                         isFirst = false
                         return
                     }
@@ -61,6 +71,13 @@ describe('Typing snippets', () => {
                         languages: ['markdown'],
                     },
                     executeCommand: '_dummyCommand1',
+                },
+                {
+                    sequence: triggerSequenceWithMultilineBody,
+                    body: '1\n\t1\n1',
+                    when: {
+                        languages: ['markdown'],
+                    },
                 },
             ]
             await vscode.workspace.getConfiguration('betterSnippets').update(configKey, configValue, vscode.ConfigurationTarget.Global)
@@ -141,5 +158,44 @@ describe('Typing snippets', () => {
         const lines = document.getText().split('\n')
         expect(lines[0]).to.equal(`${resultingBody}-${resultingBody}__${resultingBody}`)
         expect(lines[1]).to.equal(resultingBody)
+    })
+
+    it('Undo behavior (preserve content)', async () => {
+        await clearEditorText(editor)
+        await typeSequenceWithDelay(triggerSequence)
+        await vscode.commands.executeCommand('undo')
+        expect(document.getText()).to.equal(triggerSequence)
+        expect(editor.selections.length).to.equal(1)
+        expect(editor.selection.start.isEqual(editor.selection.end)).to.equal(true)
+        expect(editor.selection.start.character).to.equal(triggerSequence.length)
+    })
+
+    async function enablePreserveContentMode() {
+        await setPreserveContentMode(false)
+        after(async () => {
+            return setPreserveContentMode(true)
+        })
+    }
+
+    it('Undo behavior (dont preserve content)', async () => {
+        await enablePreserveContentMode()
+
+        await clearEditorText(editor)
+        await typeSequenceWithDelay(triggerSequence)
+        await vscode.commands.executeCommand('undo')
+        expect(document.getText()).to.equal('')
+    })
+
+    it('Multiline whitespace adjustments', async () => {
+        editor.options.insertSpaces = false
+        await doTest()
+        await enablePreserveContentMode()
+        await doTest()
+
+        async function doTest() {
+            await clearEditorText(editor, '\t')
+            await typeSequenceWithDelay(triggerSequenceWithMultilineBody)
+            expect(document.getText()).to.equal('\t1\n\t\t1\n\t1')
+        }
     })
 })
