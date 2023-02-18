@@ -18,6 +18,7 @@ specifiers:
   '@types/mocha': ^9.1.0
   '@types/node': ^16.11.25
   '@types/path-browserify': ^1.0.0
+  '@types/semver': ^7.3.13
   '@types/vscode': 1.64.0
   '@vscode/test-electron': ^2.1.5
   '@zardoy/tsconfig': ^1.4.0
@@ -39,9 +40,9 @@ specifiers:
   mocha: ^9.2.0
   modify-json-file: ^1.2.2
   path-browserify: ^1.0.1
-  prettier: ^2.5.1
   rambda: ^6.9.0
   rimraf: ^3.0.2
+  semver: ^7.3.8
   string-dedent: ^2.0.0
   ts-essentials: ^9.1.2
   tsm: ^2.2.1
@@ -66,8 +67,8 @@ dependencies:
   lodash: 4.17.21
   modify-json-file: 1.2.2
   path-browserify: 1.0.1
-  prettier: 2.5.1
   rambda: 6.9.0
+  semver: 7.3.8
   string-dedent: 2.0.0
   ts-essentials: 9.1.2_typescript@4.8.4
   type-fest: 2.11.2
@@ -85,6 +86,7 @@ devDependencies:
   '@types/mocha': 9.1.0
   '@types/node': 16.11.25
   '@types/path-browserify': 1.0.0
+  '@types/semver': 7.3.13
   '@types/vscode': 1.64.0
   '@vscode/test-electron': 2.1.5
   '@zardoy/tsconfig': 1.4.0_typescript@4.8.4
@@ -3499,7 +3501,6 @@ packages:
     engines: {node: '>=10'}
     dependencies:
       yallist: 4.0.0
-    dev: true
 
   /magic-string/0.22.5:
     resolution: {integrity: sha512-oreip9rJZkzvA8Qzk9HFs8fZGF/u7H/gtrE8EN6RjKJ9kh2HlC+yQ2QezifqTZfGyiuAV0dRv5a+y/8gBb1m9w==}
@@ -4089,12 +4090,6 @@ packages:
     engines: {node: '>= 0.8.0'}
     dev: true
 
-  /prettier/2.5.1:
-    resolution: {integrity: sha512-vBZcPRUR5MZJwoyi3ZoyQlc1rXeEck8KgeC9AwwOn+exuxLxq5toTRDTSaVrXHxelDMHy9zlicw8u66yxoSUFg==}
-    engines: {node: '>=10.13.0'}
-    hasBin: true
-    dev: false
-
   /pretty-format/27.5.1:
     resolution: {integrity: sha512-Qb1gy5OrP5+zDf2Bvnzdl3jsTf1qXVMazbvCoKhtKqVs4/YK4ozX4gKQJJVyNe+cajNPn0KoC0MC3FUmaHWEmQ==}
     engines: {node: ^10.13.0 || ^12.13.0 || ^14.15.0 || >=15.0.0}
@@ -4391,7 +4386,6 @@ packages:
     hasBin: true
     dependencies:
       lru-cache: 6.0.0
-    dev: true
 
   /sentence-case/3.0.4:
     resolution: {integrity: sha512-8LS0JInaQMCRoQ7YUytAo/xUu5W2XnQxV2HI/6uM6U7CITS1RqPElr30V6uIqyMKM9lJGRVFy5/4CuzcixNYSg==}
@@ -5316,7 +5310,6 @@ packages:
 
   /yallist/4.0.0:
     resolution: {integrity: sha512-3wdGidZyq5PB084XLES5TpOSRA3wjXAlIWMhum2kRcv/41Sn2emQ0dycQW4uZXLejwKvg6EsvbdlVL+FYEct7A==}
-    dev: true
 
   /yaml/1.10.2:
     resolution: {integrity: sha512-r3vXyErRCYJ7wg28yvBY5VSoAF8ZvlcW9/BwUzEtUsjvX/DKs24dIkuwjtuprwJJHsbyUbLApepYTR1BN4uHrg==}

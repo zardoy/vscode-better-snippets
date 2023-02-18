@@ -4,6 +4,7 @@ import { SnippetParser } from 'vscode-snippet-parser'
 import { extensionCtx, getExtensionCommandId, getExtensionSetting, getExtensionSettingId } from 'vscode-framework'
 import { ensureHasProp, oneOf } from '@zardoy/utils'
 import escapeStringRegexp from 'escape-string-regexp'
+import * as semver from 'semver'
 import { completionAddTextEdit, getConfigValueFromAllScopes, normalizeFilePathRegex, objectUndefinedIfEmpty } from './util'
 import { registerExperimentalSnippets } from './experimentalSnippets'
 import { CompletionInsertArg, registerCompletionInsert } from './completionInsert'
@@ -57,7 +58,7 @@ export const activate = () => {
         const log = (...args) => console.log(`[${debugType}]`, ...args)
         const debug = (...args) => console.debug(`[${debugType}]`, ...args)
         log(displayLanguage, 'for', snippets.length, 'snippets')
-        const getSnippetDebugName = (snippet: typeof snippets[number]) => ('name' in snippet ? snippet.name : snippet.sequence)
+        const getSnippetDebugName = (snippet: (typeof snippets)[number]) => ('name' in snippet ? snippet.name : snippet.sequence)
         debug('Active snippets:', snippets.map(getSnippetDebugName))
 
         const line = document.lineAt(position.line)
@@ -298,18 +299,26 @@ export const activate = () => {
                 updateStatusBarSeq()
             }
 
-            // TODO review implementation as its still blurry. Describe it graphically
-            let internalDocumentChange = false
+            let justInsertedTypingSnippet = false
+            let justDidTypingSnippetUndo = false
 
             // TODO losing errors here for some reason
             vscode.workspace.onDidChangeTextDocument(
                 ({ contentChanges, document, reason }) => {
+                    // eslint-disable-next-line complexity
                     ;(async () => {
                         // ignore if nothing is changed
                         if (contentChanges.length === 0) return
                         const editor = vscode.window.activeTextEditor
                         if (document.uri !== editor?.document.uri || ['output'].includes(editor.document.uri.scheme)) return
-                        if (internalDocumentChange || vscode.workspace.fs.isWritableFileSystem(document.uri.scheme) === false) return
+                        if (vscode.workspace.fs.isWritableFileSystem(document.uri.scheme) === false) return
+
+                        if (reason === vscode.TextDocumentChangeReason.Undo && justInsertedTypingSnippet) {
+                            // HACK: When you do editor.insertSnippet with range, then undo that range gets selected for some reason. Super annoying
+                            justDidTypingSnippetUndo = true
+                            // onDidChangeTextEditorSelection gets called after onDidChangeTextDocument
+                            justInsertedTypingSnippet = false
+                        }
 
                         if (oneOf(reason, vscode.TextDocumentChangeReason.Undo, vscode.TextDocumentChangeReason.Redo)) {
                             resetSequence()
@@ -357,60 +366,67 @@ export const activate = () => {
                         if (appliableTypingSnippets.length > 2) console.warn(`Multiple appliable typing snippets found: ${appliableTypingSnippets.join(', ')}`)
                         const snippet = appliableTypingSnippets[0]
                         if (!snippet) return
+
                         console.log('Applying typing snippet', snippet.sequence)
                         const { body, executeCommand, resolveImports } = snippet
-                        // TODO continue exploration
-                        // const isSnippet = body !== false && /(?<!\\)\$/.exec(body)
-                        const isSnippet = true
                         if (body !== false) {
+                            const replaceAlgorithm = getExtensionSetting('typingSnippetsUndoBehavior')
+
+                            const rangesToReplace = [] as vscode.Range[]
+                            let previousLineNum = -1
+                            let sameLinePos = 0
+                            for (const { range } of contentChanges) {
+                                // we can safely do this, as contentChanges is sorted
+                                if (previousLineNum === range.start.line) {
+                                    sameLinePos++
+                                } else {
+                                    previousLineNum = range.start.line
+                                    sameLinePos = 0
+                                }
+
+                                // start = end, which indicates where a character was typed,
+                                // so we're always ahead of 1+N character, where N is zero-based number of position on the same line
+                                // because of just typed letter + just typed letter in previous positions
+                                const endPosition = range.start.translate(0, 1 + sameLinePos)
+
+                                const negativeStartOffset =
+                                    snippet.metadata?.removeContentAfterCurrentContent === false
+                                        ? snippet.metadata.removeContentNegativeOffset
+                                        : snippet.sequence.length + (snippet.metadata?.removeContentNegativeOffset ?? 0)
+                                const startPosition = endPosition.translate(0, -negativeStartOffset)
+                                const fixedRange = new vscode.Range(startPosition, endPosition)
+                                rangesToReplace.push(fixedRange)
+                            }
+
                             // #region remove sequence content
-                            await new Promise<void>(resolve => {
-                                internalDocumentChange = true
-                                const { dispose } = vscode.workspace.onDidChangeTextDocument(({ document }) => {
-                                    if (document.uri !== editor?.document.uri) return
-                                    internalDocumentChange = false
-                                    dispose()
-                                    resolve()
-                                })
-                                const insertingBody = isSnippet ? undefined : body.replace(/\\\$/g, '$$')
-                                void editor.edit(
+                            if (replaceAlgorithm === 'no-sequence-content') {
+                                await editor.edit(
                                     builder => {
-                                        let previousLineNum = -1
-                                        let sameLinePos = 0
-                                        for (const { range } of contentChanges) {
-                                            // we can safely do this, as contentChanges is sorted
-                                            if (previousLineNum === range.start.line) {
-                                                sameLinePos++
-                                            } else {
-                                                previousLineNum = range.start.line
-                                                sameLinePos = 0
-                                            }
-
-                                            // start = end, which indicates where a character was typed,
-                                            // so we're always ahead of 1+N character, where N is zero-based number of position on the same line
-                                            // because of just typed letter + just typed letter in previous positions
-                                            const endPosition = range.start.translate(0, 1 + sameLinePos)
-
-                                            const negativeStartOffset =
-                                                snippet.metadata?.removeContentAfterCurrentContent === false
-                                                    ? snippet.metadata.removeContentNegativeOffset
-                                                    : snippet.sequence.length + (snippet.metadata?.removeContentNegativeOffset ?? 0)
-                                            const startPosition = endPosition.translate(0, -negativeStartOffset)
-                                            const fixedRange = new vscode.Range(startPosition, endPosition)
-                                            builder.delete(fixedRange)
-                                            if (insertingBody) builder.insert(fixedRange.start, insertingBody)
+                                        for (const range of rangesToReplace) {
+                                            builder.delete(range)
                                         }
                                     },
                                     {
-                                        undoStopBefore: getExtensionSetting('typingSnippetsUndoStops'),
+                                        // used to be true
+                                        undoStopBefore: false,
                                         undoStopAfter: false,
                                     },
                                 )
-                            })
-                        }
-                        // #endregion
+                            }
+                            // #endregion
 
-                        if (body !== false && isSnippet) await editor.insertSnippet(new vscode.SnippetString(body))
+                            let replaceRanges: vscode.Range[] | vscode.Position[] | undefined
+                            if (replaceAlgorithm === 'sequence-content') {
+                                replaceRanges = rangesToReplace
+                            }
+
+                            await editor.insertSnippet(new vscode.SnippetString(body), replaceRanges, {
+                                undoStopBefore: true,
+                                undoStopAfter: false,
+                            })
+                            justInsertedTypingSnippet = true
+                        }
+
                         if (executeCommand) {
                             // TODO extract fn
                             const command = typeof executeCommand === 'string' ? { command: executeCommand, arguments: [] } : executeCommand
@@ -436,6 +452,12 @@ export const activate = () => {
                 ({ textEditor, kind, selections }) => {
                     const { document } = textEditor
                     if (document.uri !== vscode.window.activeTextEditor?.document.uri) return
+                    if (justDidTypingSnippetUndo) {
+                        justDidTypingSnippetUndo = false
+                        textEditor.selections = selections.map(({ end }) => new vscode.Selection(end, end))
+                        return
+                    }
+
                     // reset on mouse click
                     if (oneOf(kind, vscode.TextEditorSelectionChangeKind.Mouse)) {
                         resetSequence()

@@ -33,7 +33,7 @@ export const isOtherLinesMatches = (
     changeIndentDiffsType(lineMatchers, true)
     changeIndentDiffsType(indentMatchers, false)
 
-    const isLineMatches = (lineText: string | null | undefined, testAgainst: typeof when.otherLines[number]) => {
+    const isLineMatches = (lineText: string | null | undefined, testAgainst: (typeof when.otherLines)[number]) => {
         if (typeof lineText !== 'string') {
             if ('displayIfNoLine' in testAgainst && testAgainst.displayIfNoLine) return true
             return false

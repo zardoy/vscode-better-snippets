@@ -63,7 +63,7 @@ export const registerCompletionInsert = () => {
                         await editor.edit(
                             editBuilder => {
                                 // not using workspace.applyEdit() to not make accidental changes (eg something in other documents)
-                                for (const { edit } of (codeFix.edit as any)._edits) editBuilder.replace(edit._range, edit._newText)
+                                for (const { range, newText } of codeFix.edit!.get(document.uri)) editBuilder.replace(range, newText)
                             },
                             {
                                 undoStopAfter: false,

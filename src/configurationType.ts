@@ -3,7 +3,7 @@ import { Simplify } from 'type-fest'
 import { snippetLocation } from './constants'
 // import { SyntaxKind } from 'typescript/lib/tsserverlibrary'
 
-export type SnippetLocation = typeof snippetLocation[number]
+export type SnippetLocation = (typeof snippetLocation)[number]
 
 type CommandDefinition =
     | string
@@ -234,8 +234,15 @@ export type Configuration = {
      * @suggestSortText betterSnippets.2
      */
     typingSnippets: Array<Simplify<TypingSnippetUnresolved>>
-    /** @default true */
-    typingSnippetsUndoStops: boolean
+    // * Which method to use to replace typing sequence with snippet.
+    /**
+     * What behavior is expected on undo after typing snippet was applied.
+     *
+     * - sequence-content - preserve sequence content.
+     * - no-sequence-content - you'll have no sequence content in editor, but it pushes additional undo stack so you can return to typed sequence with second undo.
+     * @default sequence-content
+     */
+    typingSnippetsUndoBehavior: 'sequence-content' | 'no-sequence-content'
     /**
      * Note that, currently regex are executed against first position only for now!
      * @default true
