@@ -1,10 +1,11 @@
 import * as vscode from 'vscode'
 import { normalizeRegex } from '@zardoy/vscode-utils/build/settings'
 import { SnippetParser } from 'vscode-snippet-parser'
-import { extensionCtx, getExtensionCommandId, getExtensionSetting, getExtensionSettingId } from 'vscode-framework'
+import { extensionCtx, getExtensionCommandId, getExtensionSetting, getExtensionSettingId, registerActiveDevelopmentCommand } from 'vscode-framework'
 import { ensureHasProp, oneOf } from '@zardoy/utils'
 import escapeStringRegexp from 'escape-string-regexp'
-import * as semver from 'semver'
+import { getActiveRegularEditor } from '@zardoy/vscode-utils'
+import { offsetPosition } from '@zardoy/vscode-utils/build/position'
 import { completionAddTextEdit, getConfigValueFromAllScopes, normalizeFilePathRegex, objectUndefinedIfEmpty } from './util'
 import { registerExperimentalSnippets } from './experimentalSnippets'
 import { CompletionInsertArg, registerCompletionInsert } from './completionInsert'
@@ -284,6 +285,9 @@ export const activate = () => {
             let lastTypedSeq = ''
             let lastTypePosition = null as null | vscode.Position
 
+            let justInsertedTypingSnippet = false
+            let justDidTypingSnippetUndo = false
+
             // for easier debuging during development
             const statusBarSeq = process.env.NODE_ENV === 'development' ? vscode.window.createStatusBarItem() : undefined
             statusBarSeq?.show()
@@ -299,10 +303,6 @@ export const activate = () => {
                 updateStatusBarSeq()
             }
 
-            let justInsertedTypingSnippet = false
-            let justDidTypingSnippetUndo = false
-
-            // TODO losing errors here for some reason
             vscode.workspace.onDidChangeTextDocument(
                 ({ contentChanges, document, reason }) => {
                     // eslint-disable-next-line complexity
@@ -329,10 +329,20 @@ export const activate = () => {
                         // ensure we ALWAYS work with first position only in case of multicursor
                         contentChanges = [...contentChanges].sort((a, b) => a.range.start.compareTo(b.range.start))
                         const char = contentChanges[0]?.text
-                        // also reseting on content pasting
+                        // also resetting on content pasting
                         if (char?.length !== 1) {
                             resetSequence()
                             return
+                        }
+
+                        const selectionsSorted = [...editor.selections].sort((a, b) => a.start.compareTo(b.start))
+                        for (const [i, contentChange] of contentChanges.entries()) {
+                            const { range } = contentChange
+                            const selection = selectionsSorted[i]
+                            if (!selection || !selection.start.isEqual(selection.end) || !range.start.isEqual(selection.start)) {
+                                resetSequence()
+                                return
+                            }
                         }
 
                         if (!getExtensionSetting('typingSnippetsEnableMulticursor') && contentChanges.length > 1) {
@@ -448,6 +458,13 @@ export const activate = () => {
                 undefined,
                 disposables,
             )
+            registerActiveDevelopmentCommand(async () => {
+                for (const [i, c] of ['c', 'b', ' '].entries()) {
+                    await getActiveRegularEditor()?.edit(edit => {
+                        edit.insert(new vscode.Position(0, i), c)
+                    })
+                }
+            })
             vscode.window.onDidChangeTextEditorSelection(
                 ({ textEditor, kind, selections }) => {
                     const { document } = textEditor
@@ -473,8 +490,8 @@ export const activate = () => {
                         return
                     }
 
-                    // curosr moved from last TYPING position or
-                    // curosr moved to the start of line: reset sequence!
+                    // cursor moved from last TYPING position or
+                    // to the start of line: reset sequence!
                     if (lastTypePosition && (newPos.character === 0 || !lastTypePosition.isEqual(newPos.translate(0, -1)))) resetSequence()
                 },
                 undefined,
