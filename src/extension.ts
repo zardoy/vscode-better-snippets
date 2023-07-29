@@ -339,7 +339,7 @@ export const activate = () => {
                         for (const [i, contentChange] of contentChanges.entries()) {
                             const { range } = contentChange
                             const selection = selectionsSorted[i]
-                            if (!selection || !selection.start.isEqual(selection.end) || !range.start.isEqual(selection.start)) {
+                            if (!selection || !range.start.isEqual(selection.start)) {
                                 resetSequence()
                                 return
                             }
