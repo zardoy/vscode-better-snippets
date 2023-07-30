@@ -21,13 +21,23 @@
             "name": "Attach to TS Server",
             "type": "node",
             "request": "attach",
-            "protocol": "inspector",
             "port": 9229,
             "sourceMaps": true,
             "outFiles": [
                 "${workspaceFolder}/out/**/*.js"
             ],
-        }
+        },
+        {
+            "type": "node",
+            "request": "attach",
+            "restart": true,
+            "name": "Attach to Extension Host",
+            "timeout": 0,
+            "port": 5870,
+            "outFiles": [
+                "${workspaceFolder}/out/**/*.js",
+            ]
+        },
         // NEVER USE THIS!
         // {
         //     "name": "Launch Tests",
